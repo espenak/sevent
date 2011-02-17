@@ -4,3 +4,11 @@ build/
 *.a
 .*.swp
 *~
+*.cmake
+Makefile
+CMakeFiles/
+CMakeCache.txt
+.project
+.cproject
+src/.DS_Store
+.settings/
