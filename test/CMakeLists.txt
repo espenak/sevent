@@ -1,6 +1,7 @@
 include_directories(${sevent_SOURCE_DIR})
 add_executable(Example Example.cc)
 target_link_libraries(Example sevent_socket)
+target_link_libraries(Example ${Boost_LIBRARIES})
 
 function(add_boost_test testname)
 	add_executable(${testname} ${ARGV})

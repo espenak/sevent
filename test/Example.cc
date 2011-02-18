@@ -39,8 +39,7 @@ int main(int argc, const char *argv[])
     AsioSocketConnector client(service);
     SocketSession_ptr session = client.connect(Address::make("localhost",
             "9090"));
-    char data[6] =
-    { 'h', 'e', 'l', 'l', 'o', '\0' };
+    char data[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
     session->sendEvent(EventData(10, data, 6));
     worker_threads.join_all();
 
