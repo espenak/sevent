@@ -1,7 +1,6 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
-#include "Buffer.h"
 #include "EventHandler.h"
 
 
