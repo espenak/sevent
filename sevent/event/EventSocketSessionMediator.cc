@@ -2,11 +2,11 @@
 
 namespace sevent
 {
-namespace socket
+namespace event
 {
 
 EventSocketSessionMediator::EventSocketSessionMediator(
-        SocketSession_ptr socketSession) :
+        socket::SocketSession_ptr socketSession) :
     _socketSession(socketSession)
 {
 }
@@ -16,15 +16,16 @@ EventSocketSessionMediator::~EventSocketSessionMediator()
 }
 
 EventSocketSessionMediator_ptr EventSocketSessionMediator::make(
-        SocketSession_ptr socketSession)
+        socket::SocketSession_ptr socketSession)
 {
     return EventSocketSessionMediator_ptr(new EventSocketSessionMediator(
             socketSession));
 }
 
-void EventSocketSessionMediator::sendEvent(EventData eventData)
+void EventSocketSessionMediator::sendEvent(socket::EventData eventData)
 {
     _socketSession->sendEvent(eventData);
 }
 
-}
+} // namespace event
+} // namespace sevent

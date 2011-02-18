@@ -5,11 +5,11 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "SocketService.h"
-#include "AsioSocketService.h"
-#include "AsioSocketListener.h"
-#include "AsioSocketConnector.h"
-#include "WorkerThread.h"
+#include "sevent/socket/SocketService.h"
+#include "sevent/socket/AsioSocketService.h"
+#include "sevent/socket/AsioSocketListener.h"
+#include "sevent/socket/AsioSocketConnector.h"
+#include "sevent/socket/WorkerThread.h"
 
 using namespace sevent::socket;
 boost::condition_variable listenerReady;

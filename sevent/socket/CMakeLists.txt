@@ -11,8 +11,5 @@ add_library(sevent_socket STATIC
     LocalSession.cc LocalSession.h
     SocketSessionRegistry.cc SocketSessionRegistry.h
     EventData.cc EventData.h
-
-    #EventHandlerCollection.cc EventHandlerCollection.h
-    #EventSocketSessionMediator.cc EventSocketSessionMediator.h
 )
 target_link_libraries(sevent_socket ${Boost_LIBRARIES})
