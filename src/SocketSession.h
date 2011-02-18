@@ -2,6 +2,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
 #include "EventHandler.h"
+#include "EventData.h"
 
 
 namespace socketevent
@@ -10,11 +11,14 @@ namespace socketevent
 class SocketSession
 {
     public:
-        typedef uint32_t bufSize_t;
-    public:
         virtual ~SocketSession();
-        virtual void sendEvent(eventId_t eventid, bufSize_t bufSize, char* buffer) = 0;
+        virtual void sendEvent(EventData eventData) = 0;
         virtual void reveiveEvents() = 0;
+    public:
+        void setEventHandler();
+
+    private:
+        void defaultEventHandler();
 };
 
 typedef boost::shared_ptr<SocketSession> SocketSession_ptr;

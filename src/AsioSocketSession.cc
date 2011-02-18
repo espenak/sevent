@@ -22,16 +22,16 @@ AsioSocketSession_ptr AsioSocketSession::make(socket_ptr sock)
     return AsioSocketSession_ptr(new AsioSocketSession(sock));
 }
 
-void AsioSocketSession::sendEvent(eventId_t eventid, bufSize_t bufSize, char* buffer) // TODO: Do we need Buffer? maybe just char*, size..
+void AsioSocketSession::sendEvent(EventData eventData)
 {
-    uint32_t eventIdNetworkOrder = htonl(eventid);
-    uint32_t sizeNetworkOrder = htonl(bufSize);
+    uint32_t eventIdNetworkOrder = htonl(eventData.eventid());
+    uint32_t sizeNetworkOrder = htonl(eventData.dataSize());
 
     std::vector<boost::asio::const_buffer> buffers;
     buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
             sizeof(uint32_t)));
     buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-    buffers.push_back(boost::asio::buffer(buffer, bufSize));
+    buffers.push_back(boost::asio::buffer(eventData.data(), eventData.dataSize()));
     boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
 }
 
@@ -63,9 +63,10 @@ void AsioSocketSession::onIdAndSizeReceived(
 }
 
 void AsioSocketSession::onDataReceived(const boost::system::error_code & ec,
-        std::size_t byte_transferred, uint32_t eventid, char* buffer,
-        uint32_t bufferSize)
+        std::size_t byte_transferred, uint32_t eventid, char* data,
+        uint32_t dataSize)
 {
+    EventData data(eventid, data, dataSize);
     std::cout << "Received data: ";
     std::cout.write(buffer, bufferSize);
     std::cout << std::endl;

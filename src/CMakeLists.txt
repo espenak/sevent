@@ -14,6 +14,7 @@ add_library(socketevent STATIC
     AsioSocketSession.cc AsioSocketSession.h
     LocalSession.cc LocalSession.h
     SocketSessionRegistry.cc SocketSessionRegistry.h
+    EventData.cc EventData.h
     
     EventHandlerCollection.cc EventHandlerCollection.h
     EventSocketSessionMediator.cc EventSocketSessionMediator.h

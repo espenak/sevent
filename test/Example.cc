@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include  <boost/thread/condition_variable.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
@@ -41,7 +41,7 @@ int main(int argc, const char *argv[])
             "9090"));
     char data[6] =
     { 'h', 'e', 'l', 'l', 'o', '\0' };
-    session->sendEvent(10, 6, data);
+    session->sendEvent(EventData(10, data, 6));
     worker_threads.join_all();
 
     return 0;

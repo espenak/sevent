@@ -5,13 +5,18 @@ namespace socketevent
 
 EventHandlerCollection::EventHandlerCollection()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 EventHandlerCollection::~EventHandlerCollection()
 {
-	// TODO Auto-generated destructor stub
 }
+
+    void EventHandlerCollection::addEventHandler(EventData::eventId_t eventid, eventHandler_t eventHandler)
+    {
+    }
+
+    void EventHandlerCollection::triggerEvent(EventData eventData)
+    {
+    }
 
 }
