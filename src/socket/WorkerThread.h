@@ -1,6 +1,8 @@
 #pragma once
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class ExceptionHandlingWorkerThread: boost::noncopyable
@@ -30,4 +32,5 @@ class ExceptionHandlingWorkerThread: boost::noncopyable
 };
 ExceptionHandlingWorkerThread exceptionHandlingWorkerThread;
 
-} // namespace socketevent
+} // namespace socket
+} // namespace sevent

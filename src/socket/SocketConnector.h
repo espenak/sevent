@@ -2,7 +2,9 @@
 #include "SocketSession.h"
 #include "Address.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class SocketConnector
@@ -14,4 +16,5 @@ class SocketConnector
         virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
 };
 
-} // namespace socketevent
+} // namespace socket
+} // namespace sevent

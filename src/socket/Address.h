@@ -2,7 +2,9 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class Address;
@@ -41,4 +43,5 @@ class Address
         std::string _port;
 };
 
-} // namespace socketevent
+} // namespace socket
+} // namespace sevent

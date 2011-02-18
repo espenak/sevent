@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include "EventData.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class SocketSession;
@@ -30,4 +32,5 @@ class SocketSession
 };
 
 
-}
+} // namespace socket
+} // namespace sevent

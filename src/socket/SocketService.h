@@ -1,7 +1,9 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class SocketService
@@ -15,4 +17,5 @@ class SocketService
 };
 typedef boost::shared_ptr<SocketService> SocketService_ptr;
 
-}
+} // namespace socket
+} // namespace sevent

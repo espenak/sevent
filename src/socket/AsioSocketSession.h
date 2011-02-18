@@ -5,7 +5,9 @@
 #include <boost/array.hpp>
 #include "SocketSession.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class AsioSocketSession;
@@ -34,4 +36,5 @@ class AsioSocketSession: public SocketSession,
         boost::array<unsigned, 2> _idAndSizeBuf;
 };
 
-} // namespace socketevent
+} // namespace socket
+} // namespace sevent

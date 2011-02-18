@@ -1,6 +1,8 @@
 #include "EventSocketSessionMediator.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 EventSocketSessionMediator::EventSocketSessionMediator(

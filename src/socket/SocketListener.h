@@ -1,7 +1,9 @@
 #pragma once
 #include "Address.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class SocketListener
@@ -14,4 +16,5 @@ class SocketListener
 		virtual void listen(Address_ptr address) = 0;
 };
 
-}
+} // namespace socket
+} // namespace sevent

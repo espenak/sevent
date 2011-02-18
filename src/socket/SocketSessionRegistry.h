@@ -3,7 +3,9 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class SocketSessionRegistry;
@@ -21,4 +23,5 @@ class SocketSessionRegistry
 		std::vector<SocketSession_ptr> _sessions;
 };
 
-}
+} // namespace socket
+} // namespace sevent

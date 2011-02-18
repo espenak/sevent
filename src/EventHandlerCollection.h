@@ -3,7 +3,9 @@
 #include "EventData.h"
 #include <map>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class EventHandlerCollection

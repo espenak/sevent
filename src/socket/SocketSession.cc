@@ -1,7 +1,9 @@
 #include "SocketSession.h"
 #include <iostream>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 SocketSession::~SocketSession()
@@ -26,4 +28,5 @@ void SocketSession::setAllEventsHandler(allEventsHandler_t allEventsHandler)
     _allEventsHandler = allEventsHandler;
 }
 
-}
+} // namespace socket
+} // namespace sevent

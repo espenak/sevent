@@ -1,6 +1,8 @@
 #include "EventData.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 EventData::EventData(eventId_t eventid, char *data, dataSize_t dataSize) :
@@ -27,4 +29,5 @@ char *EventData::data()
     return _data;
 }
 
-}
+} // namespace socket
+} // namespace sevent

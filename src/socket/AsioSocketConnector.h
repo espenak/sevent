@@ -3,7 +3,9 @@
 #include "AsioSocketService.h"
 #include <boost/asio.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class AsioSocketConnector: public SocketConnector
@@ -20,4 +22,5 @@ class AsioSocketConnector: public SocketConnector
         AsioSocketService_ptr _socketservice;
 };
 
-}
+} // namespace socket
+} // namespace sevent

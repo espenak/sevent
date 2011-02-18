@@ -1,6 +1,8 @@
 #pragma once
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class LocalSession
@@ -10,4 +12,5 @@ class LocalSession
 		virtual ~LocalSession();
 };
 
-}
+} // namespace socket
+} // namespace sevent

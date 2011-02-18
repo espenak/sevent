@@ -4,7 +4,9 @@
 #include "SocketSession.h"
 #include <boost/shared_ptr.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class EventSocketSessionMediator;

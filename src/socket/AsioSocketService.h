@@ -4,7 +4,9 @@
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class AsioSocketService;
@@ -27,4 +29,5 @@ class AsioSocketService: public SocketService
         boost::asio::io_service::work _work;
 };
 
-}
+} // namespace socket
+} // namespace sevent

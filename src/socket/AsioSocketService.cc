@@ -1,6 +1,8 @@
 #include "AsioSocketService.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 AsioSocketService::AsioSocketService() :
@@ -27,4 +29,5 @@ void AsioSocketService::stop()
     _io_service.stop();
 }
 
-}
+} // namespace socket
+} // namespace sevent

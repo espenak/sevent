@@ -11,7 +11,7 @@
 #include "AsioSocketConnector.h"
 #include "WorkerThread.h"
 
-using namespace socketevent;
+using namespace sevent::socket;
 boost::condition_variable listenerReady;
 boost::mutex listenerReadyMutex;
 

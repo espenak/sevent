@@ -1,7 +1,9 @@
 #pragma once
 #include <stdint.h>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class EventData
@@ -21,4 +23,5 @@ class EventData
         dataSize_t _dataSize;
 };
 
-}
+} // namespace socket
+} // namespace sevent

@@ -5,7 +5,9 @@
 #include <boost/bind.hpp>
 #include <arpa/inet.h>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 AsioSocketSession::AsioSocketSession(socket_ptr sock) :
@@ -74,4 +76,5 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & ec,
             EventData(eventid, data, dataSize));
 }
 
-} // namespace socketevent
+} // namespace socket
+} // namespace sevent

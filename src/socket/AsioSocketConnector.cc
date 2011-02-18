@@ -1,7 +1,9 @@
 #include "AsioSocketConnector.h"
 #include "AsioSocketSession.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 AsioSocketConnector::AsioSocketConnector(AsioSocketService_ptr socketservice) :
@@ -37,4 +39,5 @@ SocketSession_ptr AsioSocketConnector::connect(const Address_ptr addr)
 //{
 //}
 
-}
+} // namespace socket
+} // namespace sevent

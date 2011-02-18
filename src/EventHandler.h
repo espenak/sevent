@@ -3,10 +3,12 @@
 #include "EventData.h"
 #include "EventSocketSessionMediator.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 typedef boost::function<void(EventSocketSessionMediator_ptr mediator,
         EventData eventData)> eventHandler_t;
 
-} // namespace socketevent
+}

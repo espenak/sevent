@@ -1,6 +1,8 @@
 #include "LocalSession.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 LocalSession::LocalSession()
@@ -14,4 +16,5 @@ LocalSession::~LocalSession()
 	// TODO Auto-generated destructor stub
 }
 
-}
+} // namespace socket
+} // namespace sevent

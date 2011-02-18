@@ -1,6 +1,8 @@
 #include "SocketSessionRegistry.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 SocketSessionRegistry::SocketSessionRegistry()
@@ -24,4 +26,5 @@ void SocketSessionRegistry::add(SocketSession_ptr session)
     _sessions.push_back(session);
 }
 
-}
+} // namespace socket
+} // namespace sevent

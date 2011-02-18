@@ -5,7 +5,9 @@
 #include "SocketSessionRegistry.h"
 #include <boost/asio.hpp>
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 class AsioSocketListener: public SocketListener
@@ -26,4 +28,5 @@ class AsioSocketListener: public SocketListener
         SocketSessionRegistry_ptr _socketSessionRegistry;
 };
 
-}
+} // namespace socket
+} // namespace sevent

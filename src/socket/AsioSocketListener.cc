@@ -3,7 +3,9 @@
 #include <boost/bind.hpp>
 #include "AsioSocketSession.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 AsioSocketListener::AsioSocketListener(AsioSocketService_ptr socketservice,
@@ -48,4 +50,5 @@ void AsioSocketListener::onAccept(const boost::system::error_code & ec,
     accept();
 }
 
-}
+} // namespace socket
+} // namespace sevent

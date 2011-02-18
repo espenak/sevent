@@ -1,6 +1,8 @@
 #include "EventHandlerCollection.h"
 
-namespace socketevent
+namespace sevent
+{
+namespace socket
 {
 
 EventHandlerCollection::EventHandlerCollection()
