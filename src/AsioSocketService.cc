@@ -3,19 +3,17 @@
 namespace socketevent
 {
 
-AsioSocketService::AsioSocketService()
+AsioSocketService::AsioSocketService() :
+    _work(_io_service)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 AsioSocketService::~AsioSocketService()
-{
-	// TODO Auto-generated destructor stub
-}
+{}
 
 void AsioSocketService::run()
 {
+    _io_service.run();
 }
 
 }
