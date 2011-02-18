@@ -19,7 +19,7 @@ class AsioSocketSession: public SocketSession
     public:
         AsioSocketSession(socket_ptr sock);
         virtual ~AsioSocketSession();
-        virtual void sendEvent(eventId_t eventid, Buffer buffer);
+        virtual void sendEvent(eventId_t eventid, bufSize_t bufSize, char* buffer);
         virtual void reveiveEvents();
     private:
         void onIdAndSizeReceived(const boost::system::error_code & ec,
