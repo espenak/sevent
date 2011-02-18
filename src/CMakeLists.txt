@@ -3,6 +3,8 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 add_library(socketevent STATIC
+    SocketService.h
+    AsioSocketService.cc AsioSocketService.h
     Address.h
     SocketListener.h
     AsioSocketListener.cc AsioSocketListener.h

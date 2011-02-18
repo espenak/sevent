@@ -1,4 +1,6 @@
 #pragma once
+#include "SocketSession.h"
+#include "Address.h"
 
 namespace socketevent
 {
@@ -6,7 +8,7 @@ namespace socketevent
 class SocketConnector
 {
 public:
-	virtual SocketSession connect(const Address_ptr addr) = 0;
+	virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
 };
 
 } // namespace socketevent
