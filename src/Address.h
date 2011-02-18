@@ -10,28 +10,35 @@ typedef boost::shared_ptr<Address> Address_ptr;
 
 class Address
 {
-	public:
-		static Address_ptr make(const std::string& host, const std::string& port)
-		{
-			return Address_ptr(new Address(host, port));
-		}
+    public:
+        static Address_ptr make(const std::string& host,
+                const std::string& port)
+        {
+            return Address_ptr(new Address(host, port));
+        }
 
-	public:
-		Address(const std::string& host, const std::string& port) :
-			_host(host), _port(port)
-		{
-		}
+    public:
+        Address(const std::string& host, const std::string& port) :
+            _host(host), _port(port)
+        {
+        }
 
-		~Address()
-		{
-		}
+        ~Address()
+        {
+        }
 
-		const std::string& host();
-		const std::string& port();
+        const std::string& host()
+        {
+            return _host;
+        }
+        const std::string& port()
+        {
+            return _port;
+        }
 
-	private:
-		std::string _host;
-		std::string _port;
+    private:
+        std::string _host;
+        std::string _port;
 };
 
 } // namespace socketevent

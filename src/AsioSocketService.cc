@@ -9,7 +9,13 @@ AsioSocketService::AsioSocketService() :
 }
 
 AsioSocketService::~AsioSocketService()
-{}
+{
+}
+
+AsioSocketService_ptr AsioSocketService::make()
+{
+    return AsioSocketService_ptr(new AsioSocketService());
+}
 
 void AsioSocketService::run()
 {

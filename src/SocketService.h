@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/shared_ptr.hpp>
 
 namespace socketevent
 {
@@ -6,9 +7,9 @@ namespace socketevent
 class SocketService
 {
 	public:
-		SocketService();
-		virtual ~SocketService();
+		virtual ~SocketService() {};
 		virtual void run() = 0;
 };
+typedef boost::shared_ptr<SocketService> SocketService_ptr;
 
 }
