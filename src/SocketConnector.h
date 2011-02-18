@@ -7,8 +7,11 @@ namespace socketevent
 
 class SocketConnector
 {
-public:
-	virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
+    public:
+        virtual ~SocketConnector()
+        {
+        }
+        virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
 };
 
 } // namespace socketevent
