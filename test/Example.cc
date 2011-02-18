@@ -15,9 +15,8 @@ using namespace socketevent;
 boost::condition_variable listenerReady;
 boost::mutex listenerReadyMutex;
 
-void listenerThread(AsioSocketService_ptr service) {
-
-//    listenerReady.notify_one();
+void stopEvent(AsioSocketService_ptr service) {
+    service->stop();
 }
 
 
@@ -30,18 +29,15 @@ int main(int argc, const char *argv[])
         worker_threads.create_thread(boost::bind(boost::ref(exceptionHandlingWorkerThread), service));
     }
 
-    AsioSocketListener listener(service);
+    SocketSessionRegistry_ptr socketSessionRegistry = SocketSessionRegistry::make();
+    AsioSocketListener listener(service, socketSessionRegistry);
     listener.listen(Address::make("localhost", "9090"));
     std::cout << "Listening..." << std::endl;
 
     AsioSocketConnector client(service);
-    client.connect(Address::make("localhost", "9090"));
-
-//    boost::thread listenthread(listenerThread, service);
-//    boost::unique_lock<boost::mutex> lock(listenerReadyMutex);
-//    listenerReady.wait(lock);
-
-//    listenthread.join();
+    SocketSession_ptr session = client.connect(Address::make("localhost", "9090"));
+    char data[6] = {'h', 'e', 'l', 'l', 'o', '\0'};
+    session->sendEvent(10, Buffer(data, 6));
     worker_threads.join_all();
 
     return 0;

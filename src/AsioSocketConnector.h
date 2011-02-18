@@ -14,9 +14,8 @@ class AsioSocketConnector: public SocketConnector
         AsioSocketConnector(AsioSocketService_ptr socketservice);
         virtual ~AsioSocketConnector();
         virtual SocketSession_ptr connect(const Address_ptr addr);
-    private:
-        void connect();
-        void onConnect(const boost::system::error_code & ec, socket_ptr sock);
+//    private:
+//        void onConnect(const boost::system::error_code & ec, socket_ptr sock);
     private:
         AsioSocketService_ptr _socketservice;
 };

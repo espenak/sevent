@@ -6,6 +6,7 @@ add_library(socketevent STATIC
     SocketService.h
     AsioSocketService.cc AsioSocketService.h
     Address.h
+    Buffer.cc Buffer.h
     SocketListener.h
     AsioSocketListener.cc AsioSocketListener.h
     SocketConnector.h

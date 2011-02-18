@@ -1,4 +1,5 @@
 #include "AsioSocketConnector.h"
+#include "AsioSocketSession.h"
 
 namespace socketevent
 {
@@ -24,14 +25,16 @@ SocketSession_ptr AsioSocketConnector::connect(const Address_ptr addr)
 
     socket_ptr sock(new boost::asio::ip::tcp::socket(
             _socketservice->_io_service));
-//    sock->async_connect(endpoint, boost::bind(&AsioSocketConnector::onConnect,
-//            this, _1, sock));
     sock->connect(endpoint);
+    return AsioSocketSession::make(sock);
+
+    //    sock->async_connect(endpoint, boost::bind(&AsioSocketConnector::onConnect,
+    //            this, _1, sock));
 }
 
-void AsioSocketConnector::onConnect(const boost::system::error_code & ec,
-        socket_ptr sock)
-{
-}
+//void AsioSocketConnector::onConnect(const boost::system::error_code & ec,
+//        socket_ptr sock)
+//{
+//}
 
 }

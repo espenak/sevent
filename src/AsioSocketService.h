@@ -19,6 +19,7 @@ class AsioSocketService: public SocketService
         virtual ~AsioSocketService();
     public:
         virtual void run();
+        virtual void stop();
 
     public:
         boost::asio::io_service _io_service;

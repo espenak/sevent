@@ -22,4 +22,9 @@ void AsioSocketService::run()
     _io_service.run();
 }
 
+void AsioSocketService::stop()
+{
+    _io_service.stop();
+}
+
 }
