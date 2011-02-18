@@ -11,6 +11,7 @@ namespace socketevent
 AsioSocketSession::AsioSocketSession(socket_ptr sock) :
     _sock(sock)
 {
+    setAllEventsHandler(defaultAllEventsHandler);
 }
 
 AsioSocketSession::~AsioSocketSession()
@@ -66,10 +67,11 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & ec,
         std::size_t byte_transferred, uint32_t eventid, char* data,
         uint32_t dataSize)
 {
-    EventData data(eventid, data, dataSize);
     std::cout << "Received data: ";
-    std::cout.write(buffer, bufferSize);
+    std::cout.write(data, dataSize);
     std::cout << std::endl;
+    _allEventsHandler(shared_from_this(),
+            EventData(eventid, data, dataSize));
 }
 
 } // namespace socketevent

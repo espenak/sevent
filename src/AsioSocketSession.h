@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include "SocketSession.h"
@@ -10,7 +11,8 @@ namespace socketevent
 class AsioSocketSession;
 typedef boost::shared_ptr<AsioSocketSession> AsioSocketSession_ptr;
 
-class AsioSocketSession: public SocketSession
+class AsioSocketSession: public SocketSession,
+        public boost::enable_shared_from_this<AsioSocketSession>
 {
     private:
         typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;

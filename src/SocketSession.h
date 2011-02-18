@@ -1,26 +1,33 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <stdint.h>
-#include "EventHandler.h"
 #include "EventData.h"
-
 
 namespace socketevent
 {
 
+class SocketSession;
+typedef boost::shared_ptr<SocketSession> SocketSession_ptr;
+
 class SocketSession
 {
+    public:
+        typedef boost::function<void(SocketSession_ptr socketSession,
+                EventData eventData)> allEventsHandler_t;
     public:
         virtual ~SocketSession();
         virtual void sendEvent(EventData eventData) = 0;
         virtual void reveiveEvents() = 0;
     public:
-        void setEventHandler();
+        void setAllEventsHandler(allEventsHandler_t allEventHandler);
 
-    private:
-        void defaultEventHandler();
+    protected:
+        static void defaultAllEventsHandler(SocketSession_ptr socketSession,
+                EventData eventData);
+    protected:
+        allEventsHandler_t _allEventsHandler;
 };
 
-typedef boost::shared_ptr<SocketSession> SocketSession_ptr;
 
 }
