@@ -3,5 +3,17 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 add_library(socketevent STATIC
-    Session.cc Session.h)
+    Address.h
+    SocketListener.h
+    AsioSocketListener.cc AsioSocketListener.h
+    SocketConnector.h
+    AsioSocketConnector.cc AsioSocketConnector.h
+    SocketSession.cc SocketSession.h
+    AsioSocketSession.cc AsioSocketSession.h
+    LocalSession.cc LocalSession.h
+    SocketSessionRegistry.cc SocketSessionRegistry.h
+    
+    EventHandlerCollection.cc EventHandlerCollection.h
+    EventSocketSessionMediator.cc EventSocketSessionMediator.h
+)
 target_link_libraries(socketevent ${Boost_LIBRARIES})
