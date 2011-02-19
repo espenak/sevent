@@ -24,8 +24,20 @@ void allEventsHandler(SocketSession_ptr session, EventData eventData,
     }
 }
 
+
+//
+//void workerThread(SocketFacade_ptr facade)
+//{
+//    facade->service()->run();
+//}
+
+
 int main(int argc, const char *argv[])
 {
+//    SocketFacade_ptr facade = AsioSocketFacade::make();
+//    facade->setWorkerThread(workerThread);
+
+
     // The service handles IO events
     AsioSocketService_ptr service = AsioSocketService::make();
 
