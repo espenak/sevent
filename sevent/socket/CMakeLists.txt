@@ -11,6 +11,7 @@ add_library(sevent_socket STATIC
     LocalSession.cc LocalSession.h
     SocketSessionRegistry.cc SocketSessionRegistry.h
     EventData.cc EventData.h
-    SocketFacade.cc SocketFacade.h
+    SocketFacade.h
+    AsioSocketFacade.cc AsioSocketFacade.h
 )
 target_link_libraries(sevent_socket ${Boost_LIBRARIES})
