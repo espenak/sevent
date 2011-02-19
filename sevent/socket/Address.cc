@@ -28,6 +28,11 @@ const std::string& Address::port() const
     return _port;
 }
 
+std::string Address::str() const
+{
+    return _host + ":" + _port;
+}
+
 std::ostream& operator<<(std::ostream& out, const Address& address)
 {
     out << address.host() << ":" << address.port();

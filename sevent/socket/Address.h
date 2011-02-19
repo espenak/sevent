@@ -22,6 +22,7 @@ class Address
         virtual ~Address();
         const std::string& host() const;
         const std::string& port() const;
+        std::string str() const;
 
     private:
         std::string _host;

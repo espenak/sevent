@@ -5,7 +5,6 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <arpa/inet.h>
-#include <sstream>
 
 namespace sevent
 {
@@ -20,6 +19,7 @@ AsioSocketSession::AsioSocketSession(socket_ptr sock) :
 
 AsioSocketSession::~AsioSocketSession()
 {
+    std::cout << "DESTROY: " << getRemoteEndpointAddress()->str() << std::endl;
 }
 
 AsioSocketSession_ptr AsioSocketSession::make(socket_ptr sock)

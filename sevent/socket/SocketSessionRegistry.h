@@ -1,6 +1,7 @@
 #pragma once
 #include "SocketSession.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <vector>
 
 namespace sevent
@@ -25,7 +26,7 @@ class SocketSessionRegistry
         void add(SocketSession_ptr session);
         void remove(SocketSession_ptr session);
     private:
-        std::vector<SocketSession_ptr> _sessions;
+        boost::unordered_map<std::string, SocketSession_ptr> _sessions;
         SocketSession::allEventsHandler_t _allEventsHandler;
         SocketSession::disconnectHandler_t _disconnectHandler;
 };

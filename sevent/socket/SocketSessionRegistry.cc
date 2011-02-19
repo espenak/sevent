@@ -40,13 +40,18 @@ void SocketSessionRegistry::add(SocketSession_ptr session)
     }
     session->setDisconnectHandler(boost::bind(&SocketSessionRegistry::remove,
             this, _1));
-    _sessions.push_back(session);
+    std::string remoteAddr = session->getRemoteEndpointAddress()->str();
+    _sessions[remoteAddr] = session;
+    std::cout << "Added " << remoteAddr << std::endl;
 }
 
 
 void SocketSessionRegistry::remove(SocketSession_ptr session)
 {
-    std::cout << "Removed!" << std::endl;
+
+    std::string remoteAddr = session->getRemoteEndpointAddress()->str();
+    _sessions.erase(remoteAddr);
+    std::cout << "Removed " << remoteAddr << std::endl;
 }
 
 } // namespace socket
