@@ -13,3 +13,5 @@ CMakeCache.txt
 .cproject
 src/.DS_Store
 .settings/
+.DS_Store
+tags

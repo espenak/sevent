@@ -9,7 +9,6 @@
 #include "sevent/socket/AsioSocketService.h"
 #include "sevent/socket/AsioSocketListener.h"
 #include "sevent/socket/AsioSocketConnector.h"
-#include "sevent/socket/WorkerThread.h"
 
 using namespace sevent::socket;
 
@@ -25,19 +24,26 @@ void allEventsHandler(SocketSession_ptr session, EventData eventData,
 }
 
 
-//
-//void workerThread(SocketFacade_ptr facade)
-//{
-//    facade->service()->run();
-//}
+void workerThread(SocketService_ptr service)
+{
+    try
+    {
+        service->run();
+    } catch (boost::exception& e)
+    {
+        std::cout << "[" << boost::this_thread::get_id()
+                << "] Exception: " << boost::diagnostic_information(e)
+                << std::endl;
+    } catch (std::exception& e)
+    {
+        std::cout << "[" << boost::this_thread::get_id()
+                << "] Exception: " << e.what() << std::endl;
+    }
+}
 
 
 int main(int argc, const char *argv[])
 {
-//    SocketFacade_ptr facade = AsioSocketFacade::make();
-//    facade->setWorkerThread(workerThread);
-
-
     // The service handles IO events
     AsioSocketService_ptr service = AsioSocketService::make();
 
@@ -47,8 +53,7 @@ int main(int argc, const char *argv[])
     boost::thread_group worker_threads;
     for (int x = 0; x < workerThreadCount; ++x)
     {
-        worker_threads.create_thread(boost::bind(boost::ref(
-                exceptionHandlingWorkerThread), service));
+        worker_threads.create_thread(boost::bind(workerThread, service));
     }
 
     // Each incoming or outgoing connection get a session. They are all stored in a

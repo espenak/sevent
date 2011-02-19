@@ -10,8 +10,8 @@
 
 using namespace sevent::socket;
 
-void allEventsHandler(SocketFacade_ptr facade, EventData eventData,
-        SocketService_ptr service)
+void allEventsHandler(SocketFacade_ptr facade,
+        SocketSession_ptr session, EventData eventData)
 {
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
     if (eventData.eventid() == 20)
@@ -22,20 +22,12 @@ void allEventsHandler(SocketFacade_ptr facade, EventData eventData,
 }
 
 
-
-void workerThread(SocketFacade_ptr facade)
-{
-    facade->service()->run();
-}
-
-
 int main(int argc, const char *argv[])
 {
     SocketFacade_ptr facade = AsioSocketFacade::make();
-    facade->setWorkerThreads(5, workerThread);
-    facade->setAllEventsHandler(allEventsHandler);
-    facade->listen(Address::make("127.0.0.1", "9091"));
-    facade->listen(Address::make("127.0.0.1", "9092"));
+    facade->setWorkerThreads(5, allEventsHandler);
+    SocketListener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
+    SocketListener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
     
     SocketSession_ptr session1 = facade->connect(Address::make("127.0.0.1", "9091"));
     SocketSession_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
@@ -56,7 +48,7 @@ int main(int argc, const char *argv[])
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler
-    worker_threads.join_all();
-
+    facade->joinAllWorkerThreads();
+    
     return 0;
 }
