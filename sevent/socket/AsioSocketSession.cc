@@ -45,7 +45,7 @@ void AsioSocketSession::sendEvent(EventData eventData)
 //                    boost::bind(callback, _1, _2))));
 //}
 
-void AsioSocketSession::reveiveEvents()
+void AsioSocketSession::receiveEvents()
 {
     _sock->async_receive(boost::asio::buffer(_idAndSizeBuf), boost::bind(
             &AsioSocketSession::onIdAndSizeReceived, this, _1, _2));
@@ -74,6 +74,7 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & ec,
     std::cout << std::endl;
     _allEventsHandler(shared_from_this(),
             EventData(eventid, data, dataSize));
+    receiveEvents();
 }
 
 } // namespace socket

@@ -46,7 +46,7 @@ void AsioSocketListener::onAccept(const boost::system::error_code & ec,
     std::cout << "Socket connection accepted" << std::endl;
     AsioSocketSession_ptr session = AsioSocketSession::make(sock);
     _socketSessionRegistry->add(session);
-    session->reveiveEvents();
+    session->receiveEvents();
     accept();
 }
 
