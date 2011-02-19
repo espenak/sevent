@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <ostream>
 
 namespace sevent
 {
@@ -14,34 +15,21 @@ class Address
 {
     public:
         static Address_ptr make(const std::string& host,
-                const std::string& port)
-        {
-            return Address_ptr(new Address(host, port));
-        }
+                const std::string& port);
 
     public:
-        Address(const std::string& host, const std::string& port) :
-            _host(host), _port(port)
-        {
-        }
-
-        ~Address()
-        {
-        }
-
-        const std::string& host()
-        {
-            return _host;
-        }
-        const std::string& port()
-        {
-            return _port;
-        }
+        Address(const std::string& host, const std::string& port);
+        virtual ~Address();
+        const std::string& host() const;
+        const std::string& port() const;
 
     private:
         std::string _host;
         std::string _port;
 };
+
+std::ostream& operator<<(std::ostream& out, Address address);
+std::ostream& operator<<(std::ostream& out, Address_ptr address);
 
 } // namespace socket
 } // namespace sevent

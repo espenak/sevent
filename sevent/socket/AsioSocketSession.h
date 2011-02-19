@@ -26,8 +26,8 @@ class AsioSocketSession: public SocketSession,
         virtual ~AsioSocketSession();
         virtual void sendEvent(EventData eventData);
         virtual void receiveEvents();
-        virtual std::string getLocalEndpointInfo();
-        virtual std::string getRemoteEndpointInfo();
+        virtual Address_ptr getLocalEndpointAddress();
+        virtual Address_ptr getRemoteEndpointAddress();
     private:
         void onIdAndSizeReceived(const boost::system::error_code& error,
                 std::size_t byte_transferred);

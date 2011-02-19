@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdint.h>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <arpa/inet.h>
 #include <sstream>
 
@@ -83,22 +84,18 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & error,
     receiveEvents();
 }
 
-std::string AsioSocketSession::getRemoteEndpointInfo()
+Address_ptr AsioSocketSession::getRemoteEndpointAddress()
 {
-    std::string address = _sock->remote_endpoint().address().to_string();
+    std::string host = _sock->remote_endpoint().address().to_string();
     unsigned short port = _sock->remote_endpoint().port();
-    std::stringstream out;
-    out << address << ":" << port;
-    return out.str();
+    return Address::make(host, boost::lexical_cast<std::string>(port));
 }
 
-std::string AsioSocketSession::getLocalEndpointInfo()
+Address_ptr AsioSocketSession::getLocalEndpointAddress()
 {
-    std::string address = _sock->local_endpoint().address().to_string();
+    std::string host = _sock->local_endpoint().address().to_string();
     unsigned short port = _sock->local_endpoint().port();
-    std::stringstream out;
-    out << address << ":" << port;
-    return out.str();
+    return Address::make(host, boost::lexical_cast<std::string>(port));
 }
 
 } // namespace socket

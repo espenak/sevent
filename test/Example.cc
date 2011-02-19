@@ -47,14 +47,13 @@ int main(int argc, const char *argv[])
 
     // The listener listens for new connections, creates sessions and adds them to the registry.
     AsioSocketListener listener(service, socketSessionRegistry);
-    Address_ptr serverAddr = Address::make("localhost", "9090");
+    Address_ptr serverAddr = Address::make("127.0.0.1", "9090");
     listener.listen(serverAddr);
     std::cout << "Listening on " << std::endl;
 
     // Clients connect using a SocketConnector.
     AsioSocketConnector client(service, socketSessionRegistry);
-    SocketSession_ptr session = client.connect(Address::make("localhost",
-            "9090"));
+    SocketSession_ptr session = client.connect(serverAddr);
 
     // Lets send a couple of events!
     char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
@@ -64,8 +63,8 @@ int main(int argc, const char *argv[])
 
     // Always nice to know who you are communicating with..
     std::cout <<
-            "Local: " << session->getLocalEndpointInfo() <<
-            " Remote: " << session->getRemoteEndpointInfo() << std::endl;
+            "Local: " << session->getLocalEndpointAddress() <<
+            " Remote: " << session->getRemoteEndpointAddress() << std::endl;
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler

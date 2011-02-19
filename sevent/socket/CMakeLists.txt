@@ -1,7 +1,7 @@
 add_library(sevent_socket STATIC
     SocketService.h
     AsioSocketService.cc AsioSocketService.h
-    Address.h
+    Address.h Address.cc
     SocketListener.h
     AsioSocketListener.cc AsioSocketListener.h
     SocketConnector.h

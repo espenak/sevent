@@ -3,6 +3,7 @@
 #include <boost/function.hpp>
 #include <stdint.h>
 #include <string>
+#include "Address.h"
 #include "EventData.h"
 
 namespace sevent
@@ -24,8 +25,8 @@ class SocketSession
         virtual ~SocketSession();
         virtual void sendEvent(EventData eventData) = 0;
         virtual void receiveEvents() = 0;
-        virtual std::string getLocalEndpointInfo() = 0;
-        virtual std::string getRemoteEndpointInfo() = 0;
+        virtual Address_ptr getLocalEndpointAddress() = 0;
+        virtual Address_ptr getRemoteEndpointAddress() = 0;
 
     public:
         void setAllEventsHandler(allEventsHandler_t allEventHandler);
