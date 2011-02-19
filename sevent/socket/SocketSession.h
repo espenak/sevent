@@ -23,6 +23,7 @@ class SocketSession
         virtual void receiveEvents() = 0;
     public:
         void setAllEventsHandler(allEventsHandler_t allEventHandler);
+//        void attachToSessionRegistry(SessionRegistry_ptr sessionRegistry);
 
     protected:
         static void defaultAllEventsHandler(SocketSession_ptr socketSession,

@@ -1,5 +1,4 @@
 #include "AsioSocketListener.h"
-#include <iostream>
 #include <boost/bind.hpp>
 #include "AsioSocketSession.h"
 
@@ -43,7 +42,6 @@ void AsioSocketListener::accept()
 void AsioSocketListener::onAccept(const boost::system::error_code & ec,
         socket_ptr sock)
 {
-    std::cout << "Socket connection accepted" << std::endl;
     AsioSocketSession_ptr session = AsioSocketSession::make(sock);
     _socketSessionRegistry->add(session);
     session->receiveEvents();

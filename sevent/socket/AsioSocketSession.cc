@@ -13,7 +13,7 @@ namespace socket
 AsioSocketSession::AsioSocketSession(socket_ptr sock) :
     _sock(sock)
 {
-    setAllEventsHandler(defaultAllEventsHandler);
+    setAllEventsHandler( defaultAllEventsHandler);
 }
 
 AsioSocketSession::~AsioSocketSession()
@@ -34,11 +34,12 @@ void AsioSocketSession::sendEvent(EventData eventData)
     buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
             sizeof(uint32_t)));
     buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-    buffers.push_back(boost::asio::buffer(eventData.data(), eventData.dataSize()));
+    buffers.push_back(boost::asio::buffer(eventData.data(),
+            eventData.dataSize()));
     boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
 }
 
-//void AsioSocketSession::asyncSendEvent(eventId_t eventid, Buffer buffer, SendEventCallback_t)
+//void AsioSocketSession::asyncSendEvent(eventId_t eventid, Buffer buffer, sendEventCallback_t)
 //{
 //    boost::asio::async_write(_sock,
 //            boost::asio::buffer(boost::array<char, buffer.size()>(buffer.data()),
@@ -52,28 +53,39 @@ void AsioSocketSession::receiveEvents()
 }
 
 void AsioSocketSession::onIdAndSizeReceived(
-        const boost::system::error_code & ec, std::size_t byte_transferred)
+        const boost::system::error_code & error, std::size_t byte_transferred)
 {
-    // TODO: lock while waiting for async ops to complete.
+    if (error == boost::asio::error::eof)
+    {
+        std::cerr << "Client disconnected!" << std::endl;
+        return;
+    }
+    else if (error)
+    {
+        throw boost::system::system_error(error);
+    }
     uint32_t eventid = ntohl(_idAndSizeBuf[0]);
     uint32_t bufferSize = ntohl(_idAndSizeBuf[1]);
-    std::cout << "Received event: " << "id: " << eventid << " bufferSize: "
-            << bufferSize << std::endl;
     char* buffer = new char[bufferSize];
     _sock->async_receive(boost::asio::buffer(buffer, bufferSize), boost::bind(
-            &AsioSocketSession::onDataReceived, this, _1, _2,
-            eventid, buffer, bufferSize));
+            &AsioSocketSession::onDataReceived, this, _1, _2, eventid, buffer,
+            bufferSize));
 }
 
-void AsioSocketSession::onDataReceived(const boost::system::error_code & ec,
+void AsioSocketSession::onDataReceived(const boost::system::error_code & error,
         std::size_t byte_transferred, uint32_t eventid, char* data,
         uint32_t dataSize)
 {
-    std::cout << "Received data: ";
-    std::cout.write(data, dataSize);
-    std::cout << std::endl;
-    _allEventsHandler(shared_from_this(),
-            EventData(eventid, data, dataSize));
+    if (error == boost::asio::error::eof)
+    {
+        std::cerr << "Client disconnected!" << std::endl;
+        return;
+    }
+    else if (error)
+    {
+        throw boost::system::system_error(error);
+    }
+    _allEventsHandler(shared_from_this(), EventData(eventid, data, dataSize));
     receiveEvents();
 }
 

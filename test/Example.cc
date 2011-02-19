@@ -17,7 +17,7 @@ void allEventsHandler(SocketSession_ptr session, EventData eventData,
         SocketService_ptr service)
 {
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
-    if (eventData.eventid() == 20)
+    if (eventData.eventid() == 30)
     {
         std::cout << "Stopping service handler ..." << std::endl;
         service->stop();
@@ -52,7 +52,7 @@ int main(int argc, const char *argv[])
     std::cout << "Listening on " << std::endl;
 
     // Clients connect using a SocketConnector.
-    AsioSocketConnector client(service);
+    AsioSocketConnector client(service, socketSessionRegistry);
     SocketSession_ptr session = client.connect(Address::make("localhost",
             "9090"));
 

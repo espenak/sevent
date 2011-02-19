@@ -6,16 +6,14 @@ namespace sevent
 namespace socket
 {
 
-AsioSocketConnector::AsioSocketConnector(AsioSocketService_ptr socketservice) :
-    _socketservice(socketservice)
+AsioSocketConnector::AsioSocketConnector(AsioSocketService_ptr socketservice,
+        SocketSessionRegistry_ptr sessionRegistry) :
+    _socketservice(socketservice), _sessionRegistry(sessionRegistry)
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 AsioSocketConnector::~AsioSocketConnector()
 {
-    // TODO Auto-generated destructor stub
 }
 
 SocketSession_ptr AsioSocketConnector::connect(const Address_ptr addr)
@@ -28,16 +26,10 @@ SocketSession_ptr AsioSocketConnector::connect(const Address_ptr addr)
     socket_ptr sock(new boost::asio::ip::tcp::socket(
             _socketservice->_io_service));
     sock->connect(endpoint);
-    return AsioSocketSession::make(sock);
-
-    //    sock->async_connect(endpoint, boost::bind(&AsioSocketConnector::onConnect,
-    //            this, _1, sock));
+    AsioSocketSession_ptr session = AsioSocketSession::make(sock);
+    _sessionRegistry->add(session);
+    return session;
 }
-
-//void AsioSocketConnector::onConnect(const boost::system::error_code & ec,
-//        socket_ptr sock)
-//{
-//}
 
 } // namespace socket
 } // namespace sevent
