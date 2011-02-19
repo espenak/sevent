@@ -1,4 +1,6 @@
 #include "SocketSessionRegistry.h"
+#include <boost/bind.hpp>
+#include <iostream>
 
 namespace sevent
 {
@@ -36,7 +38,15 @@ void SocketSessionRegistry::add(SocketSession_ptr session)
     {
         session->setAllEventsHandler(_allEventsHandler);
     }
+    session->setDisconnectHandler(boost::bind(&SocketSessionRegistry::remove,
+            this, _1));
     _sessions.push_back(session);
+}
+
+
+void SocketSessionRegistry::remove(SocketSession_ptr session)
+{
+    std::cout << "Removed!" << std::endl;
 }
 
 } // namespace socket

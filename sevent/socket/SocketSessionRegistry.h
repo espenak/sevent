@@ -23,9 +23,11 @@ class SocketSessionRegistry
                 SocketSession::allEventsHandler_t allEventsHandler);
         virtual ~SocketSessionRegistry();
         void add(SocketSession_ptr session);
+        void remove(SocketSession_ptr session);
     private:
         std::vector<SocketSession_ptr> _sessions;
         SocketSession::allEventsHandler_t _allEventsHandler;
+        SocketSession::disconnectHandler_t _disconnectHandler;
 };
 
 } // namespace socket

@@ -10,10 +10,10 @@ SocketSession::~SocketSession()
 {
 }
 
-//void SocketSession::attachToSessionRegistry(SessionRegistry_ptr sessionRegistry)
-//{
-//    sessionRegistry->
-//}
+void SocketSession::setDisconnectHandler(disconnectHandler_t disconnectHandler)
+{
+    _disconnectHandler = disconnectHandler;
+}
 
 void SocketSession::defaultAllEventsHandler(SocketSession_ptr socketSession,
         EventData eventData)

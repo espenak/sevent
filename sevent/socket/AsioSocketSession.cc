@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <boost/bind.hpp>
 #include <arpa/inet.h>
+#include <sstream>
 
 namespace sevent
 {
@@ -39,13 +40,6 @@ void AsioSocketSession::sendEvent(EventData eventData)
     boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
 }
 
-//void AsioSocketSession::asyncSendEvent(eventId_t eventid, Buffer buffer, sendEventCallback_t)
-//{
-//    boost::asio::async_write(_sock,
-//            boost::asio::buffer(boost::array<char, buffer.size()>(buffer.data()),
-//                    boost::bind(callback, _1, _2))));
-//}
-
 void AsioSocketSession::receiveEvents()
 {
     _sock->async_receive(boost::asio::buffer(_idAndSizeBuf), boost::bind(
@@ -57,7 +51,7 @@ void AsioSocketSession::onIdAndSizeReceived(
 {
     if (error == boost::asio::error::eof)
     {
-        std::cerr << "Client disconnected!" << std::endl;
+        _disconnectHandler(shared_from_this());
         return;
     }
     else if (error)
@@ -78,7 +72,7 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & error,
 {
     if (error == boost::asio::error::eof)
     {
-        std::cerr << "Client disconnected!" << std::endl;
+        _disconnectHandler(shared_from_this());
         return;
     }
     else if (error)
@@ -87,6 +81,24 @@ void AsioSocketSession::onDataReceived(const boost::system::error_code & error,
     }
     _allEventsHandler(shared_from_this(), EventData(eventid, data, dataSize));
     receiveEvents();
+}
+
+std::string AsioSocketSession::getRemoteEndpointInfo()
+{
+    std::string address = _sock->remote_endpoint().address().to_string();
+    unsigned short port = _sock->remote_endpoint().port();
+    std::stringstream out;
+    out << address << ":" << port;
+    return out.str();
+}
+
+std::string AsioSocketSession::getLocalEndpointInfo()
+{
+    std::string address = _sock->local_endpoint().address().to_string();
+    unsigned short port = _sock->local_endpoint().port();
+    std::stringstream out;
+    out << address << ":" << port;
+    return out.str();
 }
 
 } // namespace socket

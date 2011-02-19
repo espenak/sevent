@@ -26,10 +26,12 @@ class AsioSocketSession: public SocketSession,
         virtual ~AsioSocketSession();
         virtual void sendEvent(EventData eventData);
         virtual void receiveEvents();
+        virtual std::string getLocalEndpointInfo();
+        virtual std::string getRemoteEndpointInfo();
     private:
-        void onIdAndSizeReceived(const boost::system::error_code & ec,
+        void onIdAndSizeReceived(const boost::system::error_code& error,
                 std::size_t byte_transferred);
-        void onDataReceived(const boost::system::error_code & ec,
+        void onDataReceived(const boost::system::error_code& error,
                 std::size_t byte_transferred, uint32_t eventid, char* data,
                 uint32_t dataSize);
     private:

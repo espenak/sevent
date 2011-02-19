@@ -62,6 +62,11 @@ int main(int argc, const char *argv[])
     char die[5] = { 'd', 'i', 'e', '!', '\0' };
     session->sendEvent(EventData(20, die, 5));
 
+    // Always nice to know who you are communicating with..
+    std::cout <<
+            "Local: " << session->getLocalEndpointInfo() <<
+            " Remote: " << session->getRemoteEndpointInfo() << std::endl;
+
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler
     worker_threads.join_all();
