@@ -20,6 +20,12 @@ void stopEvent(AsioSocketService_ptr service)
     service->stop();
 }
 
+
+void allEventsHandler(SocketSession_ptr session, EventData eventData)
+{
+    std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
+}
+
 int main(int argc, const char *argv[])
 {
     AsioSocketService_ptr service = AsioSocketService::make();
@@ -31,7 +37,7 @@ int main(int argc, const char *argv[])
     }
 
     SocketSessionRegistry_ptr socketSessionRegistry =
-            SocketSessionRegistry::make();
+            SocketSessionRegistry::make(allEventsHandler);
     AsioSocketListener listener(service, socketSessionRegistry);
     listener.listen(Address::make("localhost", "9090"));
     std::cout << "Listening..." << std::endl;

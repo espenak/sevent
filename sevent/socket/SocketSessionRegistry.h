@@ -15,12 +15,17 @@ class SocketSessionRegistry
 {
     public:
         static SocketSessionRegistry_ptr make();
-	public:
-		SocketSessionRegistry();
-		virtual ~SocketSessionRegistry();
-		void add(SocketSession_ptr session);
-	private:
-		std::vector<SocketSession_ptr> _sessions;
+        static SocketSessionRegistry_ptr make(
+                SocketSession::allEventsHandler_t allEventsHandler);
+    public:
+        SocketSessionRegistry();
+        SocketSessionRegistry(
+                SocketSession::allEventsHandler_t allEventsHandler);
+        virtual ~SocketSessionRegistry();
+        void add(SocketSession_ptr session);
+    private:
+        std::vector<SocketSession_ptr> _sessions;
+        SocketSession::allEventsHandler_t _allEventsHandler;
 };
 
 } // namespace socket

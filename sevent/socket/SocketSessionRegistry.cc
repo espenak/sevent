@@ -7,13 +7,16 @@ namespace socket
 
 SocketSessionRegistry::SocketSessionRegistry()
 {
-    // TODO Auto-generated constructor stub
+}
 
+SocketSessionRegistry::SocketSessionRegistry(
+        SocketSession::allEventsHandler_t allEventHandler) :
+    _allEventsHandler(allEventHandler)
+{
 }
 
 SocketSessionRegistry::~SocketSessionRegistry()
 {
-    // TODO Auto-generated destructor stub
 }
 
 SocketSessionRegistry_ptr SocketSessionRegistry::make()
@@ -21,8 +24,18 @@ SocketSessionRegistry_ptr SocketSessionRegistry::make()
     return SocketSessionRegistry_ptr(new SocketSessionRegistry());
 }
 
+SocketSessionRegistry_ptr SocketSessionRegistry::make(
+        SocketSession::allEventsHandler_t allEventHandler)
+{
+    return SocketSessionRegistry_ptr(new SocketSessionRegistry(allEventHandler));
+}
+
 void SocketSessionRegistry::add(SocketSession_ptr session)
 {
+    if (_allEventsHandler)
+    {
+        session->setAllEventsHandler(_allEventsHandler);
+    }
     _sessions.push_back(session);
 }
 
