@@ -41,9 +41,8 @@ int main(int argc, const char *argv[])
 
     // Each incoming or outgoing connection get a session. They are all stored in a
     // registry.
-    SocketSessionRegistry_ptr socketSessionRegistry =
-            SocketSessionRegistry::make(boost::bind(allEventsHandler, _1, _2,
-                    service));
+    SocketSessionRegistry_ptr socketSessionRegistry = SocketSessionRegistry::make();
+    socketSessionRegistry->setAllEventsHandler(boost::bind(allEventsHandler, _1, _2, service));
 
     // The listener listens for new connections, creates sessions and adds them to the registry.
     // We can have multiple listeners..
@@ -71,6 +70,9 @@ int main(int argc, const char *argv[])
     std::cout <<
             "Local: " << session1->getLocalEndpointAddress() <<
             " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
+    std::cout <<
+            "Local: " << session2->getLocalEndpointAddress() <<
+            " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler

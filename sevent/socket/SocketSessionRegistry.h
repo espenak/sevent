@@ -16,15 +16,14 @@ class SocketSessionRegistry
 {
     public:
         static SocketSessionRegistry_ptr make();
-        static SocketSessionRegistry_ptr make(
-                SocketSession::allEventsHandler_t allEventsHandler);
     public:
         SocketSessionRegistry();
-        SocketSessionRegistry(
-                SocketSession::allEventsHandler_t allEventsHandler);
         virtual ~SocketSessionRegistry();
         void add(SocketSession_ptr session);
         void remove(SocketSession_ptr session);
+        void setDisconnectHandler(SocketSession::disconnectHandler_t disconnectHandler);
+        void setAllEventsHandler(SocketSession::allEventsHandler_t allEventsHandler);
+
     private:
         boost::unordered_map<std::string, SocketSession_ptr> _sessions;
         SocketSession::allEventsHandler_t _allEventsHandler;

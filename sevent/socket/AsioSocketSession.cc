@@ -19,7 +19,6 @@ AsioSocketSession::AsioSocketSession(socket_ptr sock) :
 
 AsioSocketSession::~AsioSocketSession()
 {
-    std::cout << "DESTROY: " << getRemoteEndpointAddress()->str() << std::endl;
 }
 
 AsioSocketSession_ptr AsioSocketSession::make(socket_ptr sock)
