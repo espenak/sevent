@@ -5,14 +5,16 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket/AsioSocketFacade.h"
+#include "sevent/socket/SocketFacade.h"
 
 
 using namespace sevent::socket;
+boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
 void allEventsHandler(SocketFacade_ptr facade,
         SocketSession_ptr session, EventData eventData)
 {
+    boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
     if (eventData.eventid() == 20)
     {
@@ -24,7 +26,7 @@ void allEventsHandler(SocketFacade_ptr facade,
 
 int main(int argc, const char *argv[])
 {
-    SocketFacade_ptr facade = AsioSocketFacade::make();
+    SocketFacade_ptr facade = SocketFacade::make();
     facade->setWorkerThreads(5, allEventsHandler);
     SocketListener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
     SocketListener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
@@ -39,12 +41,15 @@ int main(int argc, const char *argv[])
     session2->sendEvent(EventData(20, die, 5));
 
     // Always nice to know who you are communicating with..
-    std::cout <<
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cout <<
             "Local: " << session1->getLocalEndpointAddress() <<
             " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
-    std::cout <<
+        std::cout <<
             "Local: " << session2->getLocalEndpointAddress() <<
             " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
+    }
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler

@@ -18,6 +18,8 @@ namespace sevent
         class SocketFacade
         {
         public:
+            static SocketFacade_ptr make();
+        public:
             typedef boost::function<void(
                     SocketFacade_ptr facade,
                     SocketSession_ptr session,

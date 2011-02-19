@@ -31,6 +31,7 @@ namespace sevent
             virtual SocketListener_ptr listen(Address_ptr address);
             virtual SocketSession_ptr connect(Address_ptr address);
             virtual void joinAllWorkerThreads();
+
         private:
             static void defaultWorkerThreadHandler(SocketFacade_ptr facade);
         private:
