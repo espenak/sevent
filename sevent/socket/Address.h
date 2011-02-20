@@ -11,6 +11,18 @@ namespace sevent
         class Address;
         typedef boost::shared_ptr<Address> Address_ptr;
 
+        /** A pair of (host, port).
+         *
+         * The host is not a hostname, but a resolved (ip) address.
+         *
+         * It is important that the host+port is a unambiguous and unique address
+         * within a network using an implemenation of sevent::socket, since this
+         * is the key used to check for existing connections.
+         *
+         * The host is a string to make it possible to use any
+         * kind of address. The asio implementation uses this for both ipv4
+         * (dot notation) and ipv6 (hex encoding).
+         */
         class Address
         {
             public:

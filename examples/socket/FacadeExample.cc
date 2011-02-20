@@ -5,7 +5,7 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket/Facade.h"
+#include "sevent/socket.h"
 
 
 using namespace sevent::socket;
