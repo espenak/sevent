@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -62,3 +63,29 @@ struct BasicFixture {
 
     ~BasicFixture () {}
 };
+
+
+void sendSizedMessages(sevent::socket::Session_ptr session, unsigned id,
+        unsigned messageCount, unsigned messageSize)
+{
+    char *buf = new char[messageSize];
+    for(unsigned i = 0; i < messageSize; i++)
+    {
+        buf[i] = 'x';
+    }
+    for(unsigned i=0; i<messageCount; i++)
+    {
+        session->sendEvent(sevent::socket::SendEvent(id, buf, messageSize));
+    }
+    delete[] buf;
+}
+
+
+void sendStringMessagesThread(sevent::socket::Session_ptr session, unsigned id,
+        unsigned messageCount, const std::string msg)
+{
+    for(unsigned i=0; i<messageCount; i++)
+    {
+        session->sendEvent(sevent::socket::SendEvent(id, msg.c_str(), msg.size()+1));
+    }
+}
