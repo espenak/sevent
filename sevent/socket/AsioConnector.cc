@@ -3,11 +3,11 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         AsioConnector::AsioConnector(AsioService_ptr socketservice,
-                SessionRegistry_ptr sessionRegistry) :
+                socket::SessionRegistry_ptr sessionRegistry) :
             _socketservice(socketservice), _sessionRegistry(sessionRegistry)
         {
         }
@@ -16,7 +16,7 @@ namespace sevent
         {
         }
 
-        Session_ptr AsioConnector::connect(const Address_ptr addr)
+        socket::Session_ptr AsioConnector::connect(const socket::Address_ptr addr)
         {
             boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
             boost::asio::ip::tcp::resolver::query query(addr->host(), addr->port());
@@ -31,5 +31,5 @@ namespace sevent
             return session;
         }
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

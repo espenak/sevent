@@ -6,13 +6,13 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         class AsioService;
         typedef boost::shared_ptr<AsioService> AsioService_ptr;
 
-        class AsioService: public Service
+        class AsioService: public socket::Service
         {
             public:
                 static AsioService_ptr make();
@@ -29,5 +29,5 @@ namespace sevent
                 boost::asio::io_service::work _work;
         };
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

@@ -4,11 +4,11 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         AsioListener::AsioListener(AsioService_ptr socketservice,
-                                               SessionRegistry_ptr socketSessionRegistry) :
+                socket::SessionRegistry_ptr socketSessionRegistry) :
             _socketservice(socketservice), _acceptor(socketservice->_io_service),
             _socketSessionRegistry(socketSessionRegistry)
         {
@@ -18,7 +18,7 @@ namespace sevent
         {
         }
 
-        void AsioListener::listen(Address_ptr address)
+        void AsioListener::listen(socket::Address_ptr address)
         {
             boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
             boost::asio::ip::tcp::resolver::query query(address->host(),
@@ -48,5 +48,5 @@ namespace sevent
             accept();
         }
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

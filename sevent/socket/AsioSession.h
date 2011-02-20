@@ -8,13 +8,13 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         class AsioSession;
         typedef boost::shared_ptr<AsioSession> AsioSession_ptr;
 
-        class AsioSession: public Session,
+        class AsioSession: public socket::Session,
             public boost::enable_shared_from_this<AsioSession>
         {
             private:
@@ -24,10 +24,10 @@ namespace sevent
             public:
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
-                virtual void sendEvent(EventData eventData);
+                virtual void sendEvent(socket::EventData eventData);
                 virtual void receiveEvents();
-                virtual Address_ptr getLocalEndpointAddress();
-                virtual Address_ptr getRemoteEndpointAddress();
+                virtual socket::Address_ptr getLocalEndpointAddress();
+                virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
                 void onIdAndSizeReceived(const boost::system::error_code& error,
                                          std::size_t byte_transferred);
@@ -39,5 +39,5 @@ namespace sevent
                 boost::array<unsigned, 2> _idAndSizeBuf;
         };
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

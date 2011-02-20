@@ -8,14 +8,14 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
         AsioFacade::AsioFacade()
         {
             _service = AsioService::make();
-            _sessionRegistry = SessionRegistry::make();
-            _connector = Connector_ptr(new AsioConnector(
-                                                 _service, _sessionRegistry));
+            _sessionRegistry = socket::SessionRegistry::make();
+            _connector = socket::Connector_ptr(new AsioConnector(
+                        _service, _sessionRegistry));
         }
         AsioFacade::~AsioFacade()
         {
@@ -45,19 +45,19 @@ namespace sevent
             }
         }
 
-        Listener_ptr AsioFacade::listen(Address_ptr address)
+        socket::Listener_ptr AsioFacade::listen(socket::Address_ptr address)
         {
-            Listener_ptr listener = boost::make_shared<AsioListener>(_service, _sessionRegistry);
+            socket::Listener_ptr listener = boost::make_shared<AsioListener>(_service, _sessionRegistry);
             listener->listen(address);
             return listener;
         }
 
-        Session_ptr AsioFacade::connect(Address_ptr address)
+        socket::Session_ptr AsioFacade::connect(socket::Address_ptr address)
         {
             return _connector->connect(address);
         }
 
-        Service_ptr AsioFacade::service()
+        socket::Service_ptr AsioFacade::service()
         {
             return _service;
         }
@@ -68,7 +68,7 @@ namespace sevent
         }
 
 
-        void AsioFacade::defaultWorkerThreadHandler(Facade_ptr facade)
+        void AsioFacade::defaultWorkerThreadHandler(socket::Facade_ptr facade)
         {
             try
             {

@@ -8,7 +8,7 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         AsioSession::AsioSession(socket_ptr sock) :
@@ -26,7 +26,7 @@ namespace sevent
             return AsioSession_ptr(new AsioSession(sock));
         }
 
-        void AsioSession::sendEvent(EventData eventData)
+        void AsioSession::sendEvent(socket::EventData eventData)
         {
             uint32_t eventIdNetworkOrder = htonl(eventData.eventid());
             uint32_t sizeNetworkOrder = htonl(eventData.dataSize());
@@ -79,23 +79,23 @@ namespace sevent
             {
                 throw boost::system::system_error(error);
             }
-            _allEventsHandler(shared_from_this(), EventData(eventid, data, dataSize));
+            _allEventsHandler(shared_from_this(), socket::EventData(eventid, data, dataSize));
             receiveEvents();
         }
 
-        Address_ptr AsioSession::getRemoteEndpointAddress()
+        socket::Address_ptr AsioSession::getRemoteEndpointAddress()
         {
             std::string host = _sock->remote_endpoint().address().to_string();
             unsigned short port = _sock->remote_endpoint().port();
-            return Address::make(host, boost::lexical_cast<std::string>(port));
+            return socket::Address::make(host, boost::lexical_cast<std::string>(port));
         }
 
-        Address_ptr AsioSession::getLocalEndpointAddress()
+        socket::Address_ptr AsioSession::getLocalEndpointAddress()
         {
             std::string host = _sock->local_endpoint().address().to_string();
             unsigned short port = _sock->local_endpoint().port();
-            return Address::make(host, boost::lexical_cast<std::string>(port));
+            return socket::Address::make(host, boost::lexical_cast<std::string>(port));
         }
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

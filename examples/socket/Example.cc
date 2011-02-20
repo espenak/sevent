@@ -11,6 +11,7 @@
 #include "sevent/socket/AsioConnector.h"
 
 using namespace sevent::socket;
+using namespace sevent::asiosocket;
 
 void allEventsHandler(Session_ptr session, EventData eventData,
                       Service_ptr service)

@@ -2,7 +2,7 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
         AsioService::AsioService() :
@@ -29,5 +29,5 @@ namespace sevent
             _io_service.stop();
         }
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

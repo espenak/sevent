@@ -6,22 +6,22 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
 
-        class AsioConnector: public Connector
+        class AsioConnector: public socket::Connector
         {
             private:
                 typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
             public:
                 AsioConnector(AsioService_ptr socketservice,
-                                    SessionRegistry_ptr sessionRegistry);
+                                    socket::SessionRegistry_ptr sessionRegistry);
                 virtual ~AsioConnector();
-                virtual Session_ptr connect(const Address_ptr addr);
+                virtual socket::Session_ptr connect(const socket::Address_ptr addr);
             private:
                 AsioService_ptr _socketservice;
-                SessionRegistry_ptr _sessionRegistry;
+                socket::SessionRegistry_ptr _sessionRegistry;
         };
 
-    } // namespace socket
+    } // namespace asiosocket
 } // namespace sevent

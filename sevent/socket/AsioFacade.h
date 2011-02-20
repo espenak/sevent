@@ -8,12 +8,12 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace asiosocket
     {
         class AsioFacade;
         typedef boost::shared_ptr<AsioFacade> AsioFacade_ptr;
 
-        class AsioFacade : public Facade,
+        class AsioFacade : public socket::Facade,
             public boost::enable_shared_from_this<AsioFacade>
         {
             public:
@@ -22,22 +22,22 @@ namespace sevent
                 AsioFacade();
             public:
                 virtual ~AsioFacade();
-                virtual Service_ptr service();
+                virtual socket::Service_ptr service();
                 virtual void setWorkerThreads(unsigned count,
                                               allEventsHandler_t allEventsHandler);
                 virtual void setWorkerThreads(unsigned count,
                                               workerThread_t workerThreadHandler,
                                               allEventsHandler_t allEventsHandler);
-                virtual Listener_ptr listen(Address_ptr address);
-                virtual Session_ptr connect(Address_ptr address);
+                virtual socket::Listener_ptr listen(socket::Address_ptr address);
+                virtual socket::Session_ptr connect(socket::Address_ptr address);
                 virtual void joinAllWorkerThreads();
 
             private:
-                static void defaultWorkerThreadHandler(Facade_ptr facade);
+                static void defaultWorkerThreadHandler(socket::Facade_ptr facade);
             private:
                 AsioService_ptr _service;
-                Connector_ptr _connector;
-                SessionRegistry_ptr _sessionRegistry;
+                socket::Connector_ptr _connector;
+                socket::SessionRegistry_ptr _sessionRegistry;
 
                 workerThread_t _workerThreadHanler;
                 allEventsHandler_t _allEventsHandler;
