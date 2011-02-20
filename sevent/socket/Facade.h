@@ -28,9 +28,9 @@ namespace sevent
             public:
                 virtual ~Facade() {};
                 virtual Service_ptr service() = 0;
-                virtual void setWorkerThreads(unsigned count,
+                virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               allEventsHandler_t allEventsHandler) = 0;
-                virtual void setWorkerThreads(unsigned count,
+                virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               workerThread_t workerThreadHandler,
                                               allEventsHandler_t allEventsHandler) = 0;
                 virtual Listener_ptr listen(Address_ptr address) = 0;

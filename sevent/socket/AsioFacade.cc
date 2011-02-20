@@ -26,19 +26,19 @@ namespace sevent
             return AsioFacade_ptr(new AsioFacade());
         }
 
-        void AsioFacade::setWorkerThreads(unsigned count,
+        void AsioFacade::setWorkerThreads(unsigned numberOfWorkerThreads,
                                                 allEventsHandler_t allEventsHandler)
         {
-            setWorkerThreads(count, defaultWorkerThreadHandler, allEventsHandler);
+            setWorkerThreads(numberOfWorkerThreads, defaultWorkerThreadHandler, allEventsHandler);
         }
 
-        void AsioFacade::setWorkerThreads(unsigned count,
+        void AsioFacade::setWorkerThreads(unsigned numberOfWorkerThreads,
                                                 workerThread_t workerThreadHandler,
                                                 allEventsHandler_t allEventsHandler)
         {
             _sessionRegistry->setAllEventsHandler(
                 boost::bind(allEventsHandler, shared_from_this(), _1, _2));
-            for (unsigned x = 0; x < count; ++x)
+            for (unsigned x = 0; x < numberOfWorkerThreads; ++x)
             {
                 _worker_threads.create_thread(
                     boost::bind(workerThreadHandler, shared_from_this()));
