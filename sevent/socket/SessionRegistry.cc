@@ -24,6 +24,7 @@ namespace sevent
 
         void SessionRegistry::add(Session_ptr session)
         {
+            boost::lock_guard<boost::mutex> lock(_lock);
             if (_allEventsHandler)
             {
                 session->setAllEventsHandler(_allEventsHandler);
@@ -35,6 +36,7 @@ namespace sevent
 
         void SessionRegistry::remove(Session_ptr session)
         {
+            boost::lock_guard<boost::mutex> lock(_lock);
             std::string remoteAddr = session->getRemoteEndpointAddress()->str();
             _sessions.erase(remoteAddr);
         }
@@ -42,12 +44,14 @@ namespace sevent
         void SessionRegistry::setAllEventsHandler(
             Session::allEventsHandler_t allEventsHandler)
         {
+            boost::lock_guard<boost::mutex> lock(_lock);
             _allEventsHandler = allEventsHandler;
         }
 
         void SessionRegistry::setDisconnectHandler(
             Session::disconnectHandler_t disconnectHandler)
         {
+            boost::lock_guard<boost::mutex> lock(_lock);
             _disconnectHandler = disconnectHandler;
         }
 

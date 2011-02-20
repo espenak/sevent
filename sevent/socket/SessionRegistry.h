@@ -2,6 +2,9 @@
 #include "Session.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <vector>
 
 namespace sevent
@@ -28,6 +31,7 @@ namespace sevent
                 boost::unordered_map<std::string, Session_ptr> _sessions;
                 Session::allEventsHandler_t _allEventsHandler;
                 Session::disconnectHandler_t _disconnectHandler;
+                boost::mutex _lock;
         };
 
     } // namespace socket
