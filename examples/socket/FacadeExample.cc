@@ -27,7 +27,7 @@ void allEventsHandler(Facade_ptr facade,
 int main(int argc, const char *argv[])
 {
     Facade_ptr facade = Facade::make();
-    facade->setWorkerThreads(5, allEventsHandler);
+    facade->setWorkerThreads(5, allEventsHandler); // Start 5 worker threads, and use the handler above for incoming events.
     Listener_ptr listener1 = facade->listen(Address::make("127.0.0.1", 9091));
     Listener_ptr listener2 = facade->listen(Address::make("127.0.0.1", 9092));
 
