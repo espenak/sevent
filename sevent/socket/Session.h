@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include "Address.h"
-#include "EventData.h"
+#include "ReceiveEvent.h"
 #include "SendEvent.h"
 
 namespace sevent
@@ -19,7 +19,7 @@ namespace sevent
         {
             public:
                 typedef boost::function<void(Session_ptr socketSession,
-                                             EventData eventData)> allEventsHandler_t;
+                                             ReceiveEvent eventData)> allEventsHandler_t;
                 typedef boost::function<void(Session_ptr socketSession)>
                 disconnectHandler_t;
             public:
@@ -35,7 +35,7 @@ namespace sevent
 
             protected:
                 static void defaultAllEventsHandler(Session_ptr socketSession,
-                                                    EventData eventData);
+                                                    ReceiveEvent eventData);
             protected:
                 allEventsHandler_t _allEventsHandler;
                 disconnectHandler_t _disconnectHandler;

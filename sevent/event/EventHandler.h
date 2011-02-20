@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/function.hpp>
-#include "sevent/socket/EventData.h"
+#include "sevent/socket/ReceiveEvent.h"
 #include "EventSessionMediator.h"
 
 namespace sevent
@@ -9,7 +9,7 @@ namespace sevent
     {
 
         typedef boost::function<void(EventSessionMediator_ptr mediator,
-                                     socket::EventData eventData)> eventHandler_t;
+                                     socket::ReceiveEvent eventData)> eventHandler_t;
 
     } // namespace event
 } // namespace sevent

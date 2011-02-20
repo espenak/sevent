@@ -14,7 +14,7 @@ using namespace sevent::socket;
 using namespace sevent::asiosocket;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
-void allEventsHandler(Session_ptr session, EventData eventData,
+void allEventsHandler(Session_ptr session, ReceiveEvent eventData,
                       Service_ptr service)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);

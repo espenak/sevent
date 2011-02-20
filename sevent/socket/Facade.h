@@ -1,5 +1,5 @@
 #pragma once
-#include "EventData.h"
+#include "ReceiveEvent.h"
 #include "Service.h"
 #include "Address.h"
 #include "Service.h"
@@ -23,7 +23,7 @@ namespace sevent
                 typedef boost::function<void(
                     Facade_ptr facade,
                     Session_ptr session,
-                    EventData eventData)> allEventsHandler_t;
+                    ReceiveEvent eventData)> allEventsHandler_t;
                 typedef boost::function<void(Facade_ptr facade)> workerThread_t;
             public:
                 virtual ~Facade() {};

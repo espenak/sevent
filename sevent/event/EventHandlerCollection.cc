@@ -13,12 +13,12 @@ namespace sevent
         {
         }
 
-        void EventHandlerCollection::addEventHandler(socket::EventData::eventId_t eventid,
+        void EventHandlerCollection::addEventHandler(socket::ReceiveEvent::eventId_t eventid,
                 eventHandler_t eventHandler)
         {
         }
 
-        void EventHandlerCollection::triggerEvent(socket::EventData eventData)
+        void EventHandlerCollection::triggerEvent(socket::ReceiveEvent eventData)
         {
         }
 

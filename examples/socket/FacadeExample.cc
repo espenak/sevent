@@ -12,7 +12,7 @@ using namespace sevent::socket;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
 void allEventsHandler(Facade_ptr facade,
-                      Session_ptr session, EventData eventData)
+                      Session_ptr session, ReceiveEvent eventData)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;

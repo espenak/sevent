@@ -1,30 +1,30 @@
-#include "EventData.h"
+#include "ReceiveEvent.h"
 
 namespace sevent
 {
     namespace socket
     {
 
-        EventData::EventData(eventId_t eventid, char *data, dataSize_t dataSize) :
+        ReceiveEvent::ReceiveEvent(eventId_t eventid, char *data, dataSize_t dataSize) :
             _eventid(eventid), _data(data), _dataSize(dataSize)
         {
         }
 
-        EventData::~EventData()
+        ReceiveEvent::~ReceiveEvent()
         {
         }
 
-        EventData::eventId_t EventData::eventid()
+        ReceiveEvent::eventId_t ReceiveEvent::eventid()
         {
             return _eventid;
         }
 
-        EventData::dataSize_t EventData::dataSize()
+        ReceiveEvent::dataSize_t ReceiveEvent::dataSize()
         {
             return _dataSize;
         }
 
-        char *EventData::data()
+        char *ReceiveEvent::data()
         {
             return _data;
         }

@@ -1,6 +1,6 @@
 #pragma once
 #include "EventHandler.h"
-#include "sevent/socket/EventData.h"
+#include "sevent/socket/ReceiveEvent.h"
 #include <map>
 
 namespace sevent
@@ -13,11 +13,11 @@ namespace sevent
             public:
                 EventHandlerCollection();
                 virtual ~EventHandlerCollection();
-                void addEventHandler(socket::EventData::eventId_t eventid, eventHandler_t eventHandler);
-                void triggerEvent(socket::EventData eventData);
+                void addEventHandler(socket::ReceiveEvent::eventId_t eventid, eventHandler_t eventHandler);
+                void triggerEvent(socket::ReceiveEvent eventData);
 
             private:
-                std::map<socket::EventData::eventId_t, eventHandler_t> _eventHandlers;
+                std::map<socket::ReceiveEvent::eventId_t, eventHandler_t> _eventHandlers;
         };
 
     } // namespace event

@@ -15,7 +15,7 @@ class AllEventsHandler
         {}
 
         void operator()(sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session, sevent::socket::EventData eventData)
+                sevent::socket::Session_ptr session, sevent::socket::ReceiveEvent eventData)
         {
             boost::lock_guard<boost::mutex> lock(counter_lock);
             _counter ++;

@@ -10,7 +10,7 @@ add_library(sevent_socket STATIC
     AsioSession.cc AsioSession.h
     LocalSession.cc LocalSession.h
     SessionRegistry.cc SessionRegistry.h
-    EventData.cc EventData.h
+    ReceiveEvent.cc ReceiveEvent.h
     SendEvent.cc SendEvent.h
     Facade.h Facade.cc
     AsioFacade.cc AsioFacade.h

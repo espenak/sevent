@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sevent/socket/EventData.h"
+#include "sevent/socket/ReceiveEvent.h"
 #include "sevent/socket/Session.h"
 #include <boost/shared_ptr.hpp>
 
@@ -24,7 +24,7 @@ namespace sevent
             public:
                 EventSessionMediator(socket::Session_ptr socketSession);
                 virtual ~EventSessionMediator();
-                void sendEvent(socket::EventData eventData);
+                void sendEvent(socket::ReceiveEvent eventData);
             private:
                 socket::Session_ptr _socketSession;
         };
