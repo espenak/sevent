@@ -47,7 +47,7 @@ class LongMessagesHandler : public CountingAllEventsHandler
         virtual void doSomething(
             sevent::socket::Facade_ptr facade,
             sevent::socket::Session_ptr session,
-            sevent::socket::ReceiveEvent event)
+            sevent::socket::ReceiveEvent& event)
         {
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
             {

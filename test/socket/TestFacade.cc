@@ -61,7 +61,7 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
         virtual void doSomething(
                 sevent::socket::Facade_ptr facade,
                 sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent event)
+                sevent::socket::ReceiveEvent& event)
         {
             std::string msg(event.data());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);

@@ -9,7 +9,7 @@ namespace sevent
     {
 
         typedef boost::function<void(EventSessionMediator_ptr mediator,
-                                     socket::ReceiveEvent event)> eventHandler_t;
+                                     socket::ReceiveEvent& event)> eventHandler_t;
 
     } // namespace event
 } // namespace sevent

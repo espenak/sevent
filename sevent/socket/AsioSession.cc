@@ -91,7 +91,8 @@ namespace sevent
             {
                 throw std::runtime_error("byte_transferred != dataSize. This is a bug, because transfer_all() should make this impossible.");
             }
-            _allEventsHandler(shared_from_this(), socket::ReceiveEvent(eventid, data, dataSize));
+            socket::ReceiveEvent event(eventid, data, dataSize);
+            _allEventsHandler(shared_from_this(), event);
             delete[] data;
             _receiveLock.unlock();
             receiveEvents();

@@ -16,7 +16,7 @@ namespace sevent
         }
 
         void Session::defaultAllEventsHandler(Session_ptr socketSession,
-                ReceiveEvent event)
+                ReceiveEvent& event)
         {
             std::cout << "Event received by default all-events handler. "
                       << "Use Session::setAllEventsHandler to plug in your own."

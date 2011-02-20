@@ -18,7 +18,7 @@ namespace sevent
         {
         }
 
-        void EventHandlerCollection::triggerEvent(socket::ReceiveEvent event)
+        void EventHandlerCollection::triggerEvent(socket::ReceiveEvent& event)
         {
         }
 

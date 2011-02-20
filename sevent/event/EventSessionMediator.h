@@ -24,7 +24,7 @@ namespace sevent
             public:
                 EventSessionMediator(socket::Session_ptr socketSession);
                 virtual ~EventSessionMediator();
-                void sendEvent(socket::ReceiveEvent event);
+                void sendEvent(socket::ReceiveEvent& event);
             private:
                 socket::Session_ptr _socketSession;
         };

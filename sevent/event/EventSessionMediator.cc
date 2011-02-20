@@ -22,7 +22,7 @@ namespace sevent
                     socketSession));
         }
 
-        void EventSessionMediator::sendEvent(socket::ReceiveEvent event)
+        void EventSessionMediator::sendEvent(socket::ReceiveEvent& event)
         {
             _socketSession->sendEvent(event);
         }
