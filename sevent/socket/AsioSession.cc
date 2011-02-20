@@ -93,7 +93,6 @@ namespace sevent
             }
             socket::ReceiveEvent event(eventid, data, dataSize);
             _allEventsHandler(shared_from_this(), event);
-            delete[] data;
             _receiveLock.unlock();
             receiveEvents();
         }

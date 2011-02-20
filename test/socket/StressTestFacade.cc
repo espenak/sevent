@@ -59,6 +59,7 @@ class LongMessagesHandler : public CountingAllEventsHandler
                 boost::lock_guard<boost::mutex> lock(assert_lock);
                 BOOST_REQUIRE_EQUAL(event.data()[i], 'x');
             }
+            delete[] event.data();
         }
     private:
         unsigned _messageSize;

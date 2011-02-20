@@ -68,6 +68,7 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
             BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage.size()+1);
             //std::cout << msg << std::endl;
+            delete[] event.data();
         }
     private:
         std::string _expectedMessage;

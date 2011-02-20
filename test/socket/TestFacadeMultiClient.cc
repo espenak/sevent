@@ -38,6 +38,7 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
                 BOOST_REQUIRE(event.eventid() <= 2004);
                 BOOST_REQUIRE_EQUAL(event.dataSize(), expectedMessage.size()+1);
             }
+            delete[] event.data();
         }
     private:
         std::string _expectedMessage;

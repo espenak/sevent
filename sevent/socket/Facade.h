@@ -20,10 +20,18 @@ namespace sevent
             public:
                 static Facade_ptr make();
             public:
+
+                /** Events are sent to a callback of this type defined in
+                 * setWorkerThreads().
+                 * 
+                 * \warning The data-buffer in ReceiveEvent::data() is not
+                 * freed automatically, so it is up to the handler to make sure
+                 * no memory leaks occur (by calling delete[] event.data()). */
                 typedef boost::function<void(
                     Facade_ptr facade,
                     Session_ptr session,
                     ReceiveEvent& event)> allEventsHandler_t;
+
                 typedef boost::function<void(Facade_ptr facade)> workerThread_t;
             public:
                 virtual ~Facade() {};

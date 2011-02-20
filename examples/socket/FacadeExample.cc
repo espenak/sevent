@@ -21,6 +21,7 @@ void allEventsHandler(Facade_ptr facade,
         std::cout << "Stopping service handler ..." << std::endl;
         facade->service()->stop();
     }
+    delete[] event.data();
 }
 
 
