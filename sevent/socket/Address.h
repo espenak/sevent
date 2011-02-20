@@ -15,18 +15,18 @@ namespace sevent
         {
             public:
                 static Address_ptr make(const std::string& host,
-                                        const std::string& port);
+                                        unsigned short port);
 
             public:
-                Address(const std::string& host, const std::string& port);
+                Address(const std::string& host, unsigned short port);
                 virtual ~Address();
                 const std::string& host() const;
-                const std::string& port() const;
+                unsigned short port() const;
                 std::string str() const;
 
             private:
                 std::string _host;
-                std::string _port;
+                unsigned short _port;
         };
 
         std::ostream& operator<<(std::ostream& out, Address address);

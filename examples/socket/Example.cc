@@ -70,8 +70,8 @@ int main(int argc, const char *argv[])
 
     // The listener listens for new connections, creates sessions and adds them to the registry.
     // We can have multiple listeners..
-    Address_ptr serverAddr1 = Address::make("127.0.0.1", "9091");
-    Address_ptr serverAddr2 = Address::make("127.0.0.1", "9092");
+    Address_ptr serverAddr1 = Address::make("127.0.0.1", 9091);
+    Address_ptr serverAddr2 = Address::make("127.0.0.1", 9092);
     AsioListener listener1(service, socketSessionRegistry);
     listener1.listen(serverAddr1);
     AsioListener listener2(service, socketSessionRegistry);
@@ -89,12 +89,15 @@ int main(int argc, const char *argv[])
     session2->sendEvent(SendEvent(2020, "die!", 5));
 
     // Always nice to know who you are communicating with..
-    std::cout <<
-              "Local: " << session1->getLocalEndpointAddress() <<
-              " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
-    std::cout <<
-              "Local: " << session2->getLocalEndpointAddress() <<
-              " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cout <<
+            "Local: " << session1->getLocalEndpointAddress() <<
+            " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
+        std::cout <<
+            "Local: " << session2->getLocalEndpointAddress() <<
+            " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
+    }
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:2020) has been handled by allEventsHandler

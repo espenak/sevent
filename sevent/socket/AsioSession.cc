@@ -3,7 +3,6 @@
 #include <vector>
 #include <stdint.h>
 #include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
 #include <arpa/inet.h>
 
 namespace sevent
@@ -87,14 +86,14 @@ namespace sevent
         {
             std::string host = _sock->remote_endpoint().address().to_string();
             unsigned short port = _sock->remote_endpoint().port();
-            return socket::Address::make(host, boost::lexical_cast<std::string>(port));
+            return socket::Address::make(host, port);
         }
 
         socket::Address_ptr AsioSession::getLocalEndpointAddress()
         {
             std::string host = _sock->local_endpoint().address().to_string();
             unsigned short port = _sock->local_endpoint().port();
-            return socket::Address::make(host, boost::lexical_cast<std::string>(port));
+            return socket::Address::make(host, port);
         }
 
     } // namespace asiosocket

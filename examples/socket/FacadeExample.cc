@@ -28,22 +28,22 @@ int main(int argc, const char *argv[])
 {
     Facade_ptr facade = Facade::make();
     facade->setWorkerThreads(5, allEventsHandler);
-    //Listener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
-    Listener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
+    Listener_ptr listener1 = facade->listen(Address::make("127.0.0.1", 9091));
+    Listener_ptr listener2 = facade->listen(Address::make("127.0.0.1", 9092));
 
-    Session_ptr session1 = facade->connect(Address::make("127.0.0.1", "9091"));
-    Session_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
+    Session_ptr session1 = facade->connect(Address::make("127.0.0.1", 9091));
+    Session_ptr session2 = facade->connect(Address::make("127.0.0.1", 9092));
 
     // Lets send a couple of events!
-    //session1->sendEvent(SendEvent(1010, "hello", 6));
+    session1->sendEvent(SendEvent(1010, "hello", 6));
     session2->sendEvent(SendEvent(2020, "die!", 5));
 
     // Always nice to know who you are communicating with..
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
-        //std::cout <<
-                  //"Local: " << session1->getLocalEndpointAddress() <<
-                  //" Remote: " << session1->getRemoteEndpointAddress() << std::endl;
+        std::cout <<
+                  "Local: " << session1->getLocalEndpointAddress() <<
+                  " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
         std::cout <<
                   "Local: " << session2->getLocalEndpointAddress() <<
                   " Remote: " << session2->getRemoteEndpointAddress() << std::endl;

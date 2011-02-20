@@ -2,6 +2,8 @@
 #include "AsioSession.h"
 #include "AsioResolver.h"
 
+using namespace boost::asio;
+
 namespace sevent
 {
     namespace asiosocket
@@ -19,13 +21,11 @@ namespace sevent
 
         socket::Session_ptr AsioConnector::connect(const socket::Address_ptr addr)
         {
-            boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
-            boost::asio::ip::tcp::resolver::query query(addr->host(), addr->port());
-            boost::asio::ip::tcp::resolver::iterator iterator = resolver.resolve(query);
-            boost::asio::ip::tcp::endpoint endpoint = *iterator;
+            ip::address address = ip::address::from_string(addr->host());
+            ip::tcp::endpoint endpoint(address, addr->port());
 
             socket_ptr sock(new boost::asio::ip::tcp::socket(
-                                _socketservice->_io_service));
+                        _socketservice->_io_service));
             sock->connect(endpoint);
             AsioSession_ptr session = AsioSession::make(sock);
             _sessionRegistry->add(session);

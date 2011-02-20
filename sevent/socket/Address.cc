@@ -1,11 +1,12 @@
 #include "Address.h"
+#include <boost/lexical_cast.hpp>
 
 namespace sevent
 {
     namespace socket
     {
 
-        Address::Address(const std::string& host, const std::string& port) :
+        Address::Address(const std::string& host, unsigned short port) :
             _host(host), _port(port)
         {
         }
@@ -14,7 +15,7 @@ namespace sevent
         {
         }
 
-        Address_ptr Address::make(const std::string& host, const std::string& port)
+        Address_ptr Address::make(const std::string& host, unsigned short port)
         {
             return Address_ptr(new Address(host, port));
         }
@@ -23,14 +24,14 @@ namespace sevent
         {
             return _host;
         }
-        const std::string& Address::port() const
+        unsigned short Address::port() const
         {
             return _port;
         }
 
         std::string Address::str() const
         {
-            return _host + ":" + _port;
+            return _host + ":" + boost::lexical_cast<std::string>(_port);
         }
 
         std::ostream& operator<<(std::ostream& out, const Address& address)

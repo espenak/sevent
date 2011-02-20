@@ -1,6 +1,5 @@
 #include "AsioResolver.h"
 #include <boost/asio.hpp>
-#include <boost/lexical_cast.hpp>
 
 namespace sevent {
     namespace asiosocket {
@@ -13,8 +12,7 @@ namespace sevent {
             boost::asio::ip::tcp::endpoint endpoint = *iterator;
 
             std::string hostIp = endpoint.address().to_string();
-            //unsigned short port = _sock->remote_endpoint().port();
-            return socket::Address::make(hostIp, boost::lexical_cast<std::string>(port));
+            return socket::Address::make(hostIp, port);
         }
     } // namespace asiosocket
 } // namespace sevent

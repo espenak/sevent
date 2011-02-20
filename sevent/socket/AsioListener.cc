@@ -2,6 +2,8 @@
 #include <boost/bind.hpp>
 #include "AsioSession.h"
 
+using namespace boost::asio;
+
 namespace sevent
 {
     namespace asiosocket
@@ -18,12 +20,16 @@ namespace sevent
         {
         }
 
-        void AsioListener::listen(socket::Address_ptr address)
+        void AsioListener::listen(socket::Address_ptr addr)
         {
-            boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
-            boost::asio::ip::tcp::resolver::query query(address->host(),
-                    address->port());
-            boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+            //boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
+            //boost::asio::ip::tcp::resolver::query query(address->host(),
+                    //address->port());
+            //boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+
+            ip::address address = ip::address::from_string(addr->host());
+            ip::tcp::endpoint endpoint(address, addr->port());
+
             _acceptor.open(endpoint.protocol());
             _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
             _acceptor.bind(endpoint);
