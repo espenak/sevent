@@ -79,6 +79,7 @@ namespace sevent
                 throw boost::system::system_error(error);
             }
             _allEventsHandler(shared_from_this(), socket::ReceiveEvent(eventid, data, dataSize));
+            delete[] data;
             receiveEvents();
         }
 

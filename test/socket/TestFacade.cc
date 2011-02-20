@@ -203,9 +203,9 @@ void sendHugeMessagesThread(Session_ptr session, int id, int messageCount)
 BOOST_AUTO_TEST_CASE( LongStreamMiltiThreadMultiClient )
 {
     BOOST_TEST_MESSAGE("Testing with 10000 messages from 5 clients with 8 listening threads");
-    int max = 1000;
+    int max = 10000;
     LongStreamMultiClientEventsHandler allEventsHandler(max);
-    facade->setWorkerThreads(1,
+    facade->setWorkerThreads(5,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
     boost::thread t1(sendMessagesThread, session, 2001, max/5, std::string("hello"));
