@@ -5,18 +5,19 @@
 #include <boost/thread/condition_variable.hpp>
 #include "sevent/socket/Facade.h"
 
-class AllEventsHandler
+class CountingAllEventsHandler
 {
     public:
         typedef void result_type;
     public:
-        AllEventsHandler(int expectedCalls) :
+        CountingAllEventsHandler(int expectedCalls) :
             _counter(0), _expectedCalls(expectedCalls)
         {}
 
         void operator()(sevent::socket::Facade_ptr facade,
                 sevent::socket::Session_ptr session, sevent::socket::ReceiveEvent event)
         {
+            doSomething(facade, session, event);
             boost::lock_guard<boost::mutex> lock(counter_lock);
             _counter ++;
             if (_counter == _expectedCalls)
@@ -24,6 +25,11 @@ class AllEventsHandler
                 facade->service()->stop();
             }
         }
+
+        virtual void doSomething(
+                sevent::socket::Facade_ptr facade,
+                sevent::socket::Session_ptr session,
+                sevent::socket::ReceiveEvent event) {}
 
         int counter() const
         {
