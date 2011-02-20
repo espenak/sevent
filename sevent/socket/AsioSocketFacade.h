@@ -1,8 +1,8 @@
 #pragma once
-#include "SocketFacade.h"
-#include "AsioSocketService.h"
-#include "SocketSessionRegistry.h"
-#include "AsioSocketConnector.h"
+#include "Facade.h"
+#include "AsioService.h"
+#include "SessionRegistry.h"
+#include "AsioConnector.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
@@ -10,34 +10,34 @@ namespace sevent
 {
     namespace socket
     {
-        class AsioSocketFacade;
-        typedef boost::shared_ptr<AsioSocketFacade> AsioSocketFacade_ptr;
+        class AsioFacade;
+        typedef boost::shared_ptr<AsioFacade> AsioFacade_ptr;
 
-        class AsioSocketFacade : public SocketFacade,
-            public boost::enable_shared_from_this<AsioSocketFacade>
+        class AsioFacade : public Facade,
+            public boost::enable_shared_from_this<AsioFacade>
         {
             public:
-                static AsioSocketFacade_ptr make();
+                static AsioFacade_ptr make();
             public:
-                AsioSocketFacade();
+                AsioFacade();
             public:
-                virtual ~AsioSocketFacade();
-                virtual SocketService_ptr service();
+                virtual ~AsioFacade();
+                virtual Service_ptr service();
                 virtual void setWorkerThreads(unsigned count,
                                               allEventsHandler_t allEventsHandler);
                 virtual void setWorkerThreads(unsigned count,
                                               workerThread_t workerThreadHandler,
                                               allEventsHandler_t allEventsHandler);
-                virtual SocketListener_ptr listen(Address_ptr address);
-                virtual SocketSession_ptr connect(Address_ptr address);
+                virtual Listener_ptr listen(Address_ptr address);
+                virtual Session_ptr connect(Address_ptr address);
                 virtual void joinAllWorkerThreads();
 
             private:
-                static void defaultWorkerThreadHandler(SocketFacade_ptr facade);
+                static void defaultWorkerThreadHandler(Facade_ptr facade);
             private:
-                AsioSocketService_ptr _service;
-                SocketConnector_ptr _connector;
-                SocketSessionRegistry_ptr _sessionRegistry;
+                AsioService_ptr _service;
+                Connector_ptr _connector;
+                SessionRegistry_ptr _sessionRegistry;
 
                 workerThread_t _workerThreadHanler;
                 allEventsHandler_t _allEventsHandler;

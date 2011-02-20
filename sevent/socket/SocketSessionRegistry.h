@@ -1,5 +1,5 @@
 #pragma once
-#include "SocketSession.h"
+#include "Session.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <vector>
@@ -9,25 +9,25 @@ namespace sevent
     namespace socket
     {
 
-        class SocketSessionRegistry;
-        typedef boost::shared_ptr<SocketSessionRegistry> SocketSessionRegistry_ptr;
+        class SessionRegistry;
+        typedef boost::shared_ptr<SessionRegistry> SessionRegistry_ptr;
 
-        class SocketSessionRegistry
+        class SessionRegistry
         {
             public:
-                static SocketSessionRegistry_ptr make();
+                static SessionRegistry_ptr make();
             public:
-                SocketSessionRegistry();
-                virtual ~SocketSessionRegistry();
-                void add(SocketSession_ptr session);
-                void remove(SocketSession_ptr session);
-                void setDisconnectHandler(SocketSession::disconnectHandler_t disconnectHandler);
-                void setAllEventsHandler(SocketSession::allEventsHandler_t allEventsHandler);
+                SessionRegistry();
+                virtual ~SessionRegistry();
+                void add(Session_ptr session);
+                void remove(Session_ptr session);
+                void setDisconnectHandler(Session::disconnectHandler_t disconnectHandler);
+                void setAllEventsHandler(Session::allEventsHandler_t allEventsHandler);
 
             private:
-                boost::unordered_map<std::string, SocketSession_ptr> _sessions;
-                SocketSession::allEventsHandler_t _allEventsHandler;
-                SocketSession::disconnectHandler_t _disconnectHandler;
+                boost::unordered_map<std::string, Session_ptr> _sessions;
+                Session::allEventsHandler_t _allEventsHandler;
+                Session::disconnectHandler_t _disconnectHandler;
         };
 
     } // namespace socket

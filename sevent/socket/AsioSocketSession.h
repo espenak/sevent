@@ -4,26 +4,26 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/array.hpp>
-#include "SocketSession.h"
+#include "Session.h"
 
 namespace sevent
 {
     namespace socket
     {
 
-        class AsioSocketSession;
-        typedef boost::shared_ptr<AsioSocketSession> AsioSocketSession_ptr;
+        class AsioSession;
+        typedef boost::shared_ptr<AsioSession> AsioSession_ptr;
 
-        class AsioSocketSession: public SocketSession,
-            public boost::enable_shared_from_this<AsioSocketSession>
+        class AsioSession: public Session,
+            public boost::enable_shared_from_this<AsioSession>
         {
             private:
                 typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
             public:
-                static AsioSocketSession_ptr make(socket_ptr sock);
+                static AsioSession_ptr make(socket_ptr sock);
             public:
-                AsioSocketSession(socket_ptr sock);
-                virtual ~AsioSocketSession();
+                AsioSession(socket_ptr sock);
+                virtual ~AsioSession();
                 virtual void sendEvent(EventData eventData);
                 virtual void receiveEvents();
                 virtual Address_ptr getLocalEndpointAddress();

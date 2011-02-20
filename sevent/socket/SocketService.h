@@ -6,16 +6,16 @@ namespace sevent
     namespace socket
     {
 
-        class SocketService
+        class Service
         {
             public:
-                virtual ~SocketService()
+                virtual ~Service()
                 {
                 }
                 virtual void run() = 0;
                 virtual void stop() = 0;
         };
-        typedef boost::shared_ptr<SocketService> SocketService_ptr;
+        typedef boost::shared_ptr<Service> Service_ptr;
 
     } // namespace socket
 } // namespace sevent

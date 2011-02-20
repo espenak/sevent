@@ -6,15 +6,15 @@ namespace sevent
 {
     namespace socket
     {
-        class SocketListener
+        class Listener
         {
             public:
-                virtual ~SocketListener()
+                virtual ~Listener()
                 {
                 };
                 virtual void listen(Address_ptr address) = 0;
         };
 
-        typedef boost::shared_ptr<SocketListener> SocketListener_ptr;
+        typedef boost::shared_ptr<Listener> Listener_ptr;
     } // namespace socket
 } // namespace sevent

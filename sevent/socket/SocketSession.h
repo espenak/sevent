@@ -11,18 +11,18 @@ namespace sevent
     namespace socket
     {
 
-        class SocketSession;
-        typedef boost::shared_ptr<SocketSession> SocketSession_ptr;
+        class Session;
+        typedef boost::shared_ptr<Session> Session_ptr;
 
-        class SocketSession
+        class Session
         {
             public:
-                typedef boost::function<void(SocketSession_ptr socketSession,
+                typedef boost::function<void(Session_ptr socketSession,
                                              EventData eventData)> allEventsHandler_t;
-                typedef boost::function<void(SocketSession_ptr socketSession)>
+                typedef boost::function<void(Session_ptr socketSession)>
                 disconnectHandler_t;
             public:
-                virtual ~SocketSession();
+                virtual ~Session();
                 virtual void sendEvent(EventData eventData) = 0;
                 virtual void receiveEvents() = 0;
                 virtual Address_ptr getLocalEndpointAddress() = 0;
@@ -33,7 +33,7 @@ namespace sevent
                 void setDisconnectHandler(disconnectHandler_t disconnectHandler);
 
             protected:
-                static void defaultAllEventsHandler(SocketSession_ptr socketSession,
+                static void defaultAllEventsHandler(Session_ptr socketSession,
                                                     EventData eventData);
             protected:
                 allEventsHandler_t _allEventsHandler;

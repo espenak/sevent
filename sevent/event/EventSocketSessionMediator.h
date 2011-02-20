@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sevent/socket/EventData.h"
-#include "sevent/socket/SocketSession.h"
+#include "sevent/socket/Session.h"
 #include <boost/shared_ptr.hpp>
 
 namespace sevent
@@ -9,24 +9,24 @@ namespace sevent
     namespace event
     {
 
-        class EventSocketSessionMediator;
-        typedef boost::shared_ptr<EventSocketSessionMediator>
-        EventSocketSessionMediator_ptr;
+        class EventSessionMediator;
+        typedef boost::shared_ptr<EventSessionMediator>
+        EventSessionMediator_ptr;
 
-        /** Somewhat decouples eventhandlers from SocketSession by only giving events
+        /** Somewhat decouples eventhandlers from Session by only giving events
          * access to the functions they need.
          */
-        class EventSocketSessionMediator
+        class EventSessionMediator
         {
             public:
-                static EventSocketSessionMediator_ptr make(
-                    socket::SocketSession_ptr socketSession);
+                static EventSessionMediator_ptr make(
+                    socket::Session_ptr socketSession);
             public:
-                EventSocketSessionMediator(socket::SocketSession_ptr socketSession);
-                virtual ~EventSocketSessionMediator();
+                EventSessionMediator(socket::Session_ptr socketSession);
+                virtual ~EventSessionMediator();
                 void sendEvent(socket::EventData eventData);
             private:
-                socket::SocketSession_ptr _socketSession;
+                socket::Session_ptr _socketSession;
         };
 
     } // namespace event

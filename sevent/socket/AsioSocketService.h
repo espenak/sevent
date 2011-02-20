@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SocketService.h"
+#include "Service.h"
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -9,16 +9,16 @@ namespace sevent
     namespace socket
     {
 
-        class AsioSocketService;
-        typedef boost::shared_ptr<AsioSocketService> AsioSocketService_ptr;
+        class AsioService;
+        typedef boost::shared_ptr<AsioService> AsioService_ptr;
 
-        class AsioSocketService: public SocketService
+        class AsioService: public Service
         {
             public:
-                static AsioSocketService_ptr make();
+                static AsioService_ptr make();
             public:
-                AsioSocketService();
-                virtual ~AsioSocketService();
+                AsioService();
+                virtual ~AsioService();
             public:
                 virtual void run();
                 virtual void stop();
