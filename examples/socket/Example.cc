@@ -14,12 +14,12 @@ using namespace sevent::socket;
 using namespace sevent::asiosocket;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
-void allEventsHandler(Session_ptr session, ReceiveEvent eventData,
+void allEventsHandler(Session_ptr session, ReceiveEvent event,
                       Service_ptr service)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
-    if (eventData.eventid() == 2020)
+    std::cout << "Event " << event.eventid() << " received!" << std::endl;
+    if (event.eventid() == 2020)
     {
         std::cout << "Stopping service handler ..." << std::endl;
         service->stop();

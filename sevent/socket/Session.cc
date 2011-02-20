@@ -16,14 +16,14 @@ namespace sevent
         }
 
         void Session::defaultAllEventsHandler(Session_ptr socketSession,
-                ReceiveEvent eventData)
+                ReceiveEvent event)
         {
             std::cout << "Event received by default all-events handler. "
                       << "Use Session::setAllEventsHandler to plug in your own."
-                      << std::endl << "Event id: " << eventData.eventid() << std::endl
-                      << "Event data size: " << eventData.dataSize() << std::endl
+                      << std::endl << "Event id: " << event.eventid() << std::endl
+                      << "Event data size: " << event.dataSize() << std::endl
                       << "Event data: ";
-            std::cout.write(eventData.data(), eventData.dataSize());
+            std::cout.write(event.data(), event.dataSize());
             std::cout << std::endl;
         }
 

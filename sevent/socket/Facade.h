@@ -23,7 +23,7 @@ namespace sevent
                 typedef boost::function<void(
                     Facade_ptr facade,
                     Session_ptr session,
-                    ReceiveEvent eventData)> allEventsHandler_t;
+                    ReceiveEvent event)> allEventsHandler_t;
                 typedef boost::function<void(Facade_ptr facade)> workerThread_t;
             public:
                 virtual ~Facade() {};

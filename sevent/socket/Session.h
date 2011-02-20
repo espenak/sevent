@@ -19,12 +19,12 @@ namespace sevent
         {
             public:
                 typedef boost::function<void(Session_ptr socketSession,
-                                             ReceiveEvent eventData)> allEventsHandler_t;
+                                             ReceiveEvent event)> allEventsHandler_t;
                 typedef boost::function<void(Session_ptr socketSession)>
                 disconnectHandler_t;
             public:
                 virtual ~Session();
-                virtual void sendEvent(const SendEvent& eventData) = 0;
+                virtual void sendEvent(const SendEvent& event) = 0;
                 virtual void receiveEvents() = 0;
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;
@@ -35,7 +35,7 @@ namespace sevent
 
             protected:
                 static void defaultAllEventsHandler(Session_ptr socketSession,
-                                                    ReceiveEvent eventData);
+                                                    ReceiveEvent event);
             protected:
                 allEventsHandler_t _allEventsHandler;
                 disconnectHandler_t _disconnectHandler;
