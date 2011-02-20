@@ -1,4 +1,14 @@
 #pragma once
+
+/** A map of event handles to make it easier to route events.
+ *
+ * 
+ * \section Example
+ *
+ * \include EventExample.cc
+ * */
+
+
 #include "socket.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>

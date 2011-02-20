@@ -11,7 +11,7 @@
  *
  * \section Example
  *
- * \include socket/FacadeExample.cc
+ * \include SocketExample.cc
  */
 
 
