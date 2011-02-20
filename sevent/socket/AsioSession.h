@@ -24,7 +24,7 @@ namespace sevent
             public:
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
-                virtual void sendEvent(socket::EventData eventData);
+                virtual void sendEvent(const socket::SendEvent& event);
                 virtual void receiveEvents();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();

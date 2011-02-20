@@ -26,17 +26,17 @@ namespace sevent
             return AsioSession_ptr(new AsioSession(sock));
         }
 
-        void AsioSession::sendEvent(socket::EventData eventData)
+        void AsioSession::sendEvent(const socket::SendEvent& event)
         {
-            uint32_t eventIdNetworkOrder = htonl(eventData.eventid());
-            uint32_t sizeNetworkOrder = htonl(eventData.dataSize());
+            uint32_t eventIdNetworkOrder = htonl(event.eventid());
+            uint32_t sizeNetworkOrder = htonl(event.dataSize());
 
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
                                                   sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-            buffers.push_back(boost::asio::buffer(eventData.data(),
-                                                  eventData.dataSize()));
+            buffers.push_back(boost::asio::buffer(event.data(),
+                                                  event.dataSize()));
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 

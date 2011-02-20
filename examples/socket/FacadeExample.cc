@@ -16,7 +16,7 @@ void allEventsHandler(Facade_ptr facade,
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
-    if (eventData.eventid() == 20)
+    if (eventData.eventid() == 2020)
     {
         std::cout << "Stopping service handler ..." << std::endl;
         facade->service()->stop();
@@ -35,10 +35,8 @@ int main(int argc, const char *argv[])
     Session_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
 
     // Lets send a couple of events!
-    char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
-    session1->sendEvent(EventData(10, hello, 6));
-    char die[5] = { 'd', 'i', 'e', '!', '\0' };
-    session2->sendEvent(EventData(20, die, 5));
+    session1->sendEvent(SendEvent(1010, "hello", 6));
+    session2->sendEvent(SendEvent(2020, "die!", 5));
 
     // Always nice to know who you are communicating with..
     {
@@ -52,7 +50,7 @@ int main(int argc, const char *argv[])
     }
 
     // Wait for all work to finish. In this example this will happen
-    // when the second message (with id:20) has been handled by allEventsHandler
+    // when the second message (with id:2020) has been handled by allEventsHandler
     facade->joinAllWorkerThreads();
 
     return 0;

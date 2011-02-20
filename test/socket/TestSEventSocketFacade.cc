@@ -23,10 +23,8 @@ BOOST_AUTO_TEST_CASE( TestSEventSocketFacadeSanity )
     Listener_ptr listener = facade->listen(Address::make("127.0.0.1", "9091"));
     Session_ptr session = facade->connect(Address::make("127.0.0.1", "9091"));
 
-    char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
-    session->sendEvent(EventData(10, hello, 6));
-    char die[6] = { 'w', 'o', 'r', 'l', 'd', '\0' };
-    session->sendEvent(EventData(20, die, 6));
+    session->sendEvent(SendEvent(1010, "Hello", 6));
+    session->sendEvent(SendEvent(2020, "World", 6));
 
     facade->joinAllWorkerThreads();
     

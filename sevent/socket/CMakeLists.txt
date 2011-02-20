@@ -11,6 +11,7 @@ add_library(sevent_socket STATIC
     LocalSession.cc LocalSession.h
     SessionRegistry.cc SessionRegistry.h
     EventData.cc EventData.h
+    SendEvent.cc SendEvent.h
     Facade.h Facade.cc
     AsioFacade.cc AsioFacade.h
 )

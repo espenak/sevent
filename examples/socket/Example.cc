@@ -12,12 +12,14 @@
 
 using namespace sevent::socket;
 using namespace sevent::asiosocket;
+boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
 void allEventsHandler(Session_ptr session, EventData eventData,
                       Service_ptr service)
 {
+    boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
-    if (eventData.eventid() == 20)
+    if (eventData.eventid() == 2020)
     {
         std::cout << "Stopping service handler ..." << std::endl;
         service->stop();
@@ -33,12 +35,14 @@ void workerThread(Service_ptr service)
     }
     catch (boost::exception& e)
     {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "[" << boost::this_thread::get_id()
                   << "] Exception: " << boost::diagnostic_information(e)
                   << std::endl;
     }
     catch (std::exception& e)
     {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "[" << boost::this_thread::get_id()
                   << "] Exception: " << e.what() << std::endl;
     }
@@ -81,10 +85,8 @@ int main(int argc, const char *argv[])
     Session_ptr session2 = client.connect(serverAddr2);
 
     // Lets send a couple of events!
-    char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
-    session1->sendEvent(EventData(10, hello, 6));
-    char die[5] = { 'd', 'i', 'e', '!', '\0' };
-    session2->sendEvent(EventData(20, die, 5));
+    session1->sendEvent(SendEvent(1010, "hello", 6));
+    session2->sendEvent(SendEvent(2020, "die!", 5));
 
     // Always nice to know who you are communicating with..
     std::cout <<
@@ -95,7 +97,7 @@ int main(int argc, const char *argv[])
               " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
 
     // Wait for all work to finish. In this example this will happen
-    // when the second message (with id:20) has been handled by allEventsHandler
+    // when the second message (with id:2020) has been handled by allEventsHandler
     worker_threads.join_all();
 
     return 0;

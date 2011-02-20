@@ -4,4 +4,4 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 add_subdirectory(socket)
-add_subdirectory(event)
+#add_subdirectory(event)
