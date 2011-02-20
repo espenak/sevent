@@ -42,6 +42,8 @@ class CountingAllEventsHandler
         boost::mutex counter_lock;
 };
 
+enum Sizes { OneKiloByte=1024, HalfMegaByte=524288, OneMegaByte=1048576 };
+
 
 struct BasicFixture {
     sevent::socket::Facade_ptr facade;
