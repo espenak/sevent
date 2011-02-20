@@ -1,5 +1,6 @@
 build/
 xcodebuild/
+doc/
 *.o
 *.so
 *.a
