@@ -1,15 +1,13 @@
 #pragma once
 #include <boost/function.hpp>
-#include "sevent/socket/ReceiveEvent.h"
-#include "EventSessionMediator.h"
+#include "sevent/socket.h"
 
 namespace sevent
 {
     namespace event
     {
-
-        typedef boost::function<void(EventSessionMediator_ptr mediator,
-                                     socket::ReceiveEvent& event)> eventHandler_t;
-
+        typedef boost::function<void(Facade_ptr facade,
+                                     Session_ptr session,
+                                     ReceiveEvent& event)> allEventsHandler_t;
     } // namespace event
 } // namespace sevent
