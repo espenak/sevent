@@ -1,30 +1,30 @@
-#include "AsioSocketService.h"
+#include "AsioService.h"
 
 namespace sevent
 {
     namespace socket
     {
 
-        AsioSocketService::AsioSocketService() :
+        AsioService::AsioService() :
             _work(_io_service)
         {
         }
 
-        AsioSocketService::~AsioSocketService()
+        AsioService::~AsioService()
         {
         }
 
-        AsioSocketService_ptr AsioSocketService::make()
+        AsioService_ptr AsioService::make()
         {
-            return AsioSocketService_ptr(new AsioSocketService());
+            return AsioService_ptr(new AsioService());
         }
 
-        void AsioSocketService::run()
+        void AsioService::run()
         {
             _io_service.run();
         }
 
-        void AsioSocketService::stop()
+        void AsioService::stop()
         {
             _io_service.stop();
         }

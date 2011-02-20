@@ -1,28 +1,28 @@
-#include "EventSocketSessionMediator.h"
+#include "EventSessionMediator.h"
 
 namespace sevent
 {
     namespace event
     {
 
-        EventSocketSessionMediator::EventSocketSessionMediator(
-            socket::SocketSession_ptr socketSession) :
+        EventSessionMediator::EventSessionMediator(
+            socket::Session_ptr socketSession) :
             _socketSession(socketSession)
         {
         }
 
-        EventSocketSessionMediator::~EventSocketSessionMediator()
+        EventSessionMediator::~EventSessionMediator()
         {
         }
 
-        EventSocketSessionMediator_ptr EventSocketSessionMediator::make(
-            socket::SocketSession_ptr socketSession)
+        EventSessionMediator_ptr EventSessionMediator::make(
+            socket::Session_ptr socketSession)
         {
-            return EventSocketSessionMediator_ptr(new EventSocketSessionMediator(
+            return EventSessionMediator_ptr(new EventSessionMediator(
                     socketSession));
         }
 
-        void EventSocketSessionMediator::sendEvent(socket::EventData eventData)
+        void EventSessionMediator::sendEvent(socket::EventData eventData)
         {
             _socketSession->sendEvent(eventData);
         }

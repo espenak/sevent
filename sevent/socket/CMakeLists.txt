@@ -1,17 +1,17 @@
 add_library(sevent_socket STATIC
-    SocketService.h
-    AsioSocketService.cc AsioSocketService.h
+    Service.h
+    AsioService.cc AsioService.h
     Address.h Address.cc
-    SocketListener.h
-    AsioSocketListener.cc AsioSocketListener.h
-    SocketConnector.h
-    AsioSocketConnector.cc AsioSocketConnector.h
-    SocketSession.cc SocketSession.h
-    AsioSocketSession.cc AsioSocketSession.h
+    Listener.h
+    AsioListener.cc AsioListener.h
+    Connector.h
+    AsioConnector.cc AsioConnector.h
+    Session.cc Session.h
+    AsioSession.cc AsioSession.h
     LocalSession.cc LocalSession.h
-    SocketSessionRegistry.cc SocketSessionRegistry.h
+    SessionRegistry.cc SessionRegistry.h
     EventData.cc EventData.h
-    SocketFacade.h SocketFacade.cc
-    AsioSocketFacade.cc AsioSocketFacade.h
+    Facade.h Facade.cc
+    AsioFacade.cc AsioFacade.h
 )
 target_link_libraries(sevent_socket ${Boost_LIBRARIES})

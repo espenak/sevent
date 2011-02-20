@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE TestSeventSocket
+#define BOOST_TEST_MODULE TestSevent
 #include <boost/test/unit_test.hpp>
 
 

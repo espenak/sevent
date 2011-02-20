@@ -1,24 +1,24 @@
-#include "AsioSocketListener.h"
+#include "AsioListener.h"
 #include <boost/bind.hpp>
-#include "AsioSocketSession.h"
+#include "AsioSession.h"
 
 namespace sevent
 {
     namespace socket
     {
 
-        AsioSocketListener::AsioSocketListener(AsioSocketService_ptr socketservice,
-                                               SocketSessionRegistry_ptr socketSessionRegistry) :
+        AsioListener::AsioListener(AsioService_ptr socketservice,
+                                               SessionRegistry_ptr socketSessionRegistry) :
             _socketservice(socketservice), _acceptor(socketservice->_io_service),
             _socketSessionRegistry(socketSessionRegistry)
         {
         }
 
-        AsioSocketListener::~AsioSocketListener()
+        AsioListener::~AsioListener()
         {
         }
 
-        void AsioSocketListener::listen(Address_ptr address)
+        void AsioListener::listen(Address_ptr address)
         {
             boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
             boost::asio::ip::tcp::resolver::query query(address->host(),
@@ -31,18 +31,18 @@ namespace sevent
             accept();
         }
 
-        void AsioSocketListener::accept()
+        void AsioListener::accept()
         {
             socket_ptr sock(new boost::asio::ip::tcp::socket(
                                 _socketservice->_io_service));
-            _acceptor.async_accept(*sock, boost::bind(&AsioSocketListener::onAccept,
+            _acceptor.async_accept(*sock, boost::bind(&AsioListener::onAccept,
                                    this, _1, sock));
         }
 
-        void AsioSocketListener::onAccept(const boost::system::error_code & ec,
+        void AsioListener::onAccept(const boost::system::error_code & ec,
                                           socket_ptr sock)
         {
-            AsioSocketSession_ptr session = AsioSocketSession::make(sock);
+            AsioSession_ptr session = AsioSession::make(sock);
             _socketSessionRegistry->add(session);
             session->receiveEvents();
             accept();

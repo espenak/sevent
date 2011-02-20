@@ -1,4 +1,4 @@
-#include "SocketSession.h"
+#include "Session.h"
 #include <iostream>
 
 namespace sevent
@@ -6,20 +6,20 @@ namespace sevent
     namespace socket
     {
 
-        SocketSession::~SocketSession()
+        Session::~Session()
         {
         }
 
-        void SocketSession::setDisconnectHandler(disconnectHandler_t disconnectHandler)
+        void Session::setDisconnectHandler(disconnectHandler_t disconnectHandler)
         {
             _disconnectHandler = disconnectHandler;
         }
 
-        void SocketSession::defaultAllEventsHandler(SocketSession_ptr socketSession,
+        void Session::defaultAllEventsHandler(Session_ptr socketSession,
                 EventData eventData)
         {
             std::cout << "Event received by default all-events handler. "
-                      << "Use SocketSession::setAllEventsHandler to plug in your own."
+                      << "Use Session::setAllEventsHandler to plug in your own."
                       << std::endl << "Event id: " << eventData.eventid() << std::endl
                       << "Event data size: " << eventData.dataSize() << std::endl
                       << "Event data: ";
@@ -27,7 +27,7 @@ namespace sevent
             std::cout << std::endl;
         }
 
-        void SocketSession::setAllEventsHandler(allEventsHandler_t allEventsHandler)
+        void Session::setAllEventsHandler(allEventsHandler_t allEventsHandler)
         {
             _allEventsHandler = allEventsHandler;
         }

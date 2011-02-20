@@ -1,6 +1,6 @@
-#include "AsioSocketFacade.h"
-#include "AsioSocketSession.h"
-#include "AsioSocketListener.h"
+#include "AsioFacade.h"
+#include "AsioSession.h"
+#include "AsioListener.h"
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -10,29 +10,29 @@ namespace sevent
 {
     namespace socket
     {
-        AsioSocketFacade::AsioSocketFacade()
+        AsioFacade::AsioFacade()
         {
-            _service = AsioSocketService::make();
-            _sessionRegistry = SocketSessionRegistry::make();
-            _connector = SocketConnector_ptr(new AsioSocketConnector(
+            _service = AsioService::make();
+            _sessionRegistry = SessionRegistry::make();
+            _connector = Connector_ptr(new AsioConnector(
                                                  _service, _sessionRegistry));
         }
-        AsioSocketFacade::~AsioSocketFacade()
+        AsioFacade::~AsioFacade()
         {
         }
 
-        AsioSocketFacade_ptr AsioSocketFacade::make()
+        AsioFacade_ptr AsioFacade::make()
         {
-            return AsioSocketFacade_ptr(new AsioSocketFacade());
+            return AsioFacade_ptr(new AsioFacade());
         }
 
-        void AsioSocketFacade::setWorkerThreads(unsigned count,
+        void AsioFacade::setWorkerThreads(unsigned count,
                                                 allEventsHandler_t allEventsHandler)
         {
             setWorkerThreads(count, defaultWorkerThreadHandler, allEventsHandler);
         }
 
-        void AsioSocketFacade::setWorkerThreads(unsigned count,
+        void AsioFacade::setWorkerThreads(unsigned count,
                                                 workerThread_t workerThreadHandler,
                                                 allEventsHandler_t allEventsHandler)
         {
@@ -45,30 +45,30 @@ namespace sevent
             }
         }
 
-        SocketListener_ptr AsioSocketFacade::listen(Address_ptr address)
+        Listener_ptr AsioFacade::listen(Address_ptr address)
         {
-            SocketListener_ptr listener = boost::make_shared<AsioSocketListener>(_service, _sessionRegistry);
+            Listener_ptr listener = boost::make_shared<AsioListener>(_service, _sessionRegistry);
             listener->listen(address);
             return listener;
         }
 
-        SocketSession_ptr AsioSocketFacade::connect(Address_ptr address)
+        Session_ptr AsioFacade::connect(Address_ptr address)
         {
             return _connector->connect(address);
         }
 
-        SocketService_ptr AsioSocketFacade::service()
+        Service_ptr AsioFacade::service()
         {
             return _service;
         }
 
-        void AsioSocketFacade::joinAllWorkerThreads()
+        void AsioFacade::joinAllWorkerThreads()
         {
             _worker_threads.join_all();
         }
 
 
-        void AsioSocketFacade::defaultWorkerThreadHandler(SocketFacade_ptr facade)
+        void AsioFacade::defaultWorkerThreadHandler(Facade_ptr facade)
         {
             try
             {

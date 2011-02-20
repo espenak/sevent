@@ -1,22 +1,22 @@
-#include "AsioSocketConnector.h"
-#include "AsioSocketSession.h"
+#include "AsioConnector.h"
+#include "AsioSession.h"
 
 namespace sevent
 {
     namespace socket
     {
 
-        AsioSocketConnector::AsioSocketConnector(AsioSocketService_ptr socketservice,
-                SocketSessionRegistry_ptr sessionRegistry) :
+        AsioConnector::AsioConnector(AsioService_ptr socketservice,
+                SessionRegistry_ptr sessionRegistry) :
             _socketservice(socketservice), _sessionRegistry(sessionRegistry)
         {
         }
 
-        AsioSocketConnector::~AsioSocketConnector()
+        AsioConnector::~AsioConnector()
         {
         }
 
-        SocketSession_ptr AsioSocketConnector::connect(const Address_ptr addr)
+        Session_ptr AsioConnector::connect(const Address_ptr addr)
         {
             boost::asio::ip::tcp::resolver resolver(_socketservice->_io_service);
             boost::asio::ip::tcp::resolver::query query(addr->host(), addr->port());
@@ -26,7 +26,7 @@ namespace sevent
             socket_ptr sock(new boost::asio::ip::tcp::socket(
                                 _socketservice->_io_service));
             sock->connect(endpoint);
-            AsioSocketSession_ptr session = AsioSocketSession::make(sock);
+            AsioSession_ptr session = AsioSession::make(sock);
             _sessionRegistry->add(session);
             return session;
         }

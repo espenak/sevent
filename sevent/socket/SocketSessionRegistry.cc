@@ -1,4 +1,4 @@
-#include "SocketSessionRegistry.h"
+#include "SessionRegistry.h"
 #include <boost/bind.hpp>
 #include <iostream>
 
@@ -7,22 +7,22 @@ namespace sevent
     namespace socket
     {
 
-        SocketSessionRegistry::SocketSessionRegistry()
+        SessionRegistry::SessionRegistry()
         {
-            setDisconnectHandler(boost::bind(&SocketSessionRegistry::remove,
+            setDisconnectHandler(boost::bind(&SessionRegistry::remove,
                                              this, _1));
         }
 
-        SocketSessionRegistry::~SocketSessionRegistry()
+        SessionRegistry::~SessionRegistry()
         {
         }
 
-        SocketSessionRegistry_ptr SocketSessionRegistry::make()
+        SessionRegistry_ptr SessionRegistry::make()
         {
-            return SocketSessionRegistry_ptr(new SocketSessionRegistry());
+            return SessionRegistry_ptr(new SessionRegistry());
         }
 
-        void SocketSessionRegistry::add(SocketSession_ptr session)
+        void SessionRegistry::add(Session_ptr session)
         {
             if (_allEventsHandler)
             {
@@ -33,20 +33,20 @@ namespace sevent
             _sessions[remoteAddr] = session;
         }
 
-        void SocketSessionRegistry::remove(SocketSession_ptr session)
+        void SessionRegistry::remove(Session_ptr session)
         {
             std::string remoteAddr = session->getRemoteEndpointAddress()->str();
             _sessions.erase(remoteAddr);
         }
 
-        void SocketSessionRegistry::setAllEventsHandler(
-            SocketSession::allEventsHandler_t allEventsHandler)
+        void SessionRegistry::setAllEventsHandler(
+            Session::allEventsHandler_t allEventsHandler)
         {
             _allEventsHandler = allEventsHandler;
         }
 
-        void SocketSessionRegistry::setDisconnectHandler(
-            SocketSession::disconnectHandler_t disconnectHandler)
+        void SessionRegistry::setDisconnectHandler(
+            Session::disconnectHandler_t disconnectHandler)
         {
             _disconnectHandler = disconnectHandler;
         }

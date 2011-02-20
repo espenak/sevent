@@ -5,14 +5,14 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket/SocketFacade.h"
+#include "sevent/socket/Facade.h"
 
 
 using namespace sevent::socket;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
-void allEventsHandler(SocketFacade_ptr facade,
-                      SocketSession_ptr session, EventData eventData)
+void allEventsHandler(Facade_ptr facade,
+                      Session_ptr session, EventData eventData)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
@@ -26,13 +26,13 @@ void allEventsHandler(SocketFacade_ptr facade,
 
 int main(int argc, const char *argv[])
 {
-    SocketFacade_ptr facade = SocketFacade::make();
+    Facade_ptr facade = Facade::make();
     facade->setWorkerThreads(5, allEventsHandler);
-    SocketListener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
-    SocketListener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
+    Listener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
+    Listener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
 
-    SocketSession_ptr session1 = facade->connect(Address::make("127.0.0.1", "9091"));
-    SocketSession_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
+    Session_ptr session1 = facade->connect(Address::make("127.0.0.1", "9091"));
+    Session_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
 
     // Lets send a couple of events!
     char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };

@@ -1,13 +1,13 @@
-#include "SocketFacade.h"
-#include "AsioSocketFacade.h"
+#include "Facade.h"
+#include "AsioFacade.h"
 
 namespace sevent
 {
     namespace socket
     {
-        SocketFacade_ptr SocketFacade::make()
+        Facade_ptr Facade::make()
         {
-            return AsioSocketFacade::make();
+            return AsioFacade::make();
         }
     }
 }

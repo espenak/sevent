@@ -5,15 +5,15 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket/SocketService.h"
-#include "sevent/socket/AsioSocketService.h"
-#include "sevent/socket/AsioSocketListener.h"
-#include "sevent/socket/AsioSocketConnector.h"
+#include "sevent/socket/Service.h"
+#include "sevent/socket/AsioService.h"
+#include "sevent/socket/AsioListener.h"
+#include "sevent/socket/AsioConnector.h"
 
 using namespace sevent::socket;
 
-void allEventsHandler(SocketSession_ptr session, EventData eventData,
-                      SocketService_ptr service)
+void allEventsHandler(Session_ptr session, EventData eventData,
+                      Service_ptr service)
 {
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
     if (eventData.eventid() == 20)
@@ -24,7 +24,7 @@ void allEventsHandler(SocketSession_ptr session, EventData eventData,
 }
 
 
-void workerThread(SocketService_ptr service)
+void workerThread(Service_ptr service)
 {
     try
     {
@@ -47,7 +47,7 @@ void workerThread(SocketService_ptr service)
 int main(int argc, const char *argv[])
 {
     // The service handles IO events
-    AsioSocketService_ptr service = AsioSocketService::make();
+    AsioService_ptr service = AsioService::make();
 
     // Start worker threads
     // Worker threads handle IO events like incoming connections and received data
@@ -60,24 +60,24 @@ int main(int argc, const char *argv[])
 
     // Each incoming or outgoing connection get a session. They are all stored in a
     // registry.
-    SocketSessionRegistry_ptr socketSessionRegistry = SocketSessionRegistry::make();
+    SessionRegistry_ptr socketSessionRegistry = SessionRegistry::make();
     socketSessionRegistry->setAllEventsHandler(boost::bind(allEventsHandler, _1, _2, service));
 
     // The listener listens for new connections, creates sessions and adds them to the registry.
     // We can have multiple listeners..
     Address_ptr serverAddr1 = Address::make("127.0.0.1", "9091");
     Address_ptr serverAddr2 = Address::make("127.0.0.1", "9092");
-    AsioSocketListener listener1(service, socketSessionRegistry);
+    AsioListener listener1(service, socketSessionRegistry);
     listener1.listen(serverAddr1);
-    AsioSocketListener listener2(service, socketSessionRegistry);
+    AsioListener listener2(service, socketSessionRegistry);
     listener2.listen(serverAddr2);
     std::cout << "Listening on " << serverAddr1 << std::endl;
     std::cout << "Listening on " << serverAddr2 << std::endl;
 
-    // Clients connect using a SocketConnector.
-    AsioSocketConnector client(service, socketSessionRegistry);
-    SocketSession_ptr session1 = client.connect(serverAddr1);
-    SocketSession_ptr session2 = client.connect(serverAddr2);
+    // Clients connect using a Connector.
+    AsioConnector client(service, socketSessionRegistry);
+    Session_ptr session1 = client.connect(serverAddr1);
+    Session_ptr session2 = client.connect(serverAddr2);
 
     // Lets send a couple of events!
     char hello[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
