@@ -35,8 +35,6 @@ namespace sevent
                                               allEventsHandler_t allEventsHandler) = 0;
                 virtual Listener_ptr listen(Address_ptr address) = 0;
                 virtual Session_ptr connect(Address_ptr address) = 0;
-                virtual Address_ptr resolve(const std::string& host,
-                        unsigned short port) = 0;
                 virtual void joinAllWorkerThreads() = 0;
         };
     }

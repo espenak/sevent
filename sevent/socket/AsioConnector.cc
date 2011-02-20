@@ -1,6 +1,5 @@
 #include "AsioConnector.h"
 #include "AsioSession.h"
-#include "AsioResolver.h"
 
 using namespace boost::asio;
 
