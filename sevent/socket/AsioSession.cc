@@ -41,6 +41,7 @@ namespace sevent
 
         void AsioSession::receiveEvents()
         {
+            _receiveLock.lock();
             _sock->async_receive(boost::asio::buffer(_idAndSizeBuf), boost::bind(
                                      &AsioSession::onIdAndSizeReceived, this, _1, _2));
         }
@@ -80,6 +81,7 @@ namespace sevent
             }
             _allEventsHandler(shared_from_this(), socket::ReceiveEvent(eventid, data, dataSize));
             delete[] data;
+            _receiveLock.unlock();
             receiveEvents();
         }
 
