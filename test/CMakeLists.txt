@@ -1,4 +1,4 @@
-find_package( Boost COMPONENTS unit_test_framework )
+find_package( Boost REQUIRED unit_test_framework date_time )
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories( ${Boost_LIBRARY_DIRS} )
 

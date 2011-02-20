@@ -41,3 +41,22 @@ class CountingAllEventsHandler
         int _expectedCalls;
         boost::mutex counter_lock;
 };
+
+
+struct BasicFixture {
+    sevent::socket::Facade_ptr facade;
+    sevent::socket::Listener_ptr listener;
+    sevent::socket::Session_ptr session;
+    sevent::socket::Address_ptr listenAddr;
+    sevent::socket::Address_ptr sessionAddr;
+
+    BasicFixture ()
+    {
+        facade = sevent::socket::Facade::make();
+        listenAddr = sevent::socket::Address::make("127.0.0.1", 9091);
+        listener = facade->listen(listenAddr);
+        session = facade->connect(listenAddr);
+    }
+
+    ~BasicFixture () {}
+};

@@ -1,6 +1,9 @@
-find_package( Boost COMPONENTS unit_test_framework )
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories( ${Boost_LIBRARY_DIRS} )
 
-add_boost_test(TestSEventSocketFacade TestFacade.cc)
-target_link_libraries(TestSEventSocketFacade sevent_socket)
+add_boost_test(TestSocketFacade TestFacade.cc)
+target_link_libraries(TestSocketFacade sevent_socket)
+
+add_boost_test(TestSocketFacadeMultiClient TestFacadeMultiClient.cc)
+target_link_libraries(TestSocketFacadeMultiClient sevent_socket)
+
+add_boost_test(StressTestSocketFacade StressTestFacade.cc)
+target_link_libraries(StressTestSocketFacade sevent_socket)
