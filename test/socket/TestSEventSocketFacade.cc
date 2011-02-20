@@ -21,7 +21,9 @@ BOOST_AUTO_TEST_CASE( TestSEventSocketFacadeSanity )
     facade->setWorkerThreads(1,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
     Listener_ptr listener = facade->listen(Address::make("127.0.0.1", 9091));
+    //Listener_ptr listener2 = facade->listen(Address::make("127.0.0.1", 9091));
     Session_ptr session = facade->connect(Address::make("127.0.0.1", 9091));
+    //Session_ptr session = facade->connect(Address::make("127.0.0.1", 9090));
 
     session->sendEvent(SendEvent(1010, "Hello", 6));
     session->sendEvent(SendEvent(2020, "World", 6));
