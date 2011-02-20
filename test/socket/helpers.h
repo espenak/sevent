@@ -79,13 +79,3 @@ void sendSizedMessages(sevent::socket::Session_ptr session, unsigned id,
     }
     delete[] buf;
 }
-
-
-void sendStringMessagesThread(sevent::socket::Session_ptr session, unsigned id,
-        unsigned messageCount, const std::string msg)
-{
-    for(unsigned i=0; i<messageCount; i++)
-    {
-        session->sendEvent(sevent::socket::SendEvent(id, msg.c_str(), msg.size()+1));
-    }
-}
