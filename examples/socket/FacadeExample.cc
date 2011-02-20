@@ -12,7 +12,7 @@ using namespace sevent::socket;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
 void allEventsHandler(SocketFacade_ptr facade,
-        SocketSession_ptr session, EventData eventData)
+                      SocketSession_ptr session, EventData eventData)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
@@ -30,7 +30,7 @@ int main(int argc, const char *argv[])
     facade->setWorkerThreads(5, allEventsHandler);
     SocketListener_ptr listener1 = facade->listen(Address::make("127.0.0.1", "9091"));
     SocketListener_ptr listener2 = facade->listen(Address::make("127.0.0.1", "9092"));
-    
+
     SocketSession_ptr session1 = facade->connect(Address::make("127.0.0.1", "9091"));
     SocketSession_ptr session2 = facade->connect(Address::make("127.0.0.1", "9092"));
 
@@ -44,16 +44,16 @@ int main(int argc, const char *argv[])
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout <<
-            "Local: " << session1->getLocalEndpointAddress() <<
-            " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
+                  "Local: " << session1->getLocalEndpointAddress() <<
+                  " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
         std::cout <<
-            "Local: " << session2->getLocalEndpointAddress() <<
-            " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
+                  "Local: " << session2->getLocalEndpointAddress() <<
+                  " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
     }
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler
     facade->joinAllWorkerThreads();
-    
+
     return 0;
 }

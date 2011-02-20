@@ -5,18 +5,18 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-class SocketConnector
-{
-    public:
-        virtual ~SocketConnector()
+        class SocketConnector
         {
-        }
-        virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
-};
-typedef boost::shared_ptr<SocketConnector> SocketConnector_ptr;
+            public:
+                virtual ~SocketConnector()
+                {
+                }
+                virtual SocketSession_ptr connect(const Address_ptr addr) = 0;
+        };
+        typedef boost::shared_ptr<SocketConnector> SocketConnector_ptr;
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

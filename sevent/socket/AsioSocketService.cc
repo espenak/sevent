@@ -2,32 +2,32 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-AsioSocketService::AsioSocketService() :
-    _work(_io_service)
-{
-}
+        AsioSocketService::AsioSocketService() :
+            _work(_io_service)
+        {
+        }
 
-AsioSocketService::~AsioSocketService()
-{
-}
+        AsioSocketService::~AsioSocketService()
+        {
+        }
 
-AsioSocketService_ptr AsioSocketService::make()
-{
-    return AsioSocketService_ptr(new AsioSocketService());
-}
+        AsioSocketService_ptr AsioSocketService::make()
+        {
+            return AsioSocketService_ptr(new AsioSocketService());
+        }
 
-void AsioSocketService::run()
-{
-    _io_service.run();
-}
+        void AsioSocketService::run()
+        {
+            _io_service.run();
+        }
 
-void AsioSocketService::stop()
-{
-    _io_service.stop();
-}
+        void AsioSocketService::stop()
+        {
+            _io_service.stop();
+        }
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

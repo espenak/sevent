@@ -2,19 +2,19 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-LocalSession::LocalSession()
-{
-	// TODO Auto-generated constructor stub
+        LocalSession::LocalSession()
+        {
+            // TODO Auto-generated constructor stub
 
-}
+        }
 
-LocalSession::~LocalSession()
-{
-	// TODO Auto-generated destructor stub
-}
+        LocalSession::~LocalSession()
+        {
+            // TODO Auto-generated destructor stub
+        }
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

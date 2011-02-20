@@ -7,26 +7,26 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-class AsioSocketListener: public SocketListener
-{
-    private:
-        typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
-    public:
-        AsioSocketListener(AsioSocketService_ptr socketservice,
-                SocketSessionRegistry_ptr socketSessionRegistry);
-        virtual ~AsioSocketListener();
-        virtual void listen(Address_ptr address);
-    private:
-        void accept();
-        void onAccept(const boost::system::error_code & ec, socket_ptr sock);
-    private:
-        AsioSocketService_ptr _socketservice;
-        boost::asio::ip::tcp::acceptor _acceptor;
-        SocketSessionRegistry_ptr _socketSessionRegistry;
-};
+        class AsioSocketListener: public SocketListener
+        {
+            private:
+                typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
+            public:
+                AsioSocketListener(AsioSocketService_ptr socketservice,
+                                   SocketSessionRegistry_ptr socketSessionRegistry);
+                virtual ~AsioSocketListener();
+                virtual void listen(Address_ptr address);
+            private:
+                void accept();
+                void onAccept(const boost::system::error_code & ec, socket_ptr sock);
+            private:
+                AsioSocketService_ptr _socketservice;
+                boost::asio::ip::tcp::acceptor _acceptor;
+                SocketSessionRegistry_ptr _socketSessionRegistry;
+        };
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

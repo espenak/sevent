@@ -5,20 +5,20 @@
 
 namespace sevent
 {
-namespace event
-{
+    namespace event
+    {
 
-class EventHandlerCollection
-{
-    public:
-        EventHandlerCollection();
-        virtual ~EventHandlerCollection();
-        void addEventHandler(socket::EventData::eventId_t eventid, eventHandler_t eventHandler);
-        void triggerEvent(socket::EventData eventData);
+        class EventHandlerCollection
+        {
+            public:
+                EventHandlerCollection();
+                virtual ~EventHandlerCollection();
+                void addEventHandler(socket::EventData::eventId_t eventid, eventHandler_t eventHandler);
+                void triggerEvent(socket::EventData eventData);
 
-    private:
-        std::map<socket::EventData::eventId_t, eventHandler_t> _eventHandlers;
-};
+            private:
+                std::map<socket::EventData::eventId_t, eventHandler_t> _eventHandlers;
+        };
 
-} // namespace event
+    } // namespace event
 } // namespace sevent

@@ -8,11 +8,11 @@ namespace sevent
     {
         class SocketListener
         {
-        public:
-            virtual ~SocketListener()
-            {
-            };
-            virtual void listen(Address_ptr address) = 0;
+            public:
+                virtual ~SocketListener()
+                {
+                };
+                virtual void listen(Address_ptr address) = 0;
         };
 
         typedef boost::shared_ptr<SocketListener> SocketListener_ptr;

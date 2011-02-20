@@ -13,7 +13,7 @@
 using namespace sevent::socket;
 
 void allEventsHandler(SocketSession_ptr session, EventData eventData,
-        SocketService_ptr service)
+                      SocketService_ptr service)
 {
     std::cout << "Event " << eventData.eventid() << " received!" << std::endl;
     if (eventData.eventid() == 20)
@@ -29,15 +29,17 @@ void workerThread(SocketService_ptr service)
     try
     {
         service->run();
-    } catch (boost::exception& e)
+    }
+    catch (boost::exception& e)
     {
         std::cout << "[" << boost::this_thread::get_id()
-                << "] Exception: " << boost::diagnostic_information(e)
-                << std::endl;
-    } catch (std::exception& e)
+                  << "] Exception: " << boost::diagnostic_information(e)
+                  << std::endl;
+    }
+    catch (std::exception& e)
     {
         std::cout << "[" << boost::this_thread::get_id()
-                << "] Exception: " << e.what() << std::endl;
+                  << "] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -85,11 +87,11 @@ int main(int argc, const char *argv[])
 
     // Always nice to know who you are communicating with..
     std::cout <<
-            "Local: " << session1->getLocalEndpointAddress() <<
-            " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
+              "Local: " << session1->getLocalEndpointAddress() <<
+              " Remote: " << session1->getRemoteEndpointAddress() << std::endl;
     std::cout <<
-            "Local: " << session2->getLocalEndpointAddress() <<
-            " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
+              "Local: " << session2->getLocalEndpointAddress() <<
+              " Remote: " << session2->getRemoteEndpointAddress() << std::endl;
 
     // Wait for all work to finish. In this example this will happen
     // when the second message (with id:20) has been handled by allEventsHandler

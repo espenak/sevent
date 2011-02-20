@@ -3,19 +3,19 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-class SocketService
-{
-    public:
-        virtual ~SocketService()
+        class SocketService
         {
-        }
-        virtual void run() = 0;
-        virtual void stop() = 0;
-};
-typedef boost::shared_ptr<SocketService> SocketService_ptr;
+            public:
+                virtual ~SocketService()
+                {
+                }
+                virtual void run() = 0;
+                virtual void stop() = 0;
+        };
+        typedef boost::shared_ptr<SocketService> SocketService_ptr;
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

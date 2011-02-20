@@ -2,15 +2,15 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-class LocalSession
-{
-	public:
-		LocalSession();
-		virtual ~LocalSession();
-};
+        class LocalSession
+        {
+            public:
+                LocalSession();
+                virtual ~LocalSession();
+        };
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

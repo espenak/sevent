@@ -15,36 +15,36 @@ namespace sevent
             _service = AsioSocketService::make();
             _sessionRegistry = SocketSessionRegistry::make();
             _connector = SocketConnector_ptr(new AsioSocketConnector(
-                    _service, _sessionRegistry));
+                                                 _service, _sessionRegistry));
         }
         AsioSocketFacade::~AsioSocketFacade()
         {
         }
-        
+
         AsioSocketFacade_ptr AsioSocketFacade::make()
         {
             return AsioSocketFacade_ptr(new AsioSocketFacade());
         }
-        
+
         void AsioSocketFacade::setWorkerThreads(unsigned count,
-                allEventsHandler_t allEventsHandler)
+                                                allEventsHandler_t allEventsHandler)
         {
             setWorkerThreads(count, defaultWorkerThreadHandler, allEventsHandler);
         }
-        
+
         void AsioSocketFacade::setWorkerThreads(unsigned count,
-                workerThread_t workerThreadHandler,
-                allEventsHandler_t allEventsHandler)
+                                                workerThread_t workerThreadHandler,
+                                                allEventsHandler_t allEventsHandler)
         {
             _sessionRegistry->setAllEventsHandler(
-                    boost::bind(allEventsHandler, shared_from_this(), _1, _2));
+                boost::bind(allEventsHandler, shared_from_this(), _1, _2));
             for (unsigned x = 0; x < count; ++x)
             {
                 _worker_threads.create_thread(
-                        boost::bind(workerThreadHandler, shared_from_this()));
+                    boost::bind(workerThreadHandler, shared_from_this()));
             }
         }
-        
+
         SocketListener_ptr AsioSocketFacade::listen(Address_ptr address)
         {
             SocketListener_ptr listener = boost::make_shared<AsioSocketListener>(_service, _sessionRegistry);
@@ -56,7 +56,7 @@ namespace sevent
         {
             return _connector->connect(address);
         }
-        
+
         SocketService_ptr AsioSocketFacade::service()
         {
             return _service;
@@ -66,22 +66,24 @@ namespace sevent
         {
             _worker_threads.join_all();
         }
-        
+
 
         void AsioSocketFacade::defaultWorkerThreadHandler(SocketFacade_ptr facade)
         {
             try
             {
                 facade->service()->run();
-            } catch (boost::exception& e)
+            }
+            catch (boost::exception& e)
             {
                 std::cerr << "[" << boost::this_thread::get_id()
-                        << "] Exception: " << boost::diagnostic_information(e)
-                        << std::endl;
-            } catch (std::exception& e)
+                          << "] Exception: " << boost::diagnostic_information(e)
+                          << std::endl;
+            }
+            catch (std::exception& e)
             {
                 std::cerr << "[" << boost::this_thread::get_id()
-                        << "] Exception: " << e.what() << std::endl;
+                          << "] Exception: " << e.what() << std::endl;
             }
         }
     }

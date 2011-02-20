@@ -2,32 +2,32 @@
 
 namespace sevent
 {
-namespace socket
-{
+    namespace socket
+    {
 
-EventData::EventData(eventId_t eventid, char *data, dataSize_t dataSize) :
-        _eventid(eventid), _data(data), _dataSize(dataSize)
-{
-}
+        EventData::EventData(eventId_t eventid, char *data, dataSize_t dataSize) :
+            _eventid(eventid), _data(data), _dataSize(dataSize)
+        {
+        }
 
-EventData::~EventData()
-{
-}
+        EventData::~EventData()
+        {
+        }
 
-EventData::eventId_t EventData::eventid()
-{
-    return _eventid;
-}
+        EventData::eventId_t EventData::eventid()
+        {
+            return _eventid;
+        }
 
-EventData::dataSize_t EventData::dataSize()
-{
-    return _dataSize;
-}
+        EventData::dataSize_t EventData::dataSize()
+        {
+            return _dataSize;
+        }
 
-char *EventData::data()
-{
-    return _data;
-}
+        char *EventData::data()
+        {
+            return _data;
+        }
 
-} // namespace socket
+    } // namespace socket
 } // namespace sevent

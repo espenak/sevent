@@ -2,25 +2,25 @@
 
 namespace sevent
 {
-namespace event
-{
+    namespace event
+    {
 
-EventHandlerCollection::EventHandlerCollection()
-{
-}
+        EventHandlerCollection::EventHandlerCollection()
+        {
+        }
 
-EventHandlerCollection::~EventHandlerCollection()
-{
-}
+        EventHandlerCollection::~EventHandlerCollection()
+        {
+        }
 
-void EventHandlerCollection::addEventHandler(socket::EventData::eventId_t eventid,
-        eventHandler_t eventHandler)
-{
-}
+        void EventHandlerCollection::addEventHandler(socket::EventData::eventId_t eventid,
+                eventHandler_t eventHandler)
+        {
+        }
 
-void EventHandlerCollection::triggerEvent(socket::EventData eventData)
-{
-}
+        void EventHandlerCollection::triggerEvent(socket::EventData eventData)
+        {
+        }
 
-} // namespace event
+    } // namespace event
 } // namespace sevent
