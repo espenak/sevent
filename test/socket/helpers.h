@@ -10,7 +10,7 @@ class CountingAllEventsHandler
     public:
         typedef void result_type;
     public:
-        CountingAllEventsHandler(int expectedCalls) :
+        CountingAllEventsHandler(unsigned expectedCalls) :
             _counter(0), _expectedCalls(expectedCalls)
         {}
 
@@ -31,14 +31,14 @@ class CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent event) {}
 
-        int counter() const
+        unsigned counter() const
         {
             return _counter;
         }
 
     private:
-        int _counter;
-        int _expectedCalls;
+        unsigned _counter;
+        unsigned _expectedCalls;
         boost::mutex counter_lock;
 };
 

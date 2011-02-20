@@ -42,8 +42,10 @@ namespace sevent
         void AsioSession::receiveEvents()
         {
             _receiveLock.lock();
-            _sock->async_receive(boost::asio::buffer(_idAndSizeBuf), boost::bind(
-                                     &AsioSession::onIdAndSizeReceived, this, _1, _2));
+            boost::asio::async_read(*_sock,
+                    boost::asio::buffer(_idAndSizeBuf),
+                    boost::asio::transfer_all(),
+                    boost::bind(&AsioSession::onIdAndSizeReceived, this, _1, _2));
         }
 
         void AsioSession::onIdAndSizeReceived(
@@ -58,12 +60,17 @@ namespace sevent
             {
                 throw boost::system::system_error(error);
             }
+            else if(byte_transferred != sizeof(uint32_t)*2)
+            {
+                throw std::runtime_error("byte_transferred != sizeof(uint32_t)*2. This is a bug, because transfer_all() should make this impossible.");
+            }
             uint32_t eventid = ntohl(_idAndSizeBuf[0]);
             uint32_t bufferSize = ntohl(_idAndSizeBuf[1]);
             char* buffer = new char[bufferSize];
-            _sock->async_receive(boost::asio::buffer(buffer, bufferSize), boost::bind(
-                                     &AsioSession::onDataReceived, this, _1, _2, eventid, buffer,
-                                     bufferSize));
+            boost::asio::async_read(*_sock,
+                    boost::asio::buffer(buffer, bufferSize),
+                    boost::asio::transfer_all(),
+                    boost::bind(&AsioSession::onDataReceived, this, _1, _2, eventid, buffer, bufferSize));
         }
 
         void AsioSession::onDataReceived(const boost::system::error_code & error,
@@ -78,6 +85,10 @@ namespace sevent
             else if (error)
             {
                 throw boost::system::system_error(error);
+            }
+            else if(byte_transferred != dataSize)
+            {
+                throw std::runtime_error("byte_transferred != dataSize. This is a bug, because transfer_all() should make this impossible.");
             }
             _allEventsHandler(shared_from_this(), socket::ReceiveEvent(eventid, data, dataSize));
             delete[] data;
