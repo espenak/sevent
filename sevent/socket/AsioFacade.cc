@@ -1,6 +1,7 @@
 #include "AsioFacade.h"
 #include "AsioSession.h"
 #include "AsioListener.h"
+#include "AsioResolver.h"
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -65,6 +66,11 @@ namespace sevent
         void AsioFacade::joinAllWorkerThreads()
         {
             _worker_threads.join_all();
+        }
+
+        socket::Address_ptr AsioFacade::resolve(const std::string& host, unsigned short port)
+        {
+            return resolveToAddress(_service, host, port);
         }
 
 

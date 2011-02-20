@@ -30,6 +30,8 @@ namespace sevent
                                               allEventsHandler_t allEventsHandler);
                 virtual socket::Listener_ptr listen(socket::Address_ptr address);
                 virtual socket::Session_ptr connect(socket::Address_ptr address);
+                virtual socket::Address_ptr resolve(const std::string& host,
+                        unsigned short port);
                 virtual void joinAllWorkerThreads();
 
             private:

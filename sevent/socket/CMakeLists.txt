@@ -14,5 +14,6 @@ add_library(sevent_socket STATIC
     SendEvent.cc SendEvent.h
     Facade.h Facade.cc
     AsioFacade.cc AsioFacade.h
+    AsioResolver.cc AsioResolver.h
 )
 target_link_libraries(sevent_socket ${Boost_LIBRARIES})

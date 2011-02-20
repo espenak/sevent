@@ -1,5 +1,6 @@
 #include "AsioConnector.h"
 #include "AsioSession.h"
+#include "AsioResolver.h"
 
 namespace sevent
 {
