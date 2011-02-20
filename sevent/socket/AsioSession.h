@@ -38,6 +38,7 @@ namespace sevent
                 socket_ptr _sock;
                 boost::array<unsigned, 2> _idAndSizeBuf;
                 boost::mutex _receiveLock;
+                boost::mutex _sendLock;
         };
 
     } // namespace asiosocket

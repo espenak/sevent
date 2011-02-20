@@ -27,6 +27,7 @@ namespace sevent
 
         void AsioSession::sendEvent(const socket::SendEvent& event)
         {
+            boost::lock_guard<boost::mutex> lock(_sendLock);
             uint32_t eventIdNetworkOrder = htonl(event.eventid());
             uint32_t sizeNetworkOrder = htonl(event.dataSize());
 
