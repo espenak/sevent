@@ -1,0 +1,2 @@
+#add_boost_test(TestSerializeBoost TestSerializeBoost.cc)
+#target_link_libraries(TestSerializeBoost sevent_serialize)
