@@ -1,8 +1,9 @@
 #pragma once
 
-/** A map of event handles to make it easier to route events.
+/** \namespace sevent::event
  *
- * 
+ * Makes event handling easier.
+ *
  * \section Example
  *
  * \include EventExample.cc
@@ -21,6 +22,7 @@ namespace sevent
         class HandlerMap;
         typedef boost::shared_ptr<HandlerMap> HandlerMap_ptr;
 
+        /** A map of event handlers to make it easier to route events. */
         class HandlerMap
         {
             public:
