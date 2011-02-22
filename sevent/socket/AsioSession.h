@@ -37,27 +37,20 @@ namespace sevent
                 void addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
                                   const socket::ConstBuffer& const_buf);
                 void onHeaderReceived(const boost::system::error_code& error,
-                                         std::size_t byte_transferred);
-                void receiveNextDataBuf();
-                void triggerAllEventsHandler();
-                void receiveDataBufSize();
-                void onDataBufSizeReceived(const boost::system::error_code & error,
-                                           std::size_t byte_transferred,
-                                           uint32_t* sizeBuf);
-                void onDataBufReceived(const boost::system::error_code & error,
-                                       std::size_t byte_transferred, char* data,
-                                       uint32_t dataSize);
+                                      std::size_t byte_transferred);
+
+
                 bool handleTransferErrors(const boost::system::error_code& error,
                                           uint32_t bytesTransferred,
                                           uint32_t expectedBytesTransferred,
                                           const char* bytesTransferredErrmsg);
             private:
                 socket_ptr _sock;
-                boost::array<unsigned, 2> _headerBuf;
                 unsigned dataBufsReceived;
                 std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
                 boost::mutex _receiveLock;
+                boost::array<uint32_t, 2> headerBuf;
         };
 
     } // namespace asiosocket

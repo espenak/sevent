@@ -28,9 +28,9 @@ namespace sevent
         void AsioSession::addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
                                        const socket::ConstBuffer& const_buf)
         {
-            std::cerr << "Adding " << const_buf.size();
-            std::cerr.write((const char*) const_buf.data(), const_buf.size());
-            std::cerr << std::endl;
+            //std::cerr << "Adding " << const_buf.size();
+            //std::cerr.write((const char*) const_buf.data(), const_buf.size());
+            //std::cerr << std::endl;
             uint32_t sizeNetworkOrder = htonl(const_buf.size());
             buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(const_buf.data(),
@@ -75,13 +75,49 @@ namespace sevent
         {
             _receiveLock.lock();
             std::cerr << "receiveEvents" << std::endl;
-            dataBufsReceived = 0;
             boost::asio::async_read(*_sock,
-                    boost::asio::buffer(_headerBuf),
-                    boost::asio::transfer_all(),
-                    boost::bind(&AsioSession::onHeaderReceived, this, _1, _2));
+                                    boost::asio::buffer(headerBuf),
+                                    boost::asio::transfer_all(),
+                                    boost::bind(&AsioSession::onHeaderReceived,
+                                                this, _1, _2));
         }
 
+
+        void AsioSession::onHeaderReceived(const boost::system::error_code & error,
+                                           std::size_t byte_transferred)
+        {
+            if(!handleTransferErrors(error,
+                                     byte_transferred,
+                                     sizeof(uint32_t)*2,
+                                     "byte_transferred != sizeof(uint32_t)*2"))
+            {
+                return;
+            }
+            uint32_t eventid = ntohl(headerBuf[0]);
+            uint32_t numElements = ntohl(headerBuf[1]);
+
+            std::cerr << "onHeaderReceived "
+                << " eventid:" << eventid
+                << " elemcount:" << numElements
+                << std::endl;
+
+            boost::array<uint32_t, 1> dataSizeBuf;
+            boost::asio::read(*_sock, boost::asio::buffer(dataSizeBuf), boost::asio::transfer_all());
+            uint32_t dataSize = ntohl(dataSizeBuf[0]);
+
+            char* data = new char[dataSize];
+            boost::asio::read(*_sock,
+                              boost::asio::buffer(data, dataSize),
+                              boost::asio::transfer_all());
+
+            socket::ReceiveEvent event(eventid,
+                                       data,
+                                       dataSize);
+            _allEventsHandler(shared_from_this(), event);
+            std::cerr << "data: " << data << std::endl;
+            _receiveLock.unlock();
+            receiveEvents();
+        }
 
         bool AsioSession::handleTransferErrors(const boost::system::error_code& error,
                                                uint32_t bytesTransferred,
@@ -105,6 +141,7 @@ namespace sevent
         }
 
 
+        /*
         void AsioSession::onHeaderReceived(
             const boost::system::error_code & error, std::size_t byte_transferred)
         {
@@ -197,6 +234,7 @@ namespace sevent
                 << std::endl;
             receiveNextDataBuf();
         }
+        */
 
         socket::Address_ptr AsioSession::getRemoteEndpointAddress()
         {
