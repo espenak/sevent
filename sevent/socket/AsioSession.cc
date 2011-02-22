@@ -100,19 +100,28 @@ namespace sevent
             uint32_t numElements = ntohl(_headerBuf[1]);
             if(dataBufsReceived < numElements)
             {
-                boost::asio::async_read(*_sock,
-                                        boost::asio::buffer(_sizeBuf),
-                                        boost::asio::transfer_all(),
-                                        boost::bind(&AsioSession::onDataBufSizeReceived, this, _1, _2));
+                receiveDataBufSize();
             } else {
-                uint32_t eventid = ntohl(_headerBuf[0]);
-                socket::ReceiveEvent event(eventid, (char*) _dataBuffers[0].data(), _dataBuffers[0].size());
-                _allEventsHandler(shared_from_this(), event);
-                _dataBuffers.clear();
-
+                triggerAllEventsHandler();
                 _receiveLock.unlock();
                 receiveEvents();
             }
+        }
+
+        void AsioSession::triggerAllEventsHandler()
+        {
+            uint32_t eventid = ntohl(_headerBuf[0]);
+            socket::ReceiveEvent event(eventid, (char*) _dataBuffers[0].data(), _dataBuffers[0].size());
+            _allEventsHandler(shared_from_this(), event);
+            _dataBuffers.clear();
+        }
+
+        void AsioSession::receiveDataBufSize()
+        {
+            boost::asio::async_read(*_sock,
+                                    boost::asio::buffer(_sizeBuf),
+                                    boost::asio::transfer_all(),
+                                    boost::bind(&AsioSession::onDataBufSizeReceived, this, _1, _2));
         }
 
         void AsioSession::onDataBufSizeReceived(const boost::system::error_code & error,

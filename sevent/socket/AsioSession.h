@@ -37,6 +37,8 @@ namespace sevent
                 void onHeaderReceived(const boost::system::error_code& error,
                                          std::size_t byte_transferred);
                 void receiveNextDataBuf();
+                void triggerAllEventsHandler();
+                void receiveDataBufSize();
                 void onDataBufSizeReceived(const boost::system::error_code & error,
                                            std::size_t byte_transferred);
                 void onDataBufReceived(const boost::system::error_code & error,
