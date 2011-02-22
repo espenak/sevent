@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <boost/bind.hpp>
 #include <arpa/inet.h>
+#include "MutableBuffer.h"
 
 namespace sevent
 {
@@ -28,9 +29,9 @@ namespace sevent
         void AsioSession::addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
                                        const socket::ConstBuffer& const_buf)
         {
-            //std::cerr << "Adding " << const_buf.size();
-            //std::cerr.write((const char*) const_buf.data(), const_buf.size());
-            //std::cerr << std::endl;
+            std::cerr << "Adding " << const_buf.size();
+            std::cerr.write((const char*) const_buf.data(), const_buf.size());
+            std::cerr << std::endl;
             uint32_t sizeNetworkOrder = htonl(const_buf.size());
             buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(const_buf.data(),
@@ -74,7 +75,7 @@ namespace sevent
         void AsioSession::receiveEvents()
         {
             _receiveLock.lock();
-            std::cerr << "receiveEvents" << std::endl;
+            //std::cerr << "receiveEvents" << std::endl;
             boost::asio::async_read(*_sock,
                                     boost::asio::buffer(headerBuf),
                                     boost::asio::transfer_all(),
@@ -101,20 +102,27 @@ namespace sevent
                 << " elemcount:" << numElements
                 << std::endl;
 
-            boost::array<uint32_t, 1> dataSizeBuf;
-            boost::asio::read(*_sock, boost::asio::buffer(dataSizeBuf), boost::asio::transfer_all());
-            uint32_t dataSize = ntohl(dataSizeBuf[0]);
+            socket::MutableBufferVector dataBufs;
+            for(int i = 0; i < numElements; i++)
+            {
+                std::cerr << "Recv size... ";
+                boost::array<uint32_t, 1> dataSizeBuf;
+                boost::asio::read(*_sock, boost::asio::buffer(dataSizeBuf), boost::asio::transfer_all());
+                uint32_t dataSize = ntohl(dataSizeBuf[0]);
+                std::cerr << dataSize << " recv data:";
 
-            char* data = new char[dataSize];
-            boost::asio::read(*_sock,
-                              boost::asio::buffer(data, dataSize),
-                              boost::asio::transfer_all());
+                char* data = new char[dataSize];
+                boost::asio::read(*_sock,
+                                  boost::asio::buffer(data, dataSize),
+                                  boost::asio::transfer_all());
+                dataBufs.push_back(socket::MutableBuffer(data, dataSize));
+                std::cerr << data << std::endl;
+            }
 
             socket::ReceiveEvent event(eventid,
-                                       data,
-                                       dataSize);
+                                       (char*) dataBufs[0].data(),
+                                       dataBufs[0].size());
             _allEventsHandler(shared_from_this(), event);
-            std::cerr << "data: " << data << std::endl;
             _receiveLock.unlock();
             receiveEvents();
         }

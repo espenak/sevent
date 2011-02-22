@@ -18,5 +18,6 @@ namespace sevent
                 void* _data;
                 bufsize_t _size;
         };
+        typedef std::vector<MutableBuffer> MutableBufferVector;
     } // namespace socket
 } // namespace sevent
