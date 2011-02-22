@@ -28,6 +28,9 @@ namespace sevent
         void AsioSession::addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
                                        const socket::ConstBuffer& const_buf)
         {
+            std::cerr << "Adding " << const_buf.size();
+            std::cerr.write((const char*) const_buf.data(), const_buf.size());
+            std::cerr << std::endl;
             uint32_t sizeNetworkOrder = htonl(const_buf.size());
             buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(const_buf.data(),
@@ -53,7 +56,7 @@ namespace sevent
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
             uint32_t eventIdNetworkOrder = htonl(eventid);
-            uint32_t numElementsNetworkOrder = htonl(1);
+            uint32_t numElementsNetworkOrder = htonl(dataBufs.size());
 
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
@@ -71,6 +74,7 @@ namespace sevent
         void AsioSession::receiveEvents()
         {
             _receiveLock.lock();
+            std::cerr << "receiveEvents" << std::endl;
             dataBufsReceived = 0;
             boost::asio::async_read(*_sock,
                     boost::asio::buffer(_headerBuf),
@@ -111,11 +115,16 @@ namespace sevent
             {
                 return;
             }
+            std::cerr << "onHeaderReceived "
+                << " eventid:" << ntohl(_headerBuf[0])
+                << " elemcount:" << ntohl(_headerBuf[1])
+                << std::endl;
             receiveNextDataBuf();
         }
 
         void AsioSession::receiveNextDataBuf()
         {
+            std::cerr << "receiveNextDataBuf" << std::endl;
             uint32_t numElements = ntohl(_headerBuf[1]);
             if(dataBufsReceived < numElements)
             {
@@ -129,6 +138,7 @@ namespace sevent
 
         void AsioSession::triggerAllEventsHandler()
         {
+            std::cerr << "triggerAllEventsHandler" << std::endl;
             uint32_t eventid = ntohl(_headerBuf[0]);
             socket::ReceiveEvent event(eventid, (char*) _dataBuffers[0].data(), _dataBuffers[0].size());
             _allEventsHandler(shared_from_this(), event);
@@ -137,14 +147,18 @@ namespace sevent
 
         void AsioSession::receiveDataBufSize()
         {
+            std::cerr << "receiveDataBufSize" << std::endl;
+            uint32_t* sizeBuf = new uint32_t[1];
             boost::asio::async_read(*_sock,
-                                    boost::asio::buffer(_sizeBuf),
+                                    boost::asio::buffer((char*)sizeBuf, sizeof(uint32_t)),
                                     boost::asio::transfer_all(),
-                                    boost::bind(&AsioSession::onDataBufSizeReceived, this, _1, _2));
+                                    boost::bind(&AsioSession::onDataBufSizeReceived,
+                                                this, _1, _2, sizeBuf));
         }
 
         void AsioSession::onDataBufSizeReceived(const boost::system::error_code & error,
-                                                std::size_t byte_transferred)
+                                                std::size_t byte_transferred,
+                                                uint32_t* sizeBuf)
         {
             if(!handleTransferErrors(error,
                                      byte_transferred,
@@ -153,7 +167,8 @@ namespace sevent
             {
                 return;
             }
-            uint32_t dataSize = ntohl(_sizeBuf[0]);
+            uint32_t dataSize = ntohl(*sizeBuf);
+            std::cerr << "onDataBufSizeReceived: " << dataSize << std::endl;
             char* data = new char[dataSize];
             boost::asio::async_read(*_sock,
                     boost::asio::buffer(data, dataSize),
@@ -175,6 +190,11 @@ namespace sevent
             }
             _dataBuffers.push_back(socket::MutableBuffer(data, dataSize));
             dataBufsReceived ++;
+            std::cerr << "onDataBufReceived: "
+                << "received:" << dataBufsReceived
+                << " data:" << data
+                << " datasize:" << dataSize
+                << std::endl;
             receiveNextDataBuf();
         }
 

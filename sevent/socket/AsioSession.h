@@ -22,6 +22,7 @@ namespace sevent
         {
             private:
                 typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
+                typedef boost::shared_ptr<uint32_t> uint32_ptr;
             public:
                 static AsioSession_ptr make(socket_ptr sock);
             public:
@@ -41,7 +42,8 @@ namespace sevent
                 void triggerAllEventsHandler();
                 void receiveDataBufSize();
                 void onDataBufSizeReceived(const boost::system::error_code & error,
-                                           std::size_t byte_transferred);
+                                           std::size_t byte_transferred,
+                                           uint32_t* sizeBuf);
                 void onDataBufReceived(const boost::system::error_code & error,
                                        std::size_t byte_transferred, char* data,
                                        uint32_t dataSize);
@@ -52,7 +54,6 @@ namespace sevent
             private:
                 socket_ptr _sock;
                 boost::array<unsigned, 2> _headerBuf;
-                boost::array<uint32_t, 1> _sizeBuf;
                 unsigned dataBufsReceived;
                 std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
