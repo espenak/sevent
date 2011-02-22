@@ -1,5 +1,6 @@
 #pragma once
 #include "size.h"
+#include <vector>
 
 
 namespace sevent
@@ -18,5 +19,7 @@ namespace sevent
                 const void* _data;
                 bufsize_t _size;
         };
+
+        typedef std::vector<ConstBuffer> ConstBufferVector;
     } // namespace socket
 } // namespace sevent

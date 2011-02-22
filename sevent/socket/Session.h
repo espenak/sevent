@@ -25,6 +25,7 @@ namespace sevent
             public:
                 virtual ~Session();
                 virtual void sendEvent(unsigned eventid, const ConstBuffer& data) = 0;
+                virtual void sendEvent(unsigned eventid, const ConstBufferVector& dataBufs) = 0;
                 virtual void receiveEvents() = 0;
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;

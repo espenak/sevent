@@ -6,4 +6,4 @@ find_package( Boost REQUIRED system serialization thread)
 
 add_subdirectory(sevent)
 add_subdirectory(test)
-add_subdirectory(examples)
+#add_subdirectory(examples)

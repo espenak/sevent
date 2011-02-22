@@ -49,6 +49,25 @@ namespace sevent
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 
+        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs)
+        {
+            boost::lock_guard<boost::mutex> lock(_sendLock);
+            uint32_t eventIdNetworkOrder = htonl(eventid);
+            uint32_t numElementsNetworkOrder = htonl(1);
+
+            std::vector<boost::asio::const_buffer> buffers;
+            buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
+                                                  sizeof(uint32_t)));
+            buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
+                                                  sizeof(uint32_t)));
+            for(int i = 0; i < dataBufs.size(); i++)
+            {
+                addToBuffers(buffers, dataBufs.at(i));
+            }
+            //addToBuffers(buffers, dataBufs.at(0));
+            boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
+        }
+
         void AsioSession::receiveEvents()
         {
             _receiveLock.lock();
