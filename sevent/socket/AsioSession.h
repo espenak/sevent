@@ -42,6 +42,10 @@ namespace sevent
                 void onDataBufReceived(const boost::system::error_code & error,
                                        std::size_t byte_transferred, char* data,
                                        uint32_t dataSize);
+                bool handleTransferErrors(const boost::system::error_code& error,
+                                          uint32_t bytesTransferred,
+                                          uint32_t expectedBytesTransferred,
+                                          const char* bytesTransferredErrmsg);
             private:
                 socket_ptr _sock;
                 boost::array<unsigned, 2> _headerBuf;

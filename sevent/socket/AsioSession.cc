@@ -45,9 +45,6 @@ namespace sevent
                                                   sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)));
-            //buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-            //buffers.push_back(boost::asio::buffer(event.data(),
-                                                  //event.dataSize()));
             addToBuffers(buffers, socket::ConstBuffer(event.data(), event.dataSize()));
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
@@ -63,21 +60,37 @@ namespace sevent
         }
 
 
-        void AsioSession::onHeaderReceived(
-            const boost::system::error_code & error, std::size_t byte_transferred)
+        bool AsioSession::handleTransferErrors(const boost::system::error_code& error,
+                                               uint32_t bytesTransferred,
+                                               uint32_t expectedBytesTransferred,
+                                               const char* bytesTransferredErrmsg)
         {
             if (error == boost::asio::error::eof)
             {
                 _disconnectHandler(shared_from_this());
-                return;
+                return false;
             }
             else if (error)
             {
                 throw boost::system::system_error(error);
             }
-            else if(byte_transferred != sizeof(uint32_t)*2)
+            else if(bytesTransferred != expectedBytesTransferred)
             {
-                throw std::runtime_error("byte_transferred != sizeof(uint32_t)*2. This is a bug, because transfer_all() should make this impossible.");
+                throw std::runtime_error(bytesTransferredErrmsg); // This is a bug, because transfer_all() should make this impossible.
+            }
+            return true;
+        }
+
+
+        void AsioSession::onHeaderReceived(
+            const boost::system::error_code & error, std::size_t byte_transferred)
+        {
+            if(!handleTransferErrors(error,
+                                     byte_transferred,
+                                     sizeof(uint32_t)*2,
+                                     "byte_transferred != sizeof(uint32_t)*2"))
+            {
+                return;
             }
             receiveNextDataBuf();
         }
@@ -105,18 +118,12 @@ namespace sevent
         void AsioSession::onDataBufSizeReceived(const boost::system::error_code & error,
                                                 std::size_t byte_transferred)
         {
-            if (error == boost::asio::error::eof)
+            if(!handleTransferErrors(error,
+                                     byte_transferred,
+                                     sizeof(uint32_t),
+                                     "byte_transferred != sizeof(uint32_t)"))
             {
-                _disconnectHandler(shared_from_this());
                 return;
-            }
-            else if (error)
-            {
-                throw boost::system::system_error(error);
-            }
-            else if(byte_transferred != sizeof(uint32_t))
-            {
-                throw std::runtime_error("byte_transferred != sizeof(uint32_t). This is a bug, because transfer_all() should make this impossible.");
             }
             uint32_t dataSize = ntohl(_sizeBuf[0]);
             char* data = new char[dataSize];
@@ -131,18 +138,12 @@ namespace sevent
                                             std::size_t byte_transferred, char* data,
                                             uint32_t dataSize)
         {
-            if (error == boost::asio::error::eof)
+            if(!handleTransferErrors(error,
+                                     byte_transferred,
+                                     dataSize,
+                                     "byte_transferred != dataSize"))
             {
-                _disconnectHandler(shared_from_this());
                 return;
-            }
-            else if (error)
-            {
-                throw boost::system::system_error(error);
-            }
-            else if(byte_transferred != dataSize)
-            {
-                throw std::runtime_error("byte_transferred != dataSize. This is a bug, because transfer_all() should make this impossible.");
             }
             _dataBuffers.push_back(socket::MutableBuffer(data, dataSize));
             dataBufsReceived ++;
