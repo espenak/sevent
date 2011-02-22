@@ -4,7 +4,10 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/array.hpp>
+#include <vector>
 #include "Session.h"
+#include "ConstBuffer.h"
+#include "MutableBuffer.h"
 
 namespace sevent
 {
@@ -29,16 +32,24 @@ namespace sevent
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
-                void onIdAndSizeReceived(const boost::system::error_code& error,
+                void addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
+                                  const socket::ConstBuffer& const_buf);
+                void onHeaderReceived(const boost::system::error_code& error,
                                          std::size_t byte_transferred);
-                void onDataReceived(const boost::system::error_code& error,
-                                    std::size_t byte_transferred, uint32_t eventid, char* data,
-                                    uint32_t dataSize);
+                void receiveNextDataBuf();
+                void onDataBufSizeReceived(const boost::system::error_code & error,
+                                           std::size_t byte_transferred);
+                void onDataBufReceived(const boost::system::error_code & error,
+                                       std::size_t byte_transferred, char* data,
+                                       uint32_t dataSize);
             private:
                 socket_ptr _sock;
-                boost::array<unsigned, 2> _idAndSizeBuf;
-                boost::mutex _receiveLock;
+                boost::array<unsigned, 2> _headerBuf;
+                boost::array<uint32_t, 1> _sizeBuf;
+                unsigned dataBufsReceived;
+                std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
+                boost::mutex _receiveLock;
         };
 
     } // namespace asiosocket

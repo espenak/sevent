@@ -5,7 +5,7 @@ namespace sevent
     namespace socket
     {
 
-        SendEvent::SendEvent(eventId_t eventid, const char *data, dataSize_t dataSize) :
+        SendEvent::SendEvent(eventId_t eventid, const char *data, bufsize_t dataSize) :
             _eventid(eventid), _data(data), _dataSize(dataSize)
         {
         }
@@ -19,7 +19,7 @@ namespace sevent
             return _eventid;
         }
 
-        SendEvent::dataSize_t SendEvent::dataSize() const
+        SendEvent::bufsize_t SendEvent::dataSize() const
         {
             return _dataSize;
         }
