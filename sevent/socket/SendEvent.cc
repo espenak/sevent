@@ -4,29 +4,41 @@ namespace sevent
 {
     namespace socket
     {
+        AbstractSendEvent::AbstractSendEvent(eventId_t eventid) :
+            _eventid(eventid)
+        {}
 
-        SendEvent::SendEvent(eventId_t eventid, const char *data, bufsize_t dataSize) :
-            _eventid(eventid), _data(data), _dataSize(dataSize)
-        {
-        }
-
-        SendEvent::~SendEvent()
-        {
-        }
-
-        SendEvent::eventId_t SendEvent::eventid() const
+        AbstractSendEvent::eventId_t AbstractSendEvent::eventid() const
         {
             return _eventid;
         }
 
-        SendEvent::bufsize_t SendEvent::dataSize() const
+        //SendEventVector::SendEventVector(eventId_t eventid, ConstBufferVector& buffers) :
+            //_eventid(eventid), _dataBuffers(buffers)
+        //{
+        
+        //}
+
+        //const ConstBufferVector_ptr SendEventVector::buffers() const
+        //{
+            //return _dataBuffers;
+        //}
+
+
+
+
+        SendEvent::SendEvent(eventId_t eventid, const char *data, bufsize_t dataSize) :
+            AbstractSendEvent(eventid), _const_buf(ConstBuffer(data, dataSize))
+        {}
+
+        bufsize_t SendEvent::size() const
         {
-            return _dataSize;
+            return 1;
         }
 
-        const char* SendEvent::data() const
+        const ConstBuffer& SendEvent::at(unsigned index) const
         {
-            return _data;
+            return _const_buf;
         }
 
     } // namespace socket
