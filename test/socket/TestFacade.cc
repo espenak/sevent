@@ -18,8 +18,8 @@ BOOST_AUTO_TEST_CASE( Sanity )
     CountingAllEventsHandler allEventsHandler(2);
     facade->setWorkerThreads(1,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
-    session->sendEvent(SendEvent(1010, "Hello", 6));
-    session->sendEvent(SendEvent(2020, "World", 6));
+    session->sendEvent(1010, ConstBuffer("Hello", 6));
+    session->sendEvent(2020, ConstBuffer("World", 6));
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 2);
 }
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( LongStreamSingleThread )
     std::string msg("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(SendEvent(2020, msg.c_str(), msg.size()+1));
+        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
     }
 
     facade->joinAllWorkerThreads();
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE( LongStreamMultiThread )
     std::string msg("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(SendEvent(2020, msg.c_str(), msg.size()+1));
+        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
     }
 
     facade->joinAllWorkerThreads();
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThread )
     std::string msg(10000, 'x');
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(SendEvent(2020, msg.c_str(), msg.size()+1));
+        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
     }
 
     facade->joinAllWorkerThreads();

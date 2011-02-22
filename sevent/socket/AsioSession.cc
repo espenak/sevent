@@ -34,10 +34,10 @@ namespace sevent
                                                   const_buf.size()));
         }
 
-        void AsioSession::sendEvent(const socket::SendEvent& event)
+        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBuffer& data)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
-            uint32_t eventIdNetworkOrder = htonl(event.eventid());
+            uint32_t eventIdNetworkOrder = htonl(eventid);
             uint32_t numElementsNetworkOrder = htonl(1);
 
             std::vector<boost::asio::const_buffer> buffers;
@@ -45,7 +45,7 @@ namespace sevent
                                                   sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)));
-            addToBuffers(buffers, socket::ConstBuffer(event.data(), event.dataSize()));
+            addToBuffers(buffers, data);
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 

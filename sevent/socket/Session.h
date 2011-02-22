@@ -5,7 +5,7 @@
 #include <string>
 #include "Address.h"
 #include "ReceiveEvent.h"
-#include "SendEvent.h"
+#include "ConstBuffer.h"
 
 namespace sevent
 {
@@ -24,7 +24,7 @@ namespace sevent
                 disconnectHandler_t;
             public:
                 virtual ~Session();
-                virtual void sendEvent(const SendEvent& event) = 0;
+                virtual void sendEvent(unsigned eventid, const ConstBuffer& data) = 0;
                 virtual void receiveEvents() = 0;
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;

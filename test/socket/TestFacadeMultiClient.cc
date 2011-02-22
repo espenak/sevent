@@ -54,7 +54,7 @@ void sendMessagesThread(Session_ptr session, int id, int messageCount,
     }
     for(int i=0; i<messageCount; i++)
     {
-        session->sendEvent(SendEvent(id, msg.c_str(), msg.size()+1));
+        session->sendEvent(id, ConstBuffer(msg.c_str(), msg.size()+1));
     }
 }
 
