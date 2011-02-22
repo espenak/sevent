@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <boost/bind.hpp>
 #include <arpa/inet.h>
-#include <string>
 
 namespace sevent
 {
@@ -46,18 +45,7 @@ namespace sevent
                                                   sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)));
-
-            //const socket::ConstBufferVector_ptr b = event.buffers();
-            //for(int i = 0; i < event.buffers()->size(); i++)
-            //{
-                //addToBuffers(buffers, event.buffers()->at(i));
-            //}
-            //addToBuffers(buffers, event.buffers()->at(0));
-            addToBuffers(buffers, event.at(0));
-            //std::cerr
-                //<< event.buffers()->at(0).size()
-                //<< std::string((char*) event.buffers()->at(0).data())
-                //<< std::endl;
+            addToBuffers(buffers, socket::ConstBuffer(event.data(), event.dataSize()));
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 
@@ -66,9 +54,9 @@ namespace sevent
             _receiveLock.lock();
             dataBufsReceived = 0;
             boost::asio::async_read(*_sock,
-                                    boost::asio::buffer(_headerBuf),
-                                    boost::asio::transfer_all(),
-                                    boost::bind(&AsioSession::onHeaderReceived, this, _1, _2));
+                    boost::asio::buffer(_headerBuf),
+                    boost::asio::transfer_all(),
+                    boost::bind(&AsioSession::onHeaderReceived, this, _1, _2));
         }
 
 
@@ -149,10 +137,10 @@ namespace sevent
             uint32_t dataSize = ntohl(_sizeBuf[0]);
             char* data = new char[dataSize];
             boost::asio::async_read(*_sock,
-                                    boost::asio::buffer(data, dataSize),
-                                    boost::asio::transfer_all(),
-                                    boost::bind(&AsioSession::onDataBufReceived, this,
-                                                _1, _2, data, dataSize));
+                    boost::asio::buffer(data, dataSize),
+                    boost::asio::transfer_all(),
+                    boost::bind(&AsioSession::onDataBufReceived, this,
+                                _1, _2, data, dataSize));
         }
 
         void AsioSession::onDataBufReceived(const boost::system::error_code & error,

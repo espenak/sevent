@@ -1,7 +1,6 @@
 #pragma once
 #include "size.h"
-#include <vector>
-#include <boost/shared_ptr.hpp>
+
 
 namespace sevent
 {
@@ -19,8 +18,5 @@ namespace sevent
                 const void* _data;
                 bufsize_t _size;
         };
-
-        typedef std::vector<ConstBuffer> ConstBufferVector;
-        typedef boost::shared_ptr<ConstBufferVector> ConstBufferVector_ptr;
     } // namespace socket
 } // namespace sevent
