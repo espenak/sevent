@@ -27,7 +27,7 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent& event)
         {
-            std::string msg(event.data());
+            std::string msg(event.data<char*>());
             std::string expectedMessage("hello");
             expectedMessage += boost::lexical_cast<std::string>(event.eventid());
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
@@ -38,7 +38,6 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
                 BOOST_REQUIRE(event.eventid() <= 2004);
                 BOOST_REQUIRE_EQUAL(event.dataSize(), expectedMessage.size()+1);
             }
-            delete[] event.data();
         }
     private:
         std::string _expectedMessage;
