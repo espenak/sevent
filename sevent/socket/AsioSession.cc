@@ -117,10 +117,9 @@ namespace sevent
                 //std::cerr << data << std::endl;
             }
 
-            socket::ReceiveEvent event(eventid,
-                                       (char*) dataBufs->at(0).data(),
-                                       dataBufs->at(0).size());
+            socket::ReceiveEvent event(eventid, dataBufs);
             _allEventsHandler(shared_from_this(), event);
+
             _receiveLock.unlock();
             receiveEvents();
         }

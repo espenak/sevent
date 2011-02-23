@@ -77,5 +77,4 @@ void sendSizedMessages(sevent::socket::Session_ptr session, unsigned id,
     {
         session->sendEvent(id, sevent::socket::ConstBuffer(buf, messageSize));
     }
-    delete[] buf;
 }

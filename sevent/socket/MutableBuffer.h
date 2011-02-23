@@ -1,5 +1,6 @@
 #pragma once
 #include "size.h"
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 
@@ -10,13 +11,17 @@ namespace sevent
         class MutableBuffer
         {
             public:
-                MutableBuffer(void* data, bufsize_t size) :
+                MutableBuffer(char* data, bufsize_t size) :
                     _data(data), _size(size) {}
-                virtual ~MutableBuffer() {}
-                void* data() { return _data; }
+                virtual ~MutableBuffer(){}
+
+                template<typename T>
+                T data() { return static_cast<T>(_data); }
+
+
                 bufsize_t size() { return _size; }
             private:
-                void* _data;
+                char* _data;
                 bufsize_t _size;
         };
         typedef std::vector<MutableBuffer> MutableBufferVector;

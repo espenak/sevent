@@ -92,12 +92,10 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent& event)
         {
-            std::string msg(event.data());
+            std::string msg(event.data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
             BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage.size()+1);
-            //std::cout << msg << std::endl;
-            delete[] event.data();
         }
     private:
         std::string _expectedMessage;
@@ -174,12 +172,11 @@ class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent& event)
         {
-            std::string msg(event.data());
+            std::string msg(event.data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
             BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage.size()+1);
             //std::cout << msg << std::endl;
-            delete[] event.data();
         }
     private:
         std::string _expectedMessage;
@@ -212,17 +209,16 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
 
             // It should work just like a "single message" event with the first
             // element
-            std::string msg(event.data());
+            std::string msg(event.data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
             BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage1.size()+1);
 
-            //std::string msg1(event.vector.at(0).data());
-            //std::string msg2(event.vector.at(1).data());
-            //std::string msg3(event.vector.at(2).data());
-            //BOOST_REQUIRE_EQUAL(msg1, _expectedMessage1);
-            //BOOST_REQUIRE_EQUAL(msg2, _expectedMessage2);
-            //BOOST_REQUIRE_EQUAL(msg3, _expectedMessage3);
-            delete[] event.data();
+            std::string msg1(event.datavector->at(0).data<char*>());
+            std::string msg2(event.datavector->at(1).data<char*>());
+            std::string msg3(event.datavector->at(2).data<char*>());
+            BOOST_REQUIRE_EQUAL(msg1, _expectedMessage1);
+            BOOST_REQUIRE_EQUAL(msg2, _expectedMessage2);
+            BOOST_REQUIRE_EQUAL(msg3, _expectedMessage3);
         }
     private:
         std::string _expectedMessage1;

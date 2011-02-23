@@ -5,8 +5,9 @@ namespace sevent
     namespace socket
     {
 
-        ReceiveEvent::ReceiveEvent(eventId_t eventid, char *data, dataSize_t dataSize) :
-            _eventid(eventid), _data(data), _dataSize(dataSize)
+        ReceiveEvent::ReceiveEvent(eventId_t eventid,
+                                   MutableBufferVector_ptr datavector_) :
+            _eventid(eventid), datavector(datavector_)
         {
         }
 
@@ -21,13 +22,13 @@ namespace sevent
 
         ReceiveEvent::dataSize_t ReceiveEvent::dataSize()
         {
-            return _dataSize;
+            return datavector->at(0).size();
         }
 
-        char *ReceiveEvent::data()
-        {
-            return _data;
-        }
+        //char *ReceiveEvent::data()
+        //{
+            //return datavector->at(0).data();;
+        //}
 
     } // namespace socket
 } // namespace sevent
