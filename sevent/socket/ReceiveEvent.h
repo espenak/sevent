@@ -16,16 +16,13 @@ namespace sevent
                 ReceiveEvent(eventId_t eventid, MutableBufferVector_ptr datavector_);
                 virtual ~ReceiveEvent();
                 eventId_t eventid();
-
+                dataSize_t dataSize();
 
                 template<typename T>
                 T data()
                 {
-                    return datavector->at(0).data<T>();
+                    return datavector->at(0)->data<T>();
                 }
-
-
-                dataSize_t dataSize();
             public:
                 MutableBufferVector_ptr datavector;
             private:

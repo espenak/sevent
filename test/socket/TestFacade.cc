@@ -213,9 +213,9 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
             BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage1.size()+1);
 
-            std::string msg1(event.datavector->at(0).data<char*>());
-            std::string msg2(event.datavector->at(1).data<char*>());
-            std::string msg3(event.datavector->at(2).data<char*>());
+            std::string msg1(event.datavector->at(0)->data<char*>());
+            std::string msg2(event.datavector->at(1)->data<char*>());
+            std::string msg3(event.datavector->at(2)->data<char*>());
             BOOST_REQUIRE_EQUAL(msg1, _expectedMessage1);
             BOOST_REQUIRE_EQUAL(msg2, _expectedMessage2);
             BOOST_REQUIRE_EQUAL(msg3, _expectedMessage3);

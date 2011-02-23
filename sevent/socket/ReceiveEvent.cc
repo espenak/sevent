@@ -22,13 +22,8 @@ namespace sevent
 
         ReceiveEvent::dataSize_t ReceiveEvent::dataSize()
         {
-            return datavector->at(0).size();
+            return datavector->at(0)->size();
         }
-
-        //char *ReceiveEvent::data()
-        //{
-            //return datavector->at(0).data();;
-        //}
 
     } // namespace socket
 } // namespace sevent

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/shared_array.hpp>
 #include <arpa/inet.h>
 #include "MutableBuffer.h"
 
@@ -109,11 +110,14 @@ namespace sevent
                 uint32_t dataSize = ntohl(dataSizeBuf[0]);
                 //std::cerr << dataSize << " recv data:";
 
-                char* data = new char[dataSize];
+                boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
                 boost::asio::read(*_sock,
-                                  boost::asio::buffer(data, dataSize),
+                                  boost::asio::buffer(data.get(), dataSize),
                                   boost::asio::transfer_all());
-                dataBufs->push_back(socket::MutableBuffer(data, dataSize));
+
+                socket::MutableBuffer_ptr mb;
+                mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
+                dataBufs->push_back(mb);
                 //std::cerr << data << std::endl;
             }
 
