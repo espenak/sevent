@@ -76,7 +76,6 @@ namespace sevent
         void AsioSession::receiveEvents()
         {
             _receiveLock.lock();
-            //std::cerr << "receiveEvents" << std::endl;
             boost::asio::async_read(*_sock,
                                     boost::asio::buffer(_headerBuf),
                                     boost::asio::transfer_all(),
@@ -84,6 +83,36 @@ namespace sevent
                                                 this, _1, _2));
         }
 
+
+        socket::MutableBuffer_ptr AsioSession::receiveData()
+        {
+            boost::array<uint32_t, 1> dataSizeBuf;
+            int bytes_read = boost::asio::read(*_sock,
+                                               boost::asio::buffer(dataSizeBuf),
+                                               boost::asio::transfer_all());
+            assert(bytes_read == sizeof(uint32_t));
+            uint32_t dataSize = ntohl(dataSizeBuf[0]);
+
+            boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
+            boost::asio::read(*_sock,
+                              boost::asio::buffer(data.get(), dataSize),
+                              boost::asio::transfer_all());
+
+            socket::MutableBuffer_ptr mb;
+            mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
+            return mb;
+        }
+
+        socket::MutableBufferVector_ptr AsioSession::receiveAllData(unsigned numElements)
+        {
+            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
+            for(int i = 0; i < numElements; i++)
+            {
+                socket::MutableBuffer_ptr mb = receiveData();
+                dataBufs->push_back(mb);
+            }
+            return dataBufs;
+        }
 
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
                                            std::size_t byte_transferred)
@@ -98,36 +127,11 @@ namespace sevent
             uint32_t eventid = ntohl(_headerBuf[0]);
             uint32_t numElements = ntohl(_headerBuf[1]);
 
-            //std::cerr << "onHeaderReceived "
-                //<< " eventid:" << eventid
-                //<< " numElements:" << numElements
-                //<< std::endl;
-
-            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
-            for(int i = 0; i < numElements; i++)
-            {
-                //std::cerr << "Recv size... ";
-                boost::array<uint32_t, 1> dataSizeBuf;
-                int bytes_read = boost::asio::read(*_sock,
-                                  boost::asio::buffer(dataSizeBuf),
-                                  boost::asio::transfer_all());
-                assert(bytes_read == sizeof(uint32_t));
-                uint32_t dataSize = ntohl(dataSizeBuf[0]);
-                //std::cerr << dataSize << " recv data:";
-
-                boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
-                boost::asio::read(*_sock,
-                                  boost::asio::buffer(data.get(), dataSize),
-                                  boost::asio::transfer_all());
-
-                socket::MutableBuffer_ptr mb;
-                mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
-                dataBufs->push_back(mb);
-                //std::cerr << data << std::endl;
+            { // Make the dataBufs go out of scope as fast as possible
+                socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
+                socket::ReceiveEvent event(eventid, dataBufs);
+                _allEventsHandler(shared_from_this(), event);
             }
-
-            socket::ReceiveEvent event(eventid, dataBufs);
-            _allEventsHandler(shared_from_this(), event);
 
             _receiveLock.unlock();
             receiveEvents();

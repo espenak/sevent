@@ -37,6 +37,8 @@ namespace sevent
                 void sendHeader(unsigned eventid, int numElements);
                 void sendData(const socket::ConstBuffer& data);
 
+                socket::MutableBuffer_ptr receiveData();
+                socket::MutableBufferVector_ptr receiveAllData(unsigned numElements);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
                 bool handleTransferErrors(const boost::system::error_code& error,
