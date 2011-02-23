@@ -34,10 +34,11 @@ namespace sevent
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
+                void sendHeader(unsigned eventid, int numElements);
+                void sendData(const socket::ConstBuffer& data);
+
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
-
-
                 bool handleTransferErrors(const boost::system::error_code& error,
                                           uint32_t bytesTransferred,
                                           uint32_t expectedBytesTransferred,
