@@ -31,10 +31,9 @@ void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     std::cout << "==================================" << std::endl;
     std::cout << "Hello-event received!" << std::endl;
     std::cout << "Event id:  " << event.eventid() << std::endl;
-    std::cout << "Data:      " << event.data() << std::endl;
+    std::cout << "Data:      " << event.data<char*>() << std::endl;
     std::cout << "Data size: " << event.dataSize() << std::endl;
     std::cout << "==================================" << std::endl;
-    delete[] event.data();
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -43,7 +42,6 @@ void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "*** DIE-event received ***" << std::endl;
     facade->service()->stop();
-    delete[] event.data();
 }
 
 
@@ -85,10 +83,10 @@ int main(int argc, const char *argv[])
 
     // Lets send a couple of events! Note that the received order is not
     // guaranteed.
-    session1->sendEvent(socket::SendEvent(HELLO_ID, "Hello", 6));
-    session2->sendEvent(socket::SendEvent(HELLO_ID, "Cruel", 6));
-    session3->sendEvent(socket::SendEvent(HELLO_ID, "World", 6));
-    session2->sendEvent(socket::SendEvent(DIE_ID, 0, 0));
+    session1->sendEvent(HELLO_ID, socket::ConstBuffer("Hello", 6));
+    session2->sendEvent(HELLO_ID, socket::ConstBuffer("Cruel", 6));
+    session3->sendEvent(HELLO_ID, socket::ConstBuffer("World", 6));
+    session2->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
 
     // Always nice to know who you are communicating with..
     {

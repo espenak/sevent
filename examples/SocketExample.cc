@@ -21,7 +21,6 @@ void allEventsHandler(Facade_ptr facade,
         std::cout << "Stopping service handler ..." << std::endl;
         facade->service()->stop();
     }
-    delete[] event.data();
 }
 
 
@@ -36,8 +35,8 @@ int main(int argc, const char *argv[])
     Session_ptr session2 = facade->connect(Address::make("127.0.0.1", 9092));
 
     // Lets send a couple of events!
-    session1->sendEvent(SendEvent(1010, "hello", 6));
-    session2->sendEvent(SendEvent(2020, "die!", 5));
+    session1->sendEvent(1010, ConstBuffer("hello", 6));
+    session2->sendEvent(2020, ConstBuffer("die!", 5));
 
     // Always nice to know who you are communicating with..
     {
