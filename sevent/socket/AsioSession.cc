@@ -40,24 +40,30 @@ namespace sevent
             uint32_t numElementsNetworkOrder = htonl(dataBufs.size());
 
             // Add header
-            std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
-                                                  sizeof(uint32_t)));
-            buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
-                                                  sizeof(uint32_t)));
+            boost::asio::write(*_sock,
+                               boost::asio::buffer(&eventIdNetworkOrder,
+                                                  sizeof(uint32_t)),
+                               boost::asio::transfer_all());
+            boost::asio::write(*_sock,
+                               boost::asio::buffer(&numElementsNetworkOrder,
+                                                  sizeof(uint32_t)),
+                               boost::asio::transfer_all());
 
             // Add databufs
             for(int i = 0; i < dataBufs.size(); i++)
             {
                 const socket::ConstBuffer& data = dataBufs.at(i);
                 uint32_t sizeNetworkOrder = htonl(data.size());
-                buffers.push_back(boost::asio::buffer(&sizeNetworkOrder,
-                                                      sizeof(uint32_t)));
-                buffers.push_back(boost::asio::buffer(data.data(),
-                                                      data.size()));
+                const char* s = (const char*) data.data();
+                //std::cerr << "Sending: " << data.size() << " " << s << std::endl;
+                boost::asio::write(*_sock,
+                                   boost::asio::buffer(&sizeNetworkOrder,
+                                                       sizeof(uint32_t)),
+                                   boost::asio::transfer_all());
+                boost::asio::write(*_sock,
+                                   boost::asio::buffer(data.data(), data.size()),
+                                   boost::asio::transfer_all());
             }
-
-            boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 
         void AsioSession::receiveEvents()
