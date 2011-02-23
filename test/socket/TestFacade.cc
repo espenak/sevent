@@ -26,26 +26,26 @@ BOOST_AUTO_TEST_CASE( Sanity )
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 4);
 }
 
-BOOST_AUTO_TEST_CASE( SanityMultiBuffer )
-{
-    CountingAllEventsHandler allEventsHandler(1);
-    facade->setWorkerThreads(1,
-            boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
-    ConstBufferVector v;
-    v.push_back(ConstBuffer("Hel", 4));
-    v.push_back(ConstBuffer("crue", 5));
-    v.push_back(ConstBuffer("worlddd", 8));
-    v.push_back(ConstBuffer("tu", 3));
-    session->sendEvent(1010, v);
+//BOOST_AUTO_TEST_CASE( SanityMultiBuffer )
+//{
+    //CountingAllEventsHandler allEventsHandler(1);
+    //facade->setWorkerThreads(1,
+            //boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
+    //ConstBufferVector v;
+    //v.push_back(ConstBuffer("Hel", 4));
+    //v.push_back(ConstBuffer("crue", 5));
+    //v.push_back(ConstBuffer("worlddd", 8));
+    //v.push_back(ConstBuffer("tu", 3));
+    //session->sendEvent(1010, v);
 
-    //ConstBufferVector v2;
-    //v2.push_back(ConstBuffer("Yo", 3));
-    //v2.push_back(ConstBuffer("dude", 5));
-    //session->sendEvent(2020, v2);
+    ////ConstBufferVector v2;
+    ////v2.push_back(ConstBuffer("Yo", 3));
+    ////v2.push_back(ConstBuffer("dude", 5));
+    ////session->sendEvent(2020, v2);
 
-    facade->joinAllWorkerThreads();
-    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 1);
-}
+    //facade->joinAllWorkerThreads();
+    //BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 1);
+//}
 
 BOOST_AUTO_TEST_CASE( ListenDuplicate )
 {

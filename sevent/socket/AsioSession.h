@@ -50,7 +50,7 @@ namespace sevent
                 std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
                 boost::mutex _receiveLock;
-                boost::array<uint32_t, 2> headerBuf;
+                boost::array<uint32_t, 2> _headerBuf;
         };
 
     } // namespace asiosocket
