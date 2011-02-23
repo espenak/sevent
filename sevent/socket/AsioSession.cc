@@ -26,53 +26,38 @@ namespace sevent
         }
 
 
-        void AsioSession::addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
-                                       const socket::ConstBuffer& const_buf)
+        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBuffer& data)
         {
-            //uint32_t sizeNetworkOrder = htonl(const_buf->size());
-            //std::cerr << "Adding " << const_buf->size() << " ";
-            //std::cerr.write((const char*) const_buf->data(), ntohl(sizeNetworkOrder));
-            //std::cerr << std::endl;
-            //buffers->push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-            //buffers.push_back(boost::asio::buffer(const_buf.data(),
-                                                  //const_buf.size()));
+            socket::ConstBufferVector dataBufs;
+            dataBufs.push_back(data);
+            sendEvent(eventid, dataBufs);
         }
 
-        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBuffer& data)
+        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
             uint32_t eventIdNetworkOrder = htonl(eventid);
-            uint32_t numElementsNetworkOrder = htonl(1);
+            uint32_t numElementsNetworkOrder = htonl(dataBufs.size());
 
+            // Add header
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
                                                   sizeof(uint32_t)));
             buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)));
-            uint32_t sizeNetworkOrder = htonl(data.size());
-            buffers.push_back(boost::asio::buffer(&sizeNetworkOrder, sizeof(uint32_t)));
-            buffers.push_back(boost::asio::buffer(data.data(),
-                                                  data.size()));
+
+            // Add databufs
+            for(int i = 0; i < dataBufs.size(); i++)
+            {
+                const socket::ConstBuffer& data = dataBufs.at(i);
+                uint32_t sizeNetworkOrder = htonl(data.size());
+                buffers.push_back(boost::asio::buffer(&sizeNetworkOrder,
+                                                      sizeof(uint32_t)));
+                buffers.push_back(boost::asio::buffer(data.data(),
+                                                      data.size()));
+            }
+
             boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
-        }
-
-        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs)
-        {
-            //boost::lock_guard<boost::mutex> lock(_sendLock);
-            //uint32_t eventIdNetworkOrder = htonl(eventid);
-            //uint32_t numElementsNetworkOrder = htonl(dataBufs.size());
-
-            //std::vector<boost::asio::const_buffer> buffers;
-            //buffers.push_back(boost::asio::buffer(&eventIdNetworkOrder,
-                                                  //sizeof(uint32_t)));
-            //buffers.push_back(boost::asio::buffer(&numElementsNetworkOrder,
-                                                  //sizeof(uint32_t)));
-            //for(int i = 0; i < dataBufs.size(); i++)
-            //{
-                //addToBuffers(buffers, dataBufs.at(i));
-            //}
-            ////addToBuffers(buffers, dataBufs.at(0));
-            //boost::asio::write(*_sock, buffers, boost::asio::transfer_all());
         }
 
         void AsioSession::receiveEvents()

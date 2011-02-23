@@ -34,8 +34,6 @@ namespace sevent
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
-                void addToBuffers(std::vector<boost::asio::const_buffer>& buffers,
-                                  const socket::ConstBuffer& const_buf);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
 
