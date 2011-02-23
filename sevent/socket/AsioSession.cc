@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 #include <arpa/inet.h>
 #include "MutableBuffer.h"
 
@@ -96,7 +97,7 @@ namespace sevent
                 //<< " numElements:" << numElements
                 //<< std::endl;
 
-            socket::MutableBufferVector dataBufs;
+            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
             for(int i = 0; i < numElements; i++)
             {
                 //std::cerr << "Recv size... ";
@@ -112,13 +113,13 @@ namespace sevent
                 boost::asio::read(*_sock,
                                   boost::asio::buffer(data, dataSize),
                                   boost::asio::transfer_all());
-                dataBufs.push_back(socket::MutableBuffer(data, dataSize));
+                dataBufs->push_back(socket::MutableBuffer(data, dataSize));
                 //std::cerr << data << std::endl;
             }
 
             socket::ReceiveEvent event(eventid,
-                                       (char*) dataBufs[0].data(),
-                                       dataBufs[0].size());
+                                       (char*) dataBufs->at(0).data(),
+                                       dataBufs->at(0).size());
             _allEventsHandler(shared_from_this(), event);
             _receiveLock.unlock();
             receiveEvents();

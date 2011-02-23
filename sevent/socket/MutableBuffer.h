@@ -1,5 +1,6 @@
 #pragma once
 #include "size.h"
+#include <boost/shared_ptr.hpp>
 
 
 namespace sevent
@@ -19,5 +20,6 @@ namespace sevent
                 bufsize_t _size;
         };
         typedef std::vector<MutableBuffer> MutableBufferVector;
+        typedef boost::shared_ptr<MutableBufferVector> MutableBufferVector_ptr;
     } // namespace socket
 } // namespace sevent
