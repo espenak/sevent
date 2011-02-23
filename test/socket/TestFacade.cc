@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE( Sanity )
 
 BOOST_AUTO_TEST_CASE( SanityMultiBuffer )
 {
-    CountingAllEventsHandler allEventsHandler(1);
+    CountingAllEventsHandler allEventsHandler(3);
     facade->setWorkerThreads(1,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
     ConstBufferVector v;
@@ -38,13 +38,19 @@ BOOST_AUTO_TEST_CASE( SanityMultiBuffer )
     v.push_back(ConstBuffer("tu", 2));
     session->sendEvent(1010, v);
 
-    //ConstBufferVector v2;
-    //v2.push_back(ConstBuffer("Yo", 3));
-    //v2.push_back(ConstBuffer("dude", 5));
-    //session->sendEvent(2020, v2);
+    ConstBufferVector v2;
+    v2.push_back(ConstBuffer("Yo", 3));
+    v2.push_back(ConstBuffer("dude", 5));
+    session->sendEvent(2020, v2);
+
+    ConstBufferVector v3;
+    v3.push_back(ConstBuffer("T", 2));
+    v3.push_back(ConstBuffer("es", 3));
+    v3.push_back(ConstBuffer("t", 2));
+    session->sendEvent(3030, v3);
 
     facade->joinAllWorkerThreads();
-    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 1);
+    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 3);
 }
 
 BOOST_AUTO_TEST_CASE( ListenDuplicate )
@@ -179,29 +185,79 @@ class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
         std::string _expectedMessage;
 };
 
-//BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThreadMultiBuf )
-//{
-    //BOOST_TEST_MESSAGE("Testing with 10000 messages from ONE client with 8 listening threads multibuffer");
-    //int max = 10000;
-    //LongStreamEventsHandler allEventsHandler(max, std::string(10000, 'x'));
-    //facade->setWorkerThreads(8,
-            //boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    //std::string msg1(10000, 'x');
-    //std::string msg2(10000, 'y');
-    //std::string msg3(10000, 'z');
-    //for(int i=0; i<max; i++)
-    //{
-        //ConstBufferVector v;
-        //v.push_back(ConstBuffer(msg1.c_str(), msg1.size()+1));
-        //v.push_back(ConstBuffer(msg2.c_str(), msg2.size()+1));
-        //v.push_back(ConstBuffer(msg3.c_str(), msg3.size()+1));
-        //session->sendEvent(2020, v);
-    //}
 
-    //facade->joinAllWorkerThreads();
-    //BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
-//}
+
+
+
+class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
+{
+    public:
+        LongMultibufStreamEventsHandler(int expectedCalls,
+                                        std::string expectedMessage1,
+                                        std::string expectedMessage2,
+                                        std::string expectedMessage3) :
+            CountingAllEventsHandler(expectedCalls),
+            _expectedMessage1(expectedMessage1),
+            _expectedMessage2(expectedMessage2),
+            _expectedMessage3(expectedMessage3)
+        {}
+
+        virtual void doSomething(
+                sevent::socket::Facade_ptr facade,
+                sevent::socket::Session_ptr session,
+                sevent::socket::ReceiveEvent& event)
+        {
+            BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
+
+            // It should work just like a "single message" event with the first
+            // element
+            std::string msg(event.data());
+            BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
+            BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage1.size()+1);
+
+            //std::string msg1(event.vector.at(0).data());
+            //std::string msg2(event.vector.at(1).data());
+            //std::string msg3(event.vector.at(2).data());
+            //BOOST_REQUIRE_EQUAL(msg1, _expectedMessage1);
+            //BOOST_REQUIRE_EQUAL(msg2, _expectedMessage2);
+            //BOOST_REQUIRE_EQUAL(msg3, _expectedMessage3);
+            delete[] event.data();
+        }
+    private:
+        std::string _expectedMessage1;
+        std::string _expectedMessage2;
+        std::string _expectedMessage3;
+};
+
+
+
+BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThreadMultiBuf )
+{
+    BOOST_TEST_MESSAGE("Testing with 10000 messages from ONE client with 8 listening threads multibuffer");
+    int max = 10000;
+    LongMultibufStreamEventsHandler allEventsHandler(max,
+                                                     std::string(3000, 'x'),
+                                                     std::string(9000, 'y'),
+                                                     std::string(6000, 'z'));
+    facade->setWorkerThreads(8,
+            boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
+
+    std::string msg1(3000, 'x');
+    std::string msg2(9000, 'y');
+    std::string msg3(6000, 'z');
+    for(int i=0; i<max; i++)
+    {
+        ConstBufferVector v;
+        v.push_back(ConstBuffer(msg1.c_str(), msg1.size()+1));
+        v.push_back(ConstBuffer(msg2.c_str(), msg2.size()+1));
+        v.push_back(ConstBuffer(msg3.c_str(), msg3.size()+1));
+        session->sendEvent(2020, v);
+    }
+
+    facade->joinAllWorkerThreads();
+    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()
