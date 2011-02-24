@@ -82,37 +82,6 @@ namespace sevent
                                                 this, _1, _2));
         }
 
-
-        socket::MutableBuffer_ptr AsioSession::receiveData()
-        {
-            boost::array<uint32_t, 1> dataSizeBuf;
-            int bytes_read = boost::asio::read(*_sock,
-                                               boost::asio::buffer(dataSizeBuf),
-                                               boost::asio::transfer_all());
-            assert(bytes_read == sizeof(uint32_t));
-            uint32_t dataSize = ntohl(dataSizeBuf[0]);
-
-            boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
-            boost::asio::read(*_sock,
-                              boost::asio::buffer(data.get(), dataSize),
-                              boost::asio::transfer_all());
-
-            socket::MutableBuffer_ptr mb;
-            mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
-            return mb;
-        }
-
-        socket::MutableBufferVector_ptr AsioSession::receiveAllData(unsigned numElements)
-        {
-            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
-            for(int i = 0; i < numElements; i++)
-            {
-                socket::MutableBuffer_ptr mb = receiveData();
-                dataBufs->push_back(mb);
-            }
-            return dataBufs;
-        }
-
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
                                            std::size_t bytesTransferred)
         {
@@ -126,6 +95,13 @@ namespace sevent
             else if (error)
             {
                 //std::cerr << "ERROR" << std::endl;
+                if(!_sock->is_open())
+                {
+                    // This will happen if we close() the session, because
+                    // the async_read operation will get a "Operation canceled"
+                    // exception.
+                    return;
+                }
                 throw boost::system::system_error(error);
             }
             else if(bytesTransferred != sizeof(uint32_t)*2)
@@ -157,6 +133,43 @@ namespace sevent
             }
             //std::cerr << "FINISHED RECEIVING" << std::endl;
             receiveEvents();
+        }
+
+        socket::MutableBuffer_ptr AsioSession::receiveData()
+        {
+            boost::array<uint32_t, 1> dataSizeBuf;
+            int bytes_read = boost::asio::read(*_sock,
+                                               boost::asio::buffer(dataSizeBuf),
+                                               boost::asio::transfer_all());
+            assert(bytes_read == sizeof(uint32_t));
+            uint32_t dataSize = ntohl(dataSizeBuf[0]);
+
+            boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
+            boost::asio::read(*_sock,
+                              boost::asio::buffer(data.get(), dataSize),
+                              boost::asio::transfer_all());
+
+            socket::MutableBuffer_ptr mb;
+            mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
+            return mb;
+        }
+
+        socket::MutableBufferVector_ptr AsioSession::receiveAllData(unsigned numElements)
+        {
+            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
+            for(int i = 0; i < numElements; i++)
+            {
+                socket::MutableBuffer_ptr mb = receiveData();
+                dataBufs->push_back(mb);
+            }
+            return dataBufs;
+        }
+
+        void AsioSession::close()
+        {
+            _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_send);
+            _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_receive);
+            _sock->close();
         }
 
         socket::Address_ptr AsioSession::getRemoteEndpointAddress()

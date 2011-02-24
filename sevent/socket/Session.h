@@ -37,6 +37,8 @@ namespace sevent
                  * This method should return at once, and make the
                  * workerthreads receive the event. */
                 virtual void receiveEvents() = 0;
+
+                virtual void close() = 0;
                 
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;

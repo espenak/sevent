@@ -31,6 +31,7 @@ namespace sevent
                 virtual void sendEvent(unsigned eventid, const socket::ConstBuffer& data);
                 virtual void sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs);
                 virtual void receiveEvents();
+                virtual void close();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
