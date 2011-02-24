@@ -52,7 +52,7 @@ class LongMessagesHandler : public CountingAllEventsHandler
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
             {
                 boost::lock_guard<boost::mutex> lock(assert_lock);
-                BOOST_REQUIRE_EQUAL(event.dataSize(), _messageSize);
+                BOOST_REQUIRE_EQUAL(event.firstDataSize(), _messageSize);
             }
             for(unsigned i = 0; i < _messageSize; i++)
             {
