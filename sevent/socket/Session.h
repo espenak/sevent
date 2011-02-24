@@ -2,7 +2,7 @@
 #include <boost/function.hpp>
 #include <stdint.h>
 #include <string>
-#include "SessionForwardDecl.h"
+#include "SessionRegistryForwardDecl.h"
 #include "Address.h"
 #include "ReceiveEvent.h"
 #include "ConstBuffer.h"

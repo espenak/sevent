@@ -1,5 +1,5 @@
 #pragma once
-#include "SessionForwardDecl.h"
+#include "SessionRegistryForwardDecl.h"
 #include "Session.h"
 #include <boost/unordered_map.hpp>
 #include <boost/thread.hpp>

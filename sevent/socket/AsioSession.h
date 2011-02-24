@@ -7,7 +7,6 @@
 #include <vector>
 #include "Session.h"
 #include "ConstBuffer.h"
-#include "SessionForwardDecl.h"
 #include "MutableBuffer.h"
 
 namespace sevent
