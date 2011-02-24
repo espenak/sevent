@@ -41,11 +41,10 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
             << "==================================" << std::endl;
     }
     //socket::Session_ptr s = facade->connect(socket::Address::make("127.0.0.1", 2020));
-    //session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
+    //s->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
+    session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
     std::cerr << "RESPONSE SENT" << std::endl;
 }
-
-
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                 socket::ReceiveEvent& event)
@@ -68,6 +67,17 @@ void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
     eventHandlerMap->triggerEvent(facade, session, event);
 }
 
+void disconnectHandler(socket::SessionRegistry_ptr sessionRegistry,
+                       socket::Session_ptr session)
+{
+
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cout << session->getRemoteEndpointAddress()
+            << " disconnected" << std::endl;
+    }
+    sessionRegistry->remove(session);
+}
 
 
 int main(int argc, const char *argv[])
@@ -82,13 +92,18 @@ int main(int argc, const char *argv[])
     eventHandlerMap->addEventHandler(ECHO_ID, echoHandler);
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
+    // Setup the disconnect handler
+    facade->sessionRegistry()->setDisconnectHandler(boost::bind(disconnectHandler,
+                                                                facade->sessionRegistry(),
+                                                                _1));
+
     // Start 5 worker threads, and use the handler above for incoming events.
     facade->setWorkerThreads(5, boost::bind(allEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
 
     // Create a listening socket.
-    socket::Listener_ptr listener1 = facade->listen(socket::Address::make(host, port));
+    socket::Listener_ptr listener = facade->listen(socket::Address::make(host, port));
 
     // Wait for all work to finish. In this example this will happen
     // when the dieHandler calls facade->service()->stop().

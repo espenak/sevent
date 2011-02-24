@@ -62,6 +62,11 @@ namespace sevent
             return _service;
         }
 
+        socket::SessionRegistry_ptr AsioFacade::sessionRegistry()
+        {
+            return _sessionRegistry;
+        }
+
         void AsioFacade::joinAllWorkerThreads()
         {
             _worker_threads.join_all();

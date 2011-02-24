@@ -28,6 +28,7 @@ namespace sevent
             sock->connect(endpoint);
             AsioSession_ptr session = AsioSession::make(sock);
             _sessionRegistry->add(session);
+            session->receiveEvents();
             return session;
         }
 

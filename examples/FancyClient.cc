@@ -15,9 +15,21 @@ enum EventIds
     DIE_ID = 20
 };
 
+int expectedResponseCount;
+void quitIfFinished(socket::Facade_ptr facade,
+                    socket::Session_ptr session)
+{
+    static int responseCount = 0;
+    responseCount ++;
+    if(responseCount == expectedResponseCount)
+    {
+        session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
+        facade->service()->stop();
+    }
+}
+
 
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
-std::string response;
 void echoResponseHandler(socket::Facade_ptr facade,
                          socket::Session_ptr session,
                          socket::ReceiveEvent& event)
@@ -26,12 +38,7 @@ void echoResponseHandler(socket::Facade_ptr facade,
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Hello-response-event received!" << std::endl
         << "      " << data << std::endl;
-    //response.append(data);
-    //std::cout << response << std::endl;
-    //if(response == std::string("HelloCruelWorld"))
-    //{
-        //session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
-    //}
+    quitIfFinished(facade, session);
 }
 
 void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
@@ -58,17 +65,22 @@ int main(int argc, const char *argv[])
     facade->setWorkerThreads(5, boost::bind(allEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
-    socket::Listener_ptr listener1 = facade->listen(socket::Address::make(host, 2020));
+    socket::Listener_ptr listener = facade->listen(socket::Address::make(host, 2020));
 
-    // Make 2 sessions, one for each listening socket.
-    // Notice that two of them is to the same listening socket!
+    // Make a session and show both sides of the communication
     socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cout << "Connected to " << session->getRemoteEndpointAddress()
+            << " as " << session->getLocalEndpointAddress() << std::endl;
+    }
 
     // Lets send a couple of events! Note that the received order is not
     // guaranteed.
     session->sendEvent(ECHO_ID, socket::ConstBuffer("Hello", 6));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("Cruel", 6));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("World", 6));
+    expectedResponseCount = 3;
 
     facade->joinAllWorkerThreads();
 

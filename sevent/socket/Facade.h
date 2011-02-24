@@ -5,6 +5,7 @@
 #include "Service.h"
 #include "Listener.h"
 #include "Session.h"
+#include "SessionRegistry.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 
@@ -36,6 +37,7 @@ namespace sevent
             public:
                 virtual ~Facade() {};
                 virtual Service_ptr service() = 0;
+                virtual SessionRegistry_ptr sessionRegistry() = 0;
                 virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               allEventsHandler_t allEventsHandler) = 0;
                 virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
@@ -68,6 +70,7 @@ namespace sevent
                  * Use service()->stop() (from another thread) to stop the
                  * Service. */
                 virtual void joinAllWorkerThreads() = 0;
+
         };
     }
 }

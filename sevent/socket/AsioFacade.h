@@ -23,6 +23,7 @@ namespace sevent
             public:
                 virtual ~AsioFacade();
                 virtual socket::Service_ptr service();
+                virtual socket::SessionRegistry_ptr sessionRegistry();
                 virtual void setWorkerThreads(unsigned count,
                                               allEventsHandler_t allEventsHandler);
                 virtual void setWorkerThreads(unsigned count,
