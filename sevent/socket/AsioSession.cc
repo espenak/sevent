@@ -125,13 +125,13 @@ namespace sevent
                 //std::cerr << "OK" << std::endl;
                 _receiveLock.unlock();
             }
-            catch(std::exception& e)
+            catch(...)
             {
                 //std::cerr << "EXCEPTION" << std::endl;
                 _receiveLock.unlock();
                 throw;
             }
-            //std::cerr << "FINISHED RECEIVING" << std::endl;
+            ////std::cerr << "FINISHED RECEIVING" << std::endl;
             receiveEvents();
         }
 
@@ -167,9 +167,15 @@ namespace sevent
 
         void AsioSession::close()
         {
-            _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_send);
-            _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_receive);
-            _sock->close();
+            boost::lock_guard<boost::mutex> lock(_closeMutex);
+            static int c = 0;
+            if(_sock->is_open())
+            {
+                boost::system::error_code ignored_error;
+                _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_send, ignored_error);
+                _sock->shutdown(boost::asio::ip::tcp::socket::shutdown_receive, ignored_error);
+                _sock->close(ignored_error);
+            }
         }
 
         socket::Address_ptr AsioSession::getRemoteEndpointAddress()

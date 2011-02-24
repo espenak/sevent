@@ -39,6 +39,7 @@ namespace sevent
             boost::lock_guard<boost::mutex> lock(_lock);
             std::string remoteAddr = session->getRemoteEndpointAddress()->str();
             _sessions.erase(remoteAddr);
+            session->close();
         }
 
         void SessionRegistry::setAllEventsHandler(

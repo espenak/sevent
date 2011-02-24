@@ -81,6 +81,7 @@ void stoppingDisconnectHandler(Facade_ptr facade,
                                Session_ptr session)
 {
 
+    std::cerr << "Disc " << session->getLocalEndpointAddress() << std::endl;
     facade->sessionRegistry()->remove(session);
     facade->service()->stop();
 }
@@ -92,12 +93,7 @@ BOOST_AUTO_TEST_CASE( Disconnect )
     facade->sessionRegistry()->setDisconnectHandler(boost::bind(stoppingDisconnectHandler,
                                                                 facade,
                                                                 _1));
-    //BOOST_REQUIRE_EQUAL(session.use_count(), 2);
-    //facade->sessionRegistry()->remove(session);
-    //BOOST_REQUIRE_EQUAL(session.use_count(), 1);
-    //session.reset();
-    //BOOST_REQUIRE_EQUAL(session.use_count(), 0);
-    session->close();
+    facade->sessionRegistry()->remove(session);
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 0);
 }

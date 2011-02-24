@@ -1,3 +1,4 @@
+#include <iostream>
 #include "AsioListener.h"
 #include <boost/bind.hpp>
 #include "AsioSession.h"
@@ -40,9 +41,18 @@ namespace sevent
                                    this, _1, sock));
         }
 
-        void AsioListener::onAccept(const boost::system::error_code & ec,
+        void AsioListener::onAccept(const boost::system::error_code & error,
                                           socket_ptr sock)
         {
+            if (error == boost::asio::error::eof)
+            {
+                return;
+            }
+            else if (error)
+            {
+                throw boost::system::system_error(error);
+            }
+
             AsioSession_ptr session = AsioSession::make(sock);
             _socketSessionRegistry->add(session);
             session->receiveEvents();

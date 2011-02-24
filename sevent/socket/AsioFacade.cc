@@ -89,6 +89,7 @@ namespace sevent
                 std::cerr << "[" << boost::this_thread::get_id()
                           << "] Exception: " << e.what() << std::endl;
             }
+            facade->service()->stop(); // As soon as one worker fails, we abort all of them (good for debugging)
         }
     }
 }

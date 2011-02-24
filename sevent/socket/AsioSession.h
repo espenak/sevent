@@ -48,6 +48,7 @@ namespace sevent
                 std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
                 boost::mutex _receiveLock;
+                boost::mutex _closeMutex;
                 boost::array<uint32_t, 2> _headerBuf;
         };
 

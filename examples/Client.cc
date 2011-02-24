@@ -20,9 +20,6 @@ int main(int argc, const char *argv[])
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
 
     socket::Facade_ptr facade = socket::Facade::make();
-
-    // Make 2 sessions, one for each listening socket.
-    // Notice that two of them is to the same listening socket!
     socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
 
     // Lets send a couple of events! Note that the received order is not
@@ -31,9 +28,5 @@ int main(int argc, const char *argv[])
     session->sendEvent(HELLO_ID, socket::ConstBuffer("Cruel", 6));
     session->sendEvent(HELLO_ID, socket::ConstBuffer("World", 6));
     session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
-
-    facade->joinAllWorkerThreads();
-    //boost::this_thread::sleep(boost::posix_time::seconds(2));
-
     return 0;
 }
