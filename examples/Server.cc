@@ -73,7 +73,7 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
-    //eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     facade->setWorkerThreads(1, boost::bind(allEventsHandler,

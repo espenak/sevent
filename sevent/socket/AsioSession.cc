@@ -116,38 +116,48 @@ namespace sevent
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
                                            std::size_t bytesTransferred)
         {
+            //std::cerr << "HEADERS RECEIVED" << std::endl;
             if (error == boost::asio::error::eof)
             {
+                //std::cerr << "DISCONNECT" << std::endl;
                 _disconnectHandler(shared_from_this());
                 return;
             }
             else if (error)
             {
+                //std::cerr << "ERROR" << std::endl;
                 throw boost::system::system_error(error);
             }
             else if(bytesTransferred != sizeof(uint32_t)*2)
             {
+                //std::cerr << "TRANSFER ERROR" << std::endl;
                 throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }
 
+            //std::cerr << "NO ERROR" << std::endl;
             uint32_t eventid = ntohl(_headerBuf[0]);
             uint32_t numElements = ntohl(_headerBuf[1]);
             _receiveLock.lock();
             try
             {
+                //std::cerr << "RECEIVE ALL DATA";
                 socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
+                //std::cerr << "OK" << std::endl;
                 socket::ReceiveEvent event(eventid, dataBufs);
+                //std::cerr << "HANDLE EVENT";
                 _allEventsHandler(shared_from_this(), event);
+                //std::cerr << "OK" << std::endl;
                 _receiveLock.unlock();
             }
             catch(std::exception& e)
             {
+                //std::cerr << "EXCEPTION" << std::endl;
                 _receiveLock.unlock();
                 throw;
             }
+            //std::cerr << "FINISHED RECEIVING" << std::endl;
             receiveEvents();
         }
-
 
         socket::Address_ptr AsioSession::getRemoteEndpointAddress()
         {

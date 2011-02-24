@@ -41,10 +41,6 @@ namespace sevent
                 socket::MutableBufferVector_ptr receiveAllData(unsigned numElements);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
-                bool handleTransferErrors(const boost::system::error_code& error,
-                                          uint32_t bytesTransferred,
-                                          uint32_t expectedBytesTransferred,
-                                          const char* bytesTransferredErrmsg);
             private:
                 socket_ptr _sock;
                 unsigned dataBufsReceived;
