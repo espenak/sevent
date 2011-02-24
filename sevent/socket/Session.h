@@ -1,8 +1,8 @@
 #pragma once
-#include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <stdint.h>
 #include <string>
+#include "SessionForwardDecl.h"
 #include "Address.h"
 #include "ReceiveEvent.h"
 #include "ConstBuffer.h"
@@ -11,10 +11,6 @@ namespace sevent
 {
     namespace socket
     {
-
-        class Session;
-        typedef boost::shared_ptr<Session> Session_ptr;
-
         class Session
         {
             public:

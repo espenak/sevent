@@ -1,6 +1,6 @@
 #pragma once
+#include "SessionForwardDecl.h"
 #include "Session.h"
-#include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -11,10 +11,6 @@ namespace sevent
 {
     namespace socket
     {
-
-        class SessionRegistry;
-        typedef boost::shared_ptr<SessionRegistry> SessionRegistry_ptr;
-
         class SessionRegistry
         {
             public:
