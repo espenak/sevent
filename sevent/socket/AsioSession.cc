@@ -75,7 +75,6 @@ namespace sevent
 
         void AsioSession::receiveEvents()
         {
-            _receiveLock.lock();
             boost::asio::async_read(*_sock,
                                     boost::asio::buffer(_headerBuf),
                                     boost::asio::transfer_all(),
@@ -115,47 +114,38 @@ namespace sevent
         }
 
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
-                                           std::size_t byte_transferred)
-        {
-            if(!handleTransferErrors(error,
-                                     byte_transferred,
-                                     sizeof(uint32_t)*2,
-                                     "byte_transferred != sizeof(uint32_t)*2"))
-            {
-                return;
-            }
-            uint32_t eventid = ntohl(_headerBuf[0]);
-            uint32_t numElements = ntohl(_headerBuf[1]);
-
-            { // Make the dataBufs go out of scope as fast as possible
-                socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
-                socket::ReceiveEvent event(eventid, dataBufs);
-                _allEventsHandler(shared_from_this(), event);
-            }
-
-            _receiveLock.unlock();
-            receiveEvents();
-        }
-
-        bool AsioSession::handleTransferErrors(const boost::system::error_code& error,
-                                               uint32_t bytesTransferred,
-                                               uint32_t expectedBytesTransferred,
-                                               const char* bytesTransferredErrmsg)
+                                           std::size_t bytesTransferred)
         {
             if (error == boost::asio::error::eof)
             {
                 _disconnectHandler(shared_from_this());
-                return false;
+                return;
             }
             else if (error)
             {
                 throw boost::system::system_error(error);
             }
-            else if(bytesTransferred != expectedBytesTransferred)
+            else if(bytesTransferred != sizeof(uint32_t)*2)
             {
-                throw std::runtime_error(bytesTransferredErrmsg); // This is a bug, because transfer_all() should make this impossible.
+                throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }
-            return true;
+
+            uint32_t eventid = ntohl(_headerBuf[0]);
+            uint32_t numElements = ntohl(_headerBuf[1]);
+            _receiveLock.lock();
+            try
+            {
+                socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
+                socket::ReceiveEvent event(eventid, dataBufs);
+                _allEventsHandler(shared_from_this(), event);
+                _receiveLock.unlock();
+            }
+            catch(std::exception& e)
+            {
+                _receiveLock.unlock();
+                throw;
+            }
+            receiveEvents();
         }
 
 
