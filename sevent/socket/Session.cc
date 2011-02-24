@@ -22,7 +22,7 @@ namespace sevent
                       << std::endl << "Event id: " << event.eventid() << std::endl
                       << "Event data size: " << event.dataSize() << std::endl
                       << "Event data: ";
-            std::cout.write(event.data<char*>(), event.dataSize());
+            std::cout.write(event.firstData<char*>(), event.dataSize());
             std::cout << std::endl;
         }
 

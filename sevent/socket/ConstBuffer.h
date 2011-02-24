@@ -7,6 +7,7 @@ namespace sevent
 {
     namespace socket
     {
+        /** Const (unchangable) buffer. */
         class ConstBuffer
         {
             public:
