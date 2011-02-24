@@ -7,6 +7,7 @@
 #include <vector>
 #include "Session.h"
 #include "ConstBuffer.h"
+#include "SessionForwardDecl.h"
 #include "MutableBuffer.h"
 
 namespace sevent
@@ -31,7 +32,6 @@ namespace sevent
                 virtual void sendEvent(unsigned eventid, const socket::ConstBuffer& data);
                 virtual void sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs);
                 virtual void receiveEvents();
-                virtual void close();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
@@ -42,6 +42,8 @@ namespace sevent
                 socket::MutableBufferVector_ptr receiveAllData(unsigned numElements);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
+            protected:
+                virtual void close();
             private:
                 socket_ptr _sock;
                 unsigned dataBufsReceived;

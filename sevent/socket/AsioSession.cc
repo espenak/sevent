@@ -6,7 +6,6 @@
 #include <boost/shared_array.hpp>
 #include <boost/foreach.hpp>
 #include <arpa/inet.h>
-#include "MutableBuffer.h"
 
 namespace sevent
 {

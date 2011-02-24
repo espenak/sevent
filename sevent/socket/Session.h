@@ -11,8 +11,11 @@ namespace sevent
 {
     namespace socket
     {
+        class Session;
+        typedef boost::shared_ptr<Session> Session_ptr;
         class Session
         {
+            friend class SessionRegistry; // enable it to close() when removing sessions
             public:
                 typedef boost::function<void(Session_ptr socketSession,
                                              ReceiveEvent& event)> allEventsHandler_t;
@@ -34,7 +37,6 @@ namespace sevent
                  * workerthreads receive the event. */
                 virtual void receiveEvents() = 0;
 
-                virtual void close() = 0;
                 
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;
@@ -43,6 +45,8 @@ namespace sevent
                 void setAllEventsHandler(allEventsHandler_t allEventHandler);
                 void setDisconnectHandler(disconnectHandler_t disconnectHandler);
 
+            protected:
+                virtual void close() = 0;
             protected:
                 static void defaultAllEventsHandler(Session_ptr socketSession,
                                                     ReceiveEvent& event);

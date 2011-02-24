@@ -80,8 +80,6 @@ BOOST_AUTO_TEST_CASE( ConnectToInvalidPort )
 void stoppingDisconnectHandler(Facade_ptr facade,
                                Session_ptr session)
 {
-
-    std::cerr << "Disc " << session->getLocalEndpointAddress() << std::endl;
     facade->sessionRegistry()->remove(session);
     facade->service()->stop();
 }
