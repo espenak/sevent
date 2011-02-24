@@ -95,7 +95,7 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
             std::string msg(event.firstData<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
-            BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage.size()+1);
+            BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage.size()+1);
         }
     private:
         std::string _expectedMessage;
@@ -175,7 +175,7 @@ class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
             std::string msg(event.firstData<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
-            BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage.size()+1);
+            BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage.size()+1);
             //std::cout << msg << std::endl;
         }
     private:
@@ -211,7 +211,7 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
             // element
             std::string msg(event.firstData<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
-            BOOST_REQUIRE_EQUAL(event.dataSize(), _expectedMessage1.size()+1);
+            BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage1.size()+1);
 
             std::string msg1(event.datavector->at(0)->data<char*>());
             std::string msg2(event.datavector->at(1)->data<char*>());

@@ -20,9 +20,9 @@ namespace sevent
         {
             std::cout << "Event received by default all-events handler. "
                       << std::endl << "Event id: " << event.eventid() << std::endl
-                      << "Event data size: " << event.dataSize() << std::endl
+                      << "Event data size: " << event.firstDataSize() << std::endl
                       << "Event data: ";
-            std::cout.write(event.firstData<char*>(), event.dataSize());
+            std::cout.write(event.firstData<char*>(), event.firstDataSize());
             std::cout << std::endl;
         }
 

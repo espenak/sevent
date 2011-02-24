@@ -17,7 +17,7 @@ namespace sevent
                 virtual ~ReceiveEvent();
                 eventId_t eventid();
 
-                dataSize_t dataSize();
+                dataSize_t firstDataSize();
 
                 template<typename T>
                 T firstData()

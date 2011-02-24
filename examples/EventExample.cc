@@ -32,7 +32,7 @@ void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     std::cout << "Hello-event received!" << std::endl;
     std::cout << "Event id:  " << event.eventid() << std::endl;
     std::cout << "Data:      " << event.firstData<char*>() << std::endl;
-    std::cout << "Data size: " << event.dataSize() << std::endl;
+    std::cout << "Data size: " << event.firstDataSize() << std::endl;
     std::cout << "==================================" << std::endl;
 }
 
