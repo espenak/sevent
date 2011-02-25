@@ -1,3 +1,12 @@
+/** /namespace sevent::endiansafe
+ *
+ * A endianess framework where we assume one will send data in pairs of
+ * (endianess,data), and decode it if needed on the receiving side.
+ *
+ * This appoach saves a lot of resoures compared to frameworks where data
+ * is encoded in one endian, and always encoded it, even if both sides
+ * use the same endianess.
+ */
 #pragma once
 #include "socket/ConstBuffer.h"
 #include "socket/ReceiveEvent.h"
@@ -43,10 +52,11 @@ namespace sevent
         {
             if(!myEndianess() == endianess)
             {
-                throw new std::runtime_error("We currently do not support endianess decoding.");
+                throw new std::runtime_error("We currently do not support endian-decoding.");
             }
         }
 
+        /** Decode a buffer with the given endianess. */
         template<typename T>
         socket::MutableBuffer_ptr decode(socket::MutableBuffer_ptr buf,
                                          Endianess endianess)
@@ -55,6 +65,9 @@ namespace sevent
             return buf;
         }
 
+        /** Shortcut for popping the data+endianess from the end of a buffer,
+         * and decode() the data.
+         * This is the reccommended opposite to addToConstBufferVector().*/
         template<typename T>
         socket::MutableBuffer_ptr popBackAndDecode(socket::ReceiveEvent& event)
         {
