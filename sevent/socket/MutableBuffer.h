@@ -20,9 +20,9 @@ namespace sevent
                 virtual ~MutableBuffer(){}
 
                 template<typename T>
-                T data()
+                T* data()
                 {
-                    return reinterpret_cast<T>(_data.get());
+                    return reinterpret_cast<T*>(_data.get());
                 }
 
                 bufsize_t size()

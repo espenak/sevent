@@ -31,7 +31,7 @@ void echoResponseHandler(socket::Facade_ptr facade,
                          socket::Session_ptr session,
                          socket::ReceiveEvent& event)
 {
-    char* data = event.first()->data<char*>();
+    char* data = event.first()->data<char>();
     if(debug)
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
@@ -45,7 +45,7 @@ void numResponseHandler(socket::Facade_ptr facade,
                          socket::Session_ptr session,
                          socket::ReceiveEvent& event)
 {
-    char* data = event.first()->data<char*>();
+    char* data = event.first()->data<char>();
     if(debug)
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);

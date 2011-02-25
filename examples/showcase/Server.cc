@@ -21,7 +21,7 @@ void echoHandler(socket::Facade_ptr facade,
                  socket::Session_ptr session,
                  socket::ReceiveEvent& event)
 {
-    char* data = event.first()->data<char*>();
+    char* data = event.first()->data<char>();
     unsigned size = event.first()->size();
     if(debug)
     {
@@ -56,18 +56,18 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
     Person spiderman;
-    boostserialize::fromString(spiderman, event.first()->data<char*>());
+    boostserialize::fromString(spiderman, event.first()->data<char>());
 
     // Notice that we have to popBackAndDecode in reverse order
     Person batman;
-    boostserialize::fromString(batman, event.popBack()->data<char*>());
+    boostserialize::fromString(batman, event.popBack()->data<char>());
 
     socket::MutableBuffer_ptr int32numsBuf = endiansafe::popBackAndDecode<int32_t>(event);
-    int32_t* int32nums = int32numsBuf->data<int32_t*>();
+    int32_t* int32nums = int32numsBuf->data<int32_t>();
     unsigned int32numsSize = int32numsBuf->numElements<int32_t>();
 
     socket::MutableBuffer_ptr uint16numsBuf = endiansafe::popBackAndDecode<uint16_t>(event);
-    uint16_t* uint16nums = uint16numsBuf->data<uint16_t*>();
+    uint16_t* uint16nums = uint16numsBuf->data<uint16_t>();
     unsigned uint16numsSize = uint16numsBuf->numElements<uint16_t>();
 
     if(debug)

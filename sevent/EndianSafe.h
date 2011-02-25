@@ -77,7 +77,7 @@ namespace sevent
         socket::MutableBuffer_ptr popBackAndDecode(socket::ReceiveEvent& event)
         {
             socket::MutableBuffer_ptr buf = event.popBack();
-            Endianess endianess = *(event.popBack()->data<Endianess*>());
+            Endianess endianess = *(event.popBack()->data<Endianess>());
             return decode<T>(buf, endianess);
         }
 
