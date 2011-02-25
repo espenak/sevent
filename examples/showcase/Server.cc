@@ -21,7 +21,7 @@ void echoHandler(socket::Facade_ptr facade,
                  socket::Session_ptr session,
                  socket::ReceiveEvent& event)
 {
-    char* data = event.firstData<char*>();
+    char* data = event.first()->data<char*>();
     unsigned size = event.firstDataSize();
     if(debug)
     {
@@ -56,7 +56,7 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
     Person spiderman;
-    boostserialize::fromString(spiderman, event.firstData<char*>());
+    boostserialize::fromString(spiderman, event.first()->data<char*>());
 
     // Notice that we have to popBackAndDecode in reverse order
     Person batman;

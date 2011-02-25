@@ -25,6 +25,10 @@ namespace sevent
             return datavector->at(0)->size();
         }
 
+        MutableBuffer_ptr ReceiveEvent::first()
+        {
+            return datavector->at(0);
+        }
         MutableBuffer_ptr ReceiveEvent::popBack()
         {
             MutableBuffer_ptr last = datavector->back();

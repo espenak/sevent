@@ -113,7 +113,7 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent& event)
         {
-            std::string msg(event.firstData<char*>());
+            std::string msg(event.first()->data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
             BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage.size()+1);
@@ -193,7 +193,7 @@ class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
                 sevent::socket::Session_ptr session,
                 sevent::socket::ReceiveEvent& event)
         {
-            std::string msg(event.firstData<char*>());
+            std::string msg(event.first()->data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
             BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
             BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage.size()+1);
@@ -230,7 +230,7 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
 
             // It should work just like a "single message" event with the first
             // element
-            std::string msg(event.firstData<char*>());
+            std::string msg(event.first()->data<char*>());
             BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
             BOOST_REQUIRE_EQUAL(event.firstDataSize(), _expectedMessage1.size()+1);
 

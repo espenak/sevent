@@ -18,12 +18,7 @@ namespace sevent
                 eventId_t eventid();
                 dataSize_t firstDataSize();
                 MutableBuffer_ptr popBack();
-
-                template<typename T>
-                T firstData()
-                {
-                    return datavector->at(0)->data<T>();
-                }
+                MutableBuffer_ptr first();
             public:
                 MutableBufferVector_ptr datavector;
             private:
