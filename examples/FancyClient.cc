@@ -46,15 +46,10 @@ void numResponseHandler(socket::Facade_ptr facade,
                          socket::Session_ptr session,
                          socket::ReceiveEvent& event)
 {
-    uint16_t* data = event.firstData<uint16_t*>();
+    char* data = event.firstData<char*>();
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "Num-response-event received!" << std::endl
-        << "      ";
-    for(int i = 0; i < event.firstDataSize(); i++)
-    {
-        std::cout << data[i];
-    }
-    std::cout << std::endl;
+        << "      " << data << std::endl;
     quitIfFinished(facade, session);
 }
 
@@ -101,12 +96,9 @@ int main(int argc, const char *argv[])
     session->sendEvent(ECHO_ID, socket::ConstBuffer("World", 6));
 
     uint16_t someU16numbers[] = {10, 20, 30, 40, 50, 60};
+    //socket::ConstBuffer someU16buf(someU16numbers, sizeof(uint16_t) * 6);
     socket::ConstBufferVector numvec;
-    endiansafe::addToConstBufferVector(numvec,
-                                       socket::ConstBuffer(someU16numbers,
-                                                           sizeof(uint16_t) * 6));
-    //session->sendEvent(NUM_ID, socket::ConstBuffer(someU16numbers,
-                                                   //sizeof(uint16_t) * 6));
+    endiansafe::pushBack(numvec, someU16numbers, 6);
     session->sendEvent(NUM_ID, numvec);
 
     expectedResponseCount = 4;

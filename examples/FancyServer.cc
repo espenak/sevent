@@ -34,7 +34,7 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "==================================" << std::endl
-            << "Hello-event received!" << std::endl
+            << "HELLO-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl
             << "Data:      " << data << std::endl
             << "Data size: " << size << std::endl
@@ -46,9 +46,6 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
-    //uint16_t* data = event.datavector->at(1)->data<uint16_t*>();
-    //unsigned size = event.datavector->at(1)->size() / sizeof(uint16_t);
-
     socket::MutableBuffer_ptr buf = endiansafe::popBackAndDecode<uint16_t>(event);
     uint16_t* data = buf->data<uint16_t*>();
     unsigned size = buf->numElements<uint16_t>();
@@ -56,7 +53,7 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "==================================" << std::endl
-            << "Hello-event received!" << std::endl
+            << "NUM-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl
             << "Data:      ";
         for(int i = 0; i < size; i++)
@@ -67,7 +64,7 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
             << "Data size: " << size << std::endl
             << "==================================" << std::endl;
     }
-    session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
+    session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer("OK", 3));
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,

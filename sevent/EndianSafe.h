@@ -40,12 +40,6 @@ namespace sevent
         }
 
 
-        void addToConstBufferVector(socket::ConstBufferVector& vec,
-                               socket::ConstBuffer b)
-        {
-            vec.push_back(socket::ConstBuffer((char*)&my_endianess, 1));
-            vec.push_back(b);
-        }
 
 
         static void endianCheck(Endianess endianess)
@@ -65,9 +59,20 @@ namespace sevent
             return buf;
         }
 
+
+        /** Shortcut for pushing endianess followed by
+         * sevent::socket::ConstBuffer(data, numElements*sizeof(T))
+         * at the back of the given vector. */
+        template<typename T>
+        void pushBack(socket::ConstBufferVector& vec, T* data, unsigned numElements)
+        {
+            vec.push_back(socket::ConstBuffer((char*)&my_endianess, 1));
+            vec.push_back( socket::ConstBuffer(data, numElements*sizeof(T)) );
+        }
+
         /** Shortcut for popping the data+endianess from the end of a buffer,
          * and decode() the data.
-         * This is the reccommended opposite to addToConstBufferVector().*/
+         * This is the reccommended opposite to pushBack().*/
         template<typename T>
         socket::MutableBuffer_ptr popBackAndDecode(socket::ReceiveEvent& event)
         {
