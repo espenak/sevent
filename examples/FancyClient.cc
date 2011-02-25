@@ -3,8 +3,7 @@
 #include <boost/thread/condition_variable.hpp>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-#include "sevent/socket.h"
-#include "sevent/EventHandlerMap.h"
+#include "sevent/sevent.h"
 
 
 using namespace sevent;
@@ -12,7 +11,9 @@ enum EventIds
 {
     ECHO_ID = 10,
     ECHO_RESPONSE_ID = 11,
-    DIE_ID = 20
+    DIE_ID = 20,
+    NUM_ID = 30,
+    NUM_RESPONSE_ID= 31
 };
 
 int expectedResponseCount;
@@ -41,6 +42,22 @@ void echoResponseHandler(socket::Facade_ptr facade,
     quitIfFinished(facade, session);
 }
 
+void numResponseHandler(socket::Facade_ptr facade,
+                         socket::Session_ptr session,
+                         socket::ReceiveEvent& event)
+{
+    uint16_t* data = event.firstData<uint16_t*>();
+    boost::lock_guard<boost::mutex> lock(stream_lock);
+    std::cout << "Num-response-event received!" << std::endl
+        << "      ";
+    for(int i = 0; i < event.firstDataSize(); i++)
+    {
+        std::cout << data[i];
+    }
+    std::cout << std::endl;
+    quitIfFinished(facade, session);
+}
+
 void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
                       socket::Facade_ptr facade,
                       socket::Session_ptr session,
@@ -60,6 +77,7 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(ECHO_RESPONSE_ID, echoResponseHandler);
+    eventHandlerMap->addEventHandler(NUM_RESPONSE_ID, numResponseHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     facade->setWorkerThreads(5, boost::bind(allEventsHandler,
@@ -77,10 +95,21 @@ int main(int argc, const char *argv[])
 
     // Lets send a couple of events! Note that the received order is not
     // guaranteed.
+    
     session->sendEvent(ECHO_ID, socket::ConstBuffer("Hello", 6));
-    session->sendEvent(ECHO_ID, socket::ConstBuffer("Cruel", 6));
+    session->sendEvent(ECHO_ID, socket::ConstBuffer("(somewhat) cruel", 17));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("World", 6));
-    expectedResponseCount = 3;
+
+    uint16_t someU16numbers[] = {10, 20, 30, 40, 50, 60};
+    socket::ConstBufferVector numvec;
+    endiansafe::addToConstBufferVector(numvec,
+                                       socket::ConstBuffer(someU16numbers,
+                                                           sizeof(uint16_t) * 6));
+    //session->sendEvent(NUM_ID, socket::ConstBuffer(someU16numbers,
+                                                   //sizeof(uint16_t) * 6));
+    session->sendEvent(NUM_ID, numvec);
+
+    expectedResponseCount = 4;
 
     facade->joinAllWorkerThreads();
 

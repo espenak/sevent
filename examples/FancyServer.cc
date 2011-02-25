@@ -6,8 +6,7 @@
 #include <boost/utility.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket.h"
-#include "sevent/EventHandlerMap.h"
+#include "sevent/sevent.h"
 
 
 using namespace sevent;
@@ -16,7 +15,8 @@ enum EventIds
 {
     ECHO_ID = 10,
     ECHO_RESPONSE_ID = 11,
-    DIE_ID = 20
+    DIE_ID = 20,
+    NUM_ID = 30,
 };
 
 
@@ -40,10 +40,34 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
             << "Data size: " << size << std::endl
             << "==================================" << std::endl;
     }
-    //socket::Session_ptr s = facade->connect(socket::Address::make("127.0.0.1", 2020));
-    //s->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
     session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
-    std::cerr << "RESPONSE SENT" << std::endl;
+}
+
+void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
+                  socket::ReceiveEvent& event)
+{
+    //uint16_t* data = event.datavector->at(1)->data<uint16_t*>();
+    //unsigned size = event.datavector->at(1)->size() / sizeof(uint16_t);
+
+    socket::MutableBuffer_ptr buf = endiansafe::popBackAndDecode<uint16_t>(event);
+    uint16_t* data = buf->data<uint16_t*>();
+    unsigned size = buf->numElements<uint16_t>();
+
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cout << "==================================" << std::endl
+            << "Hello-event received!" << std::endl
+            << "Event id:  " << event.eventid() << std::endl
+            << "Data:      ";
+        for(int i = 0; i < size; i++)
+        {
+            std::cout << data[i] << " ";
+        }
+        std::cout << std::endl
+            << "Data size: " << size << std::endl
+            << "==================================" << std::endl;
+    }
+    session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -91,6 +115,7 @@ int main(int argc, const char *argv[])
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(ECHO_ID, echoHandler);
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    eventHandlerMap->addEventHandler(NUM_ID, numHandler);
 
     // Setup the disconnect handler
     facade->sessionRegistry()->setDisconnectHandler(boost::bind(disconnectHandler,

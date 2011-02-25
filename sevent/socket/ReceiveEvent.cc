@@ -25,5 +25,12 @@ namespace sevent
             return datavector->at(0)->size();
         }
 
+        MutableBuffer_ptr ReceiveEvent::popBack()
+        {
+            MutableBuffer_ptr last = datavector->back();
+            datavector->pop_back();
+            return last;
+        }
+
     } // namespace socket
 } // namespace sevent

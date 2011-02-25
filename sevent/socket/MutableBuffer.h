@@ -22,12 +22,18 @@ namespace sevent
                 template<typename T>
                 T data()
                 {
-                    return static_cast<T>(_data.get());
+                    return reinterpret_cast<T>(_data.get());
                 }
 
                 bufsize_t size()
                 {
                     return _size;
+                }
+
+                template<typename T>
+                bufsize_t numElements()
+                {
+                    return _size / sizeof(T);
                 }
             private:
                 boost::shared_array<char> _data;
