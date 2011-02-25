@@ -16,7 +16,6 @@ namespace sevent
                 ReceiveEvent(eventId_t eventid, MutableBufferVector_ptr datavector_);
                 virtual ~ReceiveEvent();
                 eventId_t eventid();
-                dataSize_t firstDataSize();
                 MutableBuffer_ptr popBack();
                 MutableBuffer_ptr first();
             public:

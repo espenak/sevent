@@ -20,11 +20,6 @@ namespace sevent
             return _eventid;
         }
 
-        ReceiveEvent::dataSize_t ReceiveEvent::firstDataSize()
-        {
-            return datavector->at(0)->size();
-        }
-
         MutableBuffer_ptr ReceiveEvent::first()
         {
             return datavector->at(0);

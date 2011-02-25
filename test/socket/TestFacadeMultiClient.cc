@@ -36,7 +36,7 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
                 BOOST_REQUIRE_EQUAL(msg, expectedMessage);
                 BOOST_REQUIRE(event.eventid() >= 2000);
                 BOOST_REQUIRE(event.eventid() <= 2004);
-                BOOST_REQUIRE_EQUAL(event.firstDataSize(), expectedMessage.size()+1);
+                BOOST_REQUIRE_EQUAL(event.first()->size(), expectedMessage.size()+1);
             }
         }
     private:

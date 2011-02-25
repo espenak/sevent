@@ -22,7 +22,7 @@ void echoHandler(socket::Facade_ptr facade,
                  socket::ReceiveEvent& event)
 {
     char* data = event.first()->data<char*>();
-    unsigned size = event.firstDataSize();
+    unsigned size = event.first()->size();
     if(debug)
     {
         boost::lock_guard<boost::mutex> lock(streamLock);
