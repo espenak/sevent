@@ -8,25 +8,24 @@
 #include <boost/ref.hpp>
 #include "sevent/sevent.h"
 #include "Shared.h"
+#include "BoostSerializedAddressBook.h"
 
 
 using namespace sevent;
-boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
+boost::mutex streamLock; // Guard the print streams to avoid thread output intertwine
+boost::mutex debugLock;
+bool debug = true;
 
 
-// echoHandler() and dieHandler() handles received events.
-// All data is downloaded before the handler is called.
-//
-// Notice that all handlers get a ReceiveEvent object, which
-// contains the eventid. This means that we can use the same handler
-// for multiple events!
-void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
-                  socket::ReceiveEvent& event)
+void echoHandler(socket::Facade_ptr facade,
+                 socket::Session_ptr session,
+                 socket::ReceiveEvent& event)
 {
     char* data = event.firstData<char*>();
     unsigned size = event.firstDataSize();
+    if(debug)
     {
-        boost::lock_guard<boost::mutex> lock(stream_lock);
+        boost::lock_guard<boost::mutex> lock(streamLock);
         std::cout << "==================================" << std::endl
             << "ECHO-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl
@@ -35,6 +34,20 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
             << "==================================" << std::endl;
     }
     session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer(data, size));
+}
+
+void toggleDebuggingHandler(socket::Facade_ptr facade,
+                            socket::Session_ptr session,
+                            socket::ReceiveEvent& event)
+{
+    {
+        boost::lock_guard<boost::mutex> lock(debugLock);
+        debug = debug?false:true;
+    }
+    {
+        boost::lock_guard<boost::mutex> lock(streamLock);
+        std::cout << "Debugging " << (debug?"enabled": "disabled") << std::endl;
+    }
 }
 
 void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -55,8 +68,9 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     uint16_t* uint16nums = uint16numsBuf->data<uint16_t*>();
     unsigned uint16numsSize = uint16numsBuf->numElements<uint16_t>();
 
+    if(debug)
     {
-        boost::lock_guard<boost::mutex> lock(stream_lock);
+        boost::lock_guard<boost::mutex> lock(streamLock);
         std::cout << "==================================" << std::endl
             << "NUM-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl;
@@ -79,16 +93,11 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
         std::cout << std::endl;
 
         std::cout << "==================================" << std::endl;
+    } else {
+        boost::lock_guard<boost::mutex> lock(streamLock);
+        std::cout << "Num event from " << session->getRemoteEndpointAddress() << std::endl;
     }
     session->sendEvent(NUM_RESPONSE_ID, socket::ConstBuffer("OK", 3));
-}
-
-void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
-                socket::ReceiveEvent& event)
-{
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "*** DIE-event received ***" << std::endl;
-    facade->service()->stop();
 }
 
 
@@ -109,7 +118,7 @@ void disconnectHandler(socket::SessionRegistry_ptr sessionRegistry,
 {
 
     {
-        boost::lock_guard<boost::mutex> lock(stream_lock);
+        boost::lock_guard<boost::mutex> lock(streamLock);
         std::cout << session->getRemoteEndpointAddress()
             << " disconnected" << std::endl;
     }
@@ -123,28 +132,17 @@ int main(int argc, const char *argv[])
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
 
     socket::Facade_ptr facade = socket::Facade::make();
-
-    // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(ECHO_ID, echoHandler);
-    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    eventHandlerMap->addEventHandler(TOGGLE_DEBUG_EVENT_ID, toggleDebuggingHandler);
     eventHandlerMap->addEventHandler(NUM_ID, numHandler);
-
-    // Setup the disconnect handler
     facade->sessionRegistry()->setDisconnectHandler(boost::bind(disconnectHandler,
                                                                 facade->sessionRegistry(),
                                                                 _1));
-
-    // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(5, boost::bind(allEventsHandler,
+    facade->setWorkerThreads(10, boost::bind(allEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
-
-    // Create a listening socket.
     socket::Listener_ptr listener = facade->listen(socket::Address::make(host, port));
-
-    // Wait for all work to finish. In this example this will happen
-    // when the dieHandler calls facade->service()->stop().
     facade->joinAllWorkerThreads();
 
     return 0;

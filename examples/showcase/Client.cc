@@ -5,33 +5,37 @@
 #include <boost/lexical_cast.hpp>
 #include "sevent/sevent.h"
 #include "Shared.h"
+#include "BoostSerializedAddressBook.h"
 
 
 using namespace sevent;
+boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 
 int expectedResponseCount;
+boost::mutex expectedResponseCountLock;
 void quitIfFinished(socket::Facade_ptr facade,
                     socket::Session_ptr session)
 {
     static int responseCount = 0;
+    boost::lock_guard<boost::mutex> lock(expectedResponseCountLock);
     responseCount ++;
     if(responseCount == expectedResponseCount)
     {
-        session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
         facade->service()->stop();
     }
 }
 
 
-boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
 void echoResponseHandler(socket::Facade_ptr facade,
                          socket::Session_ptr session,
                          socket::ReceiveEvent& event)
 {
     char* data = event.firstData<char*>();
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "ECHO-response-event received!" << std::endl
-        << "      " << data << std::endl;
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cerr << "ECHO-response-event received!" << std::endl
+            << "      " << data << std::endl;
+    }
     quitIfFinished(facade, session);
 }
 
@@ -40,9 +44,11 @@ void numResponseHandler(socket::Facade_ptr facade,
                          socket::ReceiveEvent& event)
 {
     char* data = event.firstData<char*>();
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "Num-response-event received!" << std::endl
-        << "      " << data << std::endl;
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cerr << "Num-response-event received!" << std::endl
+            << "      " << data << std::endl;
+    }
     quitIfFinished(facade, session);
 }
 
@@ -55,32 +61,9 @@ void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
 }
 
 
-int main(int argc, const char *argv[])
+
+void sendMessage(socket::Session_ptr session)
 {
-    std::string host(argv[1]);
-    unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
-
-    socket::Facade_ptr facade = socket::Facade::make();
-
-    // Setup the eventhandlers
-    event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
-    eventHandlerMap->addEventHandler(ECHO_RESPONSE_ID, echoResponseHandler);
-    eventHandlerMap->addEventHandler(NUM_RESPONSE_ID, numResponseHandler);
-
-    // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(5, boost::bind(allEventsHandler,
-                                            eventHandlerMap,
-                                            _1, _2, _3));
-    socket::Listener_ptr listener = facade->listen(socket::Address::make(host, 2020));
-
-    // Make a session and show both sides of the communication
-    socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
-    {
-        boost::lock_guard<boost::mutex> lock(stream_lock);
-        std::cout << "Connected to " << session->getRemoteEndpointAddress()
-            << " as " << session->getLocalEndpointAddress() << std::endl;
-    }
-
     // Lets send a couple of events! Note that the received order is not
     // guaranteed.
     
@@ -107,9 +90,54 @@ int main(int argc, const char *argv[])
                                           batman_str.size()));
         session->sendEvent(NUM_ID, vec);
     }
+}
 
-    expectedResponseCount = 4;
 
+int main(int argc, const char *argv[])
+{
+    if(argc != 4)
+    {
+        std::cerr << "Usage: " << argv[0] << " <host IP> <host port> <numMessages>" << std::endl;
+        return 1;
+    }
+    std::string host(argv[1]);
+    unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
+    unsigned numMessages = boost::lexical_cast<unsigned>(argv[3]);
+
+
+    socket::Facade_ptr facade = socket::Facade::make();
+
+    // Setup the eventhandlers
+    event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
+    eventHandlerMap->addEventHandler(ECHO_RESPONSE_ID, echoResponseHandler);
+    eventHandlerMap->addEventHandler(NUM_RESPONSE_ID, numResponseHandler);
+
+    // Start 5 worker threads, and use the handler above for incoming events.
+    facade->setWorkerThreads(5, boost::bind(allEventsHandler,
+                                            eventHandlerMap,
+                                            _1, _2, _3));
+    socket::Listener_ptr listener = facade->listen(socket::Address::make(host, 2020));
+
+    // Make a session and show both sides of the communication
+    socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
+    {
+        boost::lock_guard<boost::mutex> lock(stream_lock);
+        std::cerr << "Connected to " << session->getRemoteEndpointAddress()
+            << " as " << session->getLocalEndpointAddress() << std::endl;
+    }
+
+    for(int i = 0; i < numMessages; i++)
+    {
+        {
+            boost::lock_guard<boost::mutex> lock(stream_lock);
+            std::cerr << "Sending message " << i << std::endl;
+        }
+        sendMessage(session);
+        {
+            boost::lock_guard<boost::mutex> lock(expectedResponseCountLock);
+            expectedResponseCount += 4;
+        }
+    }
     facade->joinAllWorkerThreads();
 
     return 0;
