@@ -7,17 +7,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 #include "sevent/sevent.h"
+#include "Shared.h"
 
 
 using namespace sevent;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
-enum EventIds
-{
-    ECHO_ID = 10,
-    ECHO_RESPONSE_ID = 11,
-    DIE_ID = 20,
-    NUM_ID = 30,
-};
 
 
 // echoHandler() and dieHandler() handles received events.
@@ -34,7 +28,7 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "==================================" << std::endl
-            << "HELLO-event received!" << std::endl
+            << "ECHO-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl
             << "Data:      " << data << std::endl
             << "Data size: " << size << std::endl
@@ -46,8 +40,13 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
+    Person spiderman;
+    boostserialize::fromString(spiderman, event.firstData<char*>());
 
     // Notice that we have to popBackAndDecode in reverse order
+    Person batman;
+    boostserialize::fromString(batman, event.popBack()->data<char*>());
+
     socket::MutableBuffer_ptr int32numsBuf = endiansafe::popBackAndDecode<int32_t>(event);
     int32_t* int32nums = int32numsBuf->data<int32_t*>();
     unsigned int32numsSize = int32numsBuf->numElements<int32_t>();
@@ -60,13 +59,19 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "==================================" << std::endl
             << "NUM-event received!" << std::endl
-            << "Event id:  " << event.eventid() << std::endl
-            << "Data:" << std::endl;
+            << "Event id:  " << event.eventid() << std::endl;
+
+        std::cout << "People:" << std::endl
+            << "   " << spiderman << std::endl
+            << "   " << batman << std::endl;
+        //printAddressBook(address_book);
+
+        std::cout << "Numeric data:" << std::endl << "   ";
         for(int i = 0; i < uint16numsSize; i++)
         {
             std::cout << std::setw(8) << uint16nums[i] << " ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl << "   ";
         for(int i = 0; i < int32numsSize; i++)
         {
             std::cout << std::setw(8) << int32nums[i] << " ";
@@ -75,7 +80,7 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 
         std::cout << "==================================" << std::endl;
     }
-    session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer("OK", 3));
+    session->sendEvent(NUM_RESPONSE_ID, socket::ConstBuffer("OK", 3));
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,

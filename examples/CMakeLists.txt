@@ -13,5 +13,5 @@ endfunction(add_sevent_executable)
 add_sevent_executable(EventExample)
 add_sevent_executable(Server)
 add_sevent_executable(Client)
-add_sevent_executable(FancyServer)
-add_sevent_executable(FancyClient)
+
+add_subdirectory(showcase)

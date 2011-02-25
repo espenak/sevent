@@ -4,17 +4,10 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include "sevent/sevent.h"
+#include "Shared.h"
 
 
 using namespace sevent;
-enum EventIds
-{
-    ECHO_ID = 10,
-    ECHO_RESPONSE_ID = 11,
-    DIE_ID = 20,
-    NUM_ID = 30,
-    NUM_RESPONSE_ID= 31
-};
 
 int expectedResponseCount;
 void quitIfFinished(socket::Facade_ptr facade,
@@ -37,7 +30,7 @@ void echoResponseHandler(socket::Facade_ptr facade,
 {
     char* data = event.firstData<char*>();
     boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "Hello-response-event received!" << std::endl
+    std::cout << "ECHO-response-event received!" << std::endl
         << "      " << data << std::endl;
     quitIfFinished(facade, session);
 }
@@ -91,17 +84,29 @@ int main(int argc, const char *argv[])
     // Lets send a couple of events! Note that the received order is not
     // guaranteed.
     
-    session->sendEvent(ECHO_ID, socket::ConstBuffer("Hello", 6));
+    session->sendEvent(ECHO_ID, socket::ConstBuffer("ECHO", 6));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("(somewhat) cruel", 17));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("World", 6));
 
-    // A endian-safe message containing arrays.
-    uint16_t uint16nums[] = {10, 20, 30, 40, 50, 60};
-    int32_t int32nums[] = {-5000000, 50, -50, 5000, -5000};
-    socket::ConstBufferVector numvec;
-    endiansafe::pushBack(numvec, uint16nums, 6);
-    endiansafe::pushBack(numvec, int32nums, 5);
-    session->sendEvent(NUM_ID, numvec);
+    // An endian-safe message containing arrays.
+    {
+        uint16_t uint16nums[] = {10, 20, 30, 40, 50, 60};
+        int32_t int32nums[] = {-5000000, 50, -50, 5000, -5000};
+
+        Person spiderman(10, "Spiderman", "spider@man.com");
+        Person batman(11, "Batman", "bat@man.com");
+        std::string spiderman_str = boostserialize::toString(spiderman);
+        std::string batman_str = boostserialize::toString(batman);
+
+        socket::ConstBufferVector vec;
+        vec.push_back(socket::ConstBuffer(spiderman_str.c_str(),
+                                          spiderman_str.size()));
+        endiansafe::pushBack(vec, uint16nums, 6);
+        endiansafe::pushBack(vec, int32nums, 5);
+        vec.push_back(socket::ConstBuffer(batman_str.c_str(),
+                                          batman_str.size()));
+        session->sendEvent(NUM_ID, vec);
+    }
 
     expectedResponseCount = 4;
 
