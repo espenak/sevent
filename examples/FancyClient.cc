@@ -95,10 +95,12 @@ int main(int argc, const char *argv[])
     session->sendEvent(ECHO_ID, socket::ConstBuffer("(somewhat) cruel", 17));
     session->sendEvent(ECHO_ID, socket::ConstBuffer("World", 6));
 
-    uint16_t someU16numbers[] = {10, 20, 30, 40, 50, 60};
-    //socket::ConstBuffer someU16buf(someU16numbers, sizeof(uint16_t) * 6);
+    // A endian-safe message containing arrays.
+    uint16_t uint16nums[] = {10, 20, 30, 40, 50, 60};
+    int32_t int32nums[] = {-5000000, 50, -50, 5000, -5000};
     socket::ConstBufferVector numvec;
-    endiansafe::pushBack(numvec, someU16numbers, 6);
+    endiansafe::pushBack(numvec, uint16nums, 6);
+    endiansafe::pushBack(numvec, int32nums, 5);
     session->sendEvent(NUM_ID, numvec);
 
     expectedResponseCount = 4;

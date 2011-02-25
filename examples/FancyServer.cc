@@ -46,23 +46,34 @@ void echoHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
-    socket::MutableBuffer_ptr buf = endiansafe::popBackAndDecode<uint16_t>(event);
-    uint16_t* data = buf->data<uint16_t*>();
-    unsigned size = buf->numElements<uint16_t>();
+
+    // Notice that we have to popBackAndDecode in reverse order
+    socket::MutableBuffer_ptr int32numsBuf = endiansafe::popBackAndDecode<int32_t>(event);
+    int32_t* int32nums = int32numsBuf->data<int32_t*>();
+    unsigned int32numsSize = int32numsBuf->numElements<int32_t>();
+
+    socket::MutableBuffer_ptr uint16numsBuf = endiansafe::popBackAndDecode<uint16_t>(event);
+    uint16_t* uint16nums = uint16numsBuf->data<uint16_t*>();
+    unsigned uint16numsSize = uint16numsBuf->numElements<uint16_t>();
 
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cout << "==================================" << std::endl
             << "NUM-event received!" << std::endl
             << "Event id:  " << event.eventid() << std::endl
-            << "Data:      ";
-        for(int i = 0; i < size; i++)
+            << "Data:" << std::endl;
+        for(int i = 0; i < uint16numsSize; i++)
         {
-            std::cout << data[i] << " ";
+            std::cout << std::setw(8) << uint16nums[i] << " ";
         }
-        std::cout << std::endl
-            << "Data size: " << size << std::endl
-            << "==================================" << std::endl;
+        std::cout << std::endl;
+        for(int i = 0; i < int32numsSize; i++)
+        {
+            std::cout << std::setw(8) << int32nums[i] << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "==================================" << std::endl;
     }
     session->sendEvent(ECHO_RESPONSE_ID, socket::ConstBuffer("OK", 3));
 }
