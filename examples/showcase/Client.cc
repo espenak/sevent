@@ -10,6 +10,7 @@
 
 using namespace sevent;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
+bool debug = false;
 
 int expectedResponseCount;
 boost::mutex expectedResponseCountLock;
@@ -31,6 +32,7 @@ void echoResponseHandler(socket::Facade_ptr facade,
                          socket::ReceiveEvent& event)
 {
     char* data = event.firstData<char*>();
+    if(debug)
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cerr << "ECHO-response-event received!" << std::endl
@@ -44,6 +46,7 @@ void numResponseHandler(socket::Facade_ptr facade,
                          socket::ReceiveEvent& event)
 {
     char* data = event.firstData<char*>();
+    if(debug)
     {
         boost::lock_guard<boost::mutex> lock(stream_lock);
         std::cerr << "Num-response-event received!" << std::endl
@@ -95,14 +98,16 @@ void sendMessage(socket::Session_ptr session)
 
 int main(int argc, const char *argv[])
 {
-    if(argc != 4)
+    if(argc < 4)
     {
-        std::cerr << "Usage: " << argv[0] << " <host IP> <host port> <numMessages>" << std::endl;
+        std::cerr << "Usage: " << argv[0]
+            << " <host IP> <host port> <numMessages> [debug]" << std::endl;
         return 1;
     }
     std::string host(argv[1]);
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
     unsigned numMessages = boost::lexical_cast<unsigned>(argv[3]);
+    debug = argc == 5;
 
 
     socket::Facade_ptr facade = socket::Facade::make();
@@ -116,7 +121,6 @@ int main(int argc, const char *argv[])
     facade->setWorkerThreads(5, boost::bind(allEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
-    socket::Listener_ptr listener = facade->listen(socket::Address::make(host, 2020));
 
     // Make a session and show both sides of the communication
     socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
@@ -128,6 +132,7 @@ int main(int argc, const char *argv[])
 
     for(int i = 0; i < numMessages; i++)
     {
+        if(debug)
         {
             boost::lock_guard<boost::mutex> lock(stream_lock);
             std::cerr << "Sending message " << i << std::endl;

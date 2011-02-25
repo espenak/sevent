@@ -14,7 +14,7 @@
 using namespace sevent;
 boost::mutex streamLock; // Guard the print streams to avoid thread output intertwine
 boost::mutex debugLock;
-bool debug = true;
+bool debug = false;
 
 
 void echoHandler(socket::Facade_ptr facade,
@@ -47,6 +47,8 @@ void toggleDebuggingHandler(socket::Facade_ptr facade,
     {
         boost::lock_guard<boost::mutex> lock(streamLock);
         std::cout << "Debugging " << (debug?"enabled": "disabled") << std::endl;
+        if(!debug)
+            std::cout << "Showing one . for each 1000 NUM message." << std::endl;
     }
 }
 
@@ -95,7 +97,10 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
         std::cout << "==================================" << std::endl;
     } else {
         boost::lock_guard<boost::mutex> lock(streamLock);
-        std::cout << "Num event from " << session->getRemoteEndpointAddress() << std::endl;
+        static int counter = 0;
+        if(counter%1000 == 0)
+            std::cerr << ".";
+        counter ++;
     }
     session->sendEvent(NUM_RESPONSE_ID, socket::ConstBuffer("OK", 3));
 }
@@ -128,8 +133,15 @@ void disconnectHandler(socket::SessionRegistry_ptr sessionRegistry,
 
 int main(int argc, const char *argv[])
 {
+    if(argc < 3)
+    {
+        std::cerr << "Usage: " << argv[0]
+            << " <host IP> <host port> [debug]" << std::endl;
+        return 1;
+    }
     std::string host(argv[1]);
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
+    debug = argc == 4;
 
     socket::Facade_ptr facade = socket::Facade::make();
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
