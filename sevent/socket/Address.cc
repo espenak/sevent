@@ -5,6 +5,8 @@ namespace sevent
 {
     namespace socket
     {
+        Address::Address()
+        {}
 
         Address::Address(const std::string& host, unsigned short port) :
             _host(host), _port(port)

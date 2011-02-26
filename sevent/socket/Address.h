@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/access.hpp>
 #include <ostream>
 
 namespace sevent
@@ -30,6 +32,7 @@ namespace sevent
                                         unsigned short port);
 
             public:
+                Address();
                 Address(const std::string& host, unsigned short port);
                 virtual ~Address();
                 const std::string& host() const;
@@ -39,10 +42,18 @@ namespace sevent
             private:
                 std::string _host;
                 unsigned short _port;
+
+            private:
+                friend class boost::serialization::access;
+                template<class Archive>
+                void serialize(Archive& ar, const unsigned int version)
+                {
+                    ar & _host & _port;
+                }
         };
 
-        std::ostream& operator<<(std::ostream& out, Address address);
+        std::ostream& operator<<(std::ostream& out, const Address& address);
         std::ostream& operator<<(std::ostream& out, Address_ptr address);
-
     } // namespace socket
 } // namespace sevent
+
