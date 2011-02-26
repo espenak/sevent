@@ -2,7 +2,8 @@
 
 /** \namespace sevent::event
  *
- * Makes event handling easier.
+ * sevent::socket has a single handler for all events, this namespace adds
+ * event-forwarding to multiple handlers.
  *
  * \section Example
  *
@@ -54,6 +55,16 @@ namespace sevent
         };
         
 
+        /** A "all events handler" which forwards incoming events to the
+         * handlers registered with the eventHandlerMap.
+         *
+         * This is intentionally left really simple because one should
+         * create a custom allEventsHandler in all situations except
+         * testing/examples to keep error handling in the application,
+         * instead of just having the application crash.
+         *
+         * \throws std::runtime_error If the eventid is not in the map.
+         * */
         void simpleAllEventsHandler(event::HandlerMap_ptr eventHandlerMap,
                                      socket::Facade_ptr facade,
                                      socket::Session_ptr session,

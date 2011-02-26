@@ -10,4 +10,6 @@ function(add_boost_test testname)
     add_test(${testname} ${testname})
 endfunction(add_boost_test)
 
+add_boost_test(TestBoostSerialize TestBoostSerialize.cc)
+
 add_subdirectory(socket)

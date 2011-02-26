@@ -45,18 +45,6 @@ void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 }
 
 
-// A very simple "all events handler" which just triggers events from an
-// eventmap. This could of course be a class with operator() if we needed
-// something more complex.
-void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
-                      socket::Facade_ptr facade,
-                      socket::Session_ptr session,
-                      socket::ReceiveEvent& event)
-{
-    eventHandlerMap->triggerEvent(facade, session, event);
-}
-
-
 int main(int argc, const char *argv[])
 {
     socket::Facade_ptr facade = socket::Facade::make();
@@ -67,11 +55,18 @@ int main(int argc, const char *argv[])
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(5, boost::bind(allEventsHandler,
+    // Worker threads poll for IO-events, and ends up running event-handlers
+    // (registered above), so it is a good idea to start new threads or spawn
+    // many worker threads if any event-handler does any time-consuming task.
+    facade->setWorkerThreads(5, boost::bind(event::simpleAllEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
 
-    // Create 2 listening sockets.
+    // Create 2 listening sockets. YES we are running both the server and the
+    // client in the same process within the same service (a facade contains a
+    // single service, and a service is what receives IO-requests).
+    // We could of course have created multiple facades, but it would not have
+    // made any difference in this example.
     socket::Listener_ptr listener1 = facade->listen(socket::Address::make("127.0.0.1", 9091));
     socket::Listener_ptr listener2 = facade->listen(socket::Address::make("127.0.0.1", 9092));
 
@@ -82,7 +77,7 @@ int main(int argc, const char *argv[])
     socket::Session_ptr session3 = facade->connect(socket::Address::make("127.0.0.1", 9092));
 
     // Lets send a couple of events! Note that the received order is not
-    // guaranteed.
+    // guaranteed, so we might die before all messages are received!
     session1->sendEvent(HELLO_ID, socket::ConstBuffer("Hello", 6));
     session2->sendEvent(HELLO_ID, socket::ConstBuffer("Cruel", 6));
     session3->sendEvent(HELLO_ID, socket::ConstBuffer("World", 6));

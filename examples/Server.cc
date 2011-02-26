@@ -7,8 +7,7 @@
 #include <boost/utility.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket.h"
-#include "sevent/EventHandlerMap.h"
+#include "sevent/sevent.h"
 
 
 using namespace sevent;
@@ -49,19 +48,6 @@ void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
 }
 
 
-//
-// A very simple "all events handler" which just triggers events from an
-// eventmap. This could of course be a class with operator() if we needed
-// something more complex.
-void allEventsHandler(event::HandlerMap_ptr eventHandlerMap,
-                      socket::Facade_ptr facade,
-                      socket::Session_ptr session,
-                      socket::ReceiveEvent& event)
-{
-    eventHandlerMap->triggerEvent(facade, session, event);
-}
-
-
 
 int main(int argc, const char *argv[])
 {
@@ -76,7 +62,7 @@ int main(int argc, const char *argv[])
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(1, boost::bind(allEventsHandler,
+    facade->setWorkerThreads(1, boost::bind(event::simpleAllEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
 
