@@ -1,4 +1,5 @@
 #include "EventHandlerMap.h"
+#include <boost/lexical_cast.hpp>
 
 namespace sevent
 {
@@ -40,6 +41,24 @@ namespace sevent
             boost::lock_guard<boost::mutex> lock(_lock);
             Handler_ptr handler = _handlers[event.eventid()];
             handler->handler(facade, session, event);
+        }
+
+
+
+        void simpleAllEventsHandler(event::HandlerMap_ptr eventHandlerMap,
+                                    socket::Facade_ptr facade,
+                                    socket::Session_ptr session,
+                                    socket::ReceiveEvent& event)
+        {
+            if(eventHandlerMap->contains(event.eventid()))
+            {
+                eventHandlerMap->triggerEvent(facade, session, event);
+            }
+            else
+            {
+                throw std::runtime_error("No event handler for eventid " +
+                                         boost::lexical_cast<std::string>(event.eventid()));
+            }
         }
 
     } // namespace event

@@ -52,6 +52,12 @@ namespace sevent
                 boost::unordered_map<socket::ReceiveEvent::eventId_t, Handler_ptr> _handlers;
                 boost::mutex _lock;
         };
+        
+
+        void simpleAllEventsHandler(event::HandlerMap_ptr eventHandlerMap,
+                                     socket::Facade_ptr facade,
+                                     socket::Session_ptr session,
+                                     socket::ReceiveEvent& event);
 
     } // namespace event
 } // namespace sevent
