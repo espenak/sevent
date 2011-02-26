@@ -18,6 +18,12 @@ namespace sevent
             return HandlerMap_ptr(new HandlerMap());
         }
 
+        bool HandlerMap::contains(socket::ReceiveEvent::eventId_t eventid)
+        {
+            boost::lock_guard<boost::mutex> lock(_lock);
+            return _handlers.find(eventid) != _handlers.end();
+        }
+
         void HandlerMap::addEventHandler(socket::ReceiveEvent::eventId_t eventid,
                                          handler_t handler)
         {

@@ -13,7 +13,7 @@
 #include "socket.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
-#include <map>
+#include <boost/unordered_map.hpp>
 
 namespace sevent
 {
@@ -41,6 +41,7 @@ namespace sevent
                 virtual ~HandlerMap();
                 static HandlerMap_ptr make();
             public:
+                bool contains(socket::ReceiveEvent::eventId_t eventid);
                 void addEventHandler(socket::ReceiveEvent::eventId_t eventid,
                                      handler_t handler);
                 void triggerEvent(socket::Facade_ptr facade,
@@ -48,7 +49,7 @@ namespace sevent
                                   socket::ReceiveEvent& event);
 
             private:
-                std::map<socket::ReceiveEvent::eventId_t, Handler_ptr> _handlers;
+                boost::unordered_map<socket::ReceiveEvent::eventId_t, Handler_ptr> _handlers;
                 boost::mutex _lock;
         };
 
