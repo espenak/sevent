@@ -84,16 +84,13 @@ namespace sevent
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
                                            std::size_t bytesTransferred)
         {
-            //std::cerr << "HEADERS RECEIVED" << std::endl;
             if (error == boost::asio::error::eof)
             {
-                //std::cerr << "DISCONNECT" << std::endl;
                 _disconnectHandler(shared_from_this());
                 return;
             }
             else if (error)
             {
-                //std::cerr << "ERROR" << std::endl;
                 if(!_sock->is_open())
                 {
                     // This will happen if we close() the session, because
@@ -101,36 +98,39 @@ namespace sevent
                     // exception.
                     return;
                 }
-                throw boost::system::system_error(error);
+                BOOST_THROW_EXCEPTION(ReceiveHeaderError()
+                                      << BoostSystemCondition(error.default_error_condition().message())
+                                      << BoostSystemMsg(error.message()));
             }
             else if(bytesTransferred != sizeof(uint32_t)*2)
             {
-                //std::cerr << "TRANSFER ERROR" << std::endl;
                 throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }
 
-            //std::cerr << "NO ERROR" << std::endl;
             uint32_t eventid = ntohl(_headerBuf[0]);
             uint32_t numElements = ntohl(_headerBuf[1]);
             _receiveLock.lock();
             try
             {
-                //std::cerr << "RECEIVE ALL DATA";
                 socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
-                //std::cerr << "OK" << std::endl;
                 socket::ReceiveEvent event(eventid, dataBufs);
-                //std::cerr << "HANDLE EVENT";
                 _allEventsHandler(shared_from_this(), event);
-                //std::cerr << "OK" << std::endl;
                 _receiveLock.unlock();
             }
-            catch(...)
+            catch(boost::system::system_error& error)
             {
-                //std::cerr << "EXCEPTION" << std::endl;
                 _receiveLock.unlock();
-                throw;
+                BOOST_THROW_EXCEPTION(ReceiveDataBoostSystemError()
+                                      << BoostSystemCondition(error.code().default_error_condition().message())
+                                      << BoostSystemMsg(error.code().message()));
+            } catch(std::exception& e) {
+                _receiveLock.unlock();
+                BOOST_THROW_EXCEPTION(ReceiveDataStdError()
+                                      << StdErrorMsg(e.what()));
+            } catch(...) {
+                _receiveLock.unlock();
+                BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
             }
-            ////std::cerr << "FINISHED RECEIVING" << std::endl;
             receiveEvents();
         }
 

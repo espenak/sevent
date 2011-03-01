@@ -8,6 +8,7 @@
 #include "Session.h"
 #include "ConstBuffer.h"
 #include "MutableBuffer.h"
+#include <boost/exception/all.hpp>
 
 namespace sevent
 {
@@ -16,6 +17,17 @@ namespace sevent
 
         class AsioSession;
         typedef boost::shared_ptr<AsioSession> AsioSession_ptr;
+
+
+        typedef boost::error_info<struct tag_BoostSystemMsg,std::string> BoostSystemCondition;
+        typedef boost::error_info<struct tag_BoostSystemMsg,std::string> BoostSystemMsg;
+        typedef boost::error_info<struct tag_StdErrorMsg,std::string> StdErrorMsg;
+        struct SessionError: virtual boost::exception, virtual std::exception {};
+        struct ReceiveHeaderError: virtual SessionError {};
+        struct ReceiveDataError: virtual SessionError {};
+        struct ReceiveDataBoostSystemError: virtual ReceiveDataError {};
+        struct ReceiveDataStdError: virtual ReceiveDataError {};
+        struct ReceiveDataUnknownError: virtual ReceiveDataError {};
 
         class AsioSession: public socket::Session,
             public boost::enable_shared_from_this<AsioSession>
