@@ -38,8 +38,20 @@ namespace sevent
                 virtual ~Facade() {};
                 virtual Service_ptr service() = 0;
                 virtual SessionRegistry_ptr sessionRegistry() = 0;
+
+                /** Shortcut for setWorkerThreads() with a implementation
+                 * spesific default workerThreadHandler. */
                 virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               allEventsHandler_t allEventsHandler) = 0;
+
+
+                /**
+                 * @param numberOfWorkerThreads Number of worker threads
+                 *      started.
+                 * @param allEventsHandler Called to handle incoming events.
+                 * @param workerThreadHandler This function is started in
+                 *      numberOfWorkerThreads separate threads.
+                 * */
                 virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               workerThread_t workerThreadHandler,
                                               allEventsHandler_t allEventsHandler) = 0;

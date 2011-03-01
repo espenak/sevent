@@ -18,23 +18,28 @@ namespace sevent
         {
             public:
                 static AsioFacade_ptr make();
+                static void defaultWorkerThreadHandler(socket::Facade_ptr facade);
             public:
                 AsioFacade();
             public:
                 virtual ~AsioFacade();
                 virtual socket::Service_ptr service();
                 virtual socket::SessionRegistry_ptr sessionRegistry();
-                virtual void setWorkerThreads(unsigned count,
+
+
+                /** Shortcut for setWorkerThreads(numberOfWorkerThreads,
+                 * defaultWorkerThreadHandler, allEventsHandler) */
+                virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               allEventsHandler_t allEventsHandler);
-                virtual void setWorkerThreads(unsigned count,
+
+
+                virtual void setWorkerThreads(unsigned numberOfWorkerThreads,
                                               workerThread_t workerThreadHandler,
                                               allEventsHandler_t allEventsHandler);
                 virtual socket::Listener_ptr listen(socket::Address_ptr address);
                 virtual socket::Session_ptr connect(socket::Address_ptr address);
                 virtual void joinAllWorkerThreads();
 
-            private:
-                static void defaultWorkerThreadHandler(socket::Facade_ptr facade);
             private:
                 AsioService_ptr _service;
                 socket::Connector_ptr _connector;
