@@ -1,7 +1,7 @@
 include_directories(${sevent_SOURCE_DIR})
 
 add_executable(SocketExample.cc SocketExample.cc)
-target_link_libraries(SocketExample.cc sevent_socket)
+target_link_libraries(SocketExample.cc sevent)
 target_link_libraries(SocketExample.cc ${Boost_LIBRARIES})
 
 function(add_sevent_executable execname)
