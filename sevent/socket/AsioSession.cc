@@ -60,6 +60,7 @@ namespace sevent
             boost::lock_guard<boost::mutex> lock(_sendLock);
             sendHeader(eventid, 1);
             sendData(data);
+            //std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
         }
 
         void AsioSession::sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs)
@@ -84,6 +85,7 @@ namespace sevent
         void AsioSession::onHeaderReceived(const boost::system::error_code & error,
                                            std::size_t bytesTransferred)
         {
+            //std::cerr << "onHeaderReceived()" << std::endl;
             if (error == boost::asio::error::eof)
             {
                 _disconnectHandler(shared_from_this());
@@ -106,15 +108,21 @@ namespace sevent
             {
                 throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }
+            //std::cerr << "onHeaderReceived() no errors" << std::endl;
 
             uint32_t eventid = ntohl(_headerBuf[0]);
             uint32_t numElements = ntohl(_headerBuf[1]);
+            //std::cerr << "onHeaderReceived() eventid:" << eventid
+                //<< ", numElements:" << numElements << std::endl;
             _receiveLock.lock();
+            //std::cerr << "onHeaderReceived() obtained lock" << std::endl;
             try
             {
                 socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
+                //std::cerr << "onHeaderReceived() received all data" << std::endl;
                 socket::ReceiveEvent event(eventid, dataBufs);
                 _allEventsHandler(shared_from_this(), event);
+                //std::cerr << "onHeaderReceived() invoked allEventsHandler" << std::endl;
                 _receiveLock.unlock();
             }
             catch(boost::system::system_error& error)
@@ -131,6 +139,7 @@ namespace sevent
                 _receiveLock.unlock();
                 BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
             }
+            //std::cerr << "onHeaderReceived() finished!" << std::endl;
             receiveEvents();
         }
 
