@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <ostream>
 #include "MutableBuffer.h"
 
 namespace sevent
@@ -15,7 +16,7 @@ namespace sevent
             public:
                 ReceiveEvent(eventId_t eventid, MutableBufferVector_ptr datavector_);
                 virtual ~ReceiveEvent();
-                eventId_t eventid();
+                eventId_t eventid() const;
                 MutableBuffer_ptr popBack();
                 MutableBuffer_ptr first();
             public:
@@ -26,5 +27,6 @@ namespace sevent
                 dataSize_t _dataSize;
         };
 
+        std::ostream& operator<<(std::ostream& out, const ReceiveEvent& event);
     } // namespace socket
 } // namespace sevent
