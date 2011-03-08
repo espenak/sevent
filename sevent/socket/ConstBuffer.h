@@ -13,6 +13,8 @@ namespace sevent
             public:
                 ConstBuffer(const void* data, bufsize_t size) :
                     _data(data), _size(size) {}
+                ConstBuffer(const std::string& data) :
+                    _data(data.c_str()), _size(data.size()+1) {}
                 virtual ~ConstBuffer() {}
 
                 /** Return the data stored in the buffer. */
