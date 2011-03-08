@@ -3,15 +3,16 @@
 #include <boost/thread.hpp>
 
 #include "sevent/sevent.h"
+#include "SerializablePerson.h"
 
 
 using namespace sevent;
 enum EventIds
 {
     HELLO_ID = 10,
+    PERSON_ID = 15,
     DIE_ID = 20
 };
-
 
 
 int main(int argc, const char *argv[])
@@ -23,9 +24,11 @@ int main(int argc, const char *argv[])
     socket::Session_ptr session = facade->connect(socket::Address::make(host, port));
 
     // Lets send a couple of events! Note that the received order is not
-    // guaranteed.
+    // guaranteed. Note that we can send more than one buffer in a single
+    // event, see examples/showcase/ for examples.
     session->sendEvent(HELLO_ID, socket::ConstBuffer("Hello", 6));
     session->sendEvent(HELLO_ID, socket::ConstBuffer("Cruel", 6));
+    session->sendEvent(PERSON_ID, boostserialize::toConstBuffer(Person("Superman", 39)));
     session->sendEvent(HELLO_ID, socket::ConstBuffer("World", 6));
     session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
     return 0;
