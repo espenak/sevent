@@ -73,7 +73,7 @@ namespace sevent
         /** Shortcut for popping the data+endianess from the end of a buffer,
          * and decode() the data.
          * This is the reccommended opposite to pushBack().*/
-        template<typename T>
+        template<typename T> // TODO: partial template specialization!
         socket::MutableBuffer_ptr popBackAndDecode(socket::ReceiveEvent& event)
         {
             socket::MutableBuffer_ptr buf = event.popBack();
