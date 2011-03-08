@@ -1,4 +1,8 @@
-/** A server listening for 2 events: hello(print input) and die(stop server). */
+/** A server listening for 3 types of events:
+ * - hello(print input)
+ * - person(deserialize and print person)
+ * - die(stop server)
+ */
 #include <iostream>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -8,6 +12,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 #include "sevent/sevent.h"
+#include "SerializablePerson.h"
 
 
 using namespace sevent;
@@ -15,17 +20,19 @@ boost::mutex stream_lock; // Guard the print streams to avoid thread output inte
 enum EventIds
 {
     HELLO_ID = 10,
+    PERSON_ID = 15,
     DIE_ID = 20
 };
 
 
-// helloHandler() and dieHandler() handles received events.
+// helloHandler(), personHandler() and dieHandler() handles received events.
 // All data is downloaded before the handler is called.
 //
 // Notice that all handlers get a ReceiveEvent object, which
 // contains the eventid. This means that we can use the same handler
 // for multiple events!
-void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
+void helloHandler(socket::Facade_ptr facade,
+                  socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
@@ -34,12 +41,26 @@ void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     std::cout << "Event id:  " << event.eventid() << std::endl;
     std::cout << "Data:      " << event.first()->data<char>() << std::endl;
     std::cout << "Data size: " << event.first()->size() << std::endl;
+    std::cout << "Sender: " << session->getRemoteEndpointAddress() << std::endl;
+    std::cout << "Receiver: " << session->getLocalEndpointAddress() << std::endl;
     std::cout << "==================================" << std::endl;
 }
 
 
+void personHandler(socket::Facade_ptr facade,
+                   socket::Session_ptr session,
+                   socket::ReceiveEvent& event)
+{
+    Person p;
+    sevent::boostserialize::fromString(p, event.first()->data<char>());
+    boost::lock_guard<boost::mutex> lock(stream_lock);
+    std::cout << "### Person-event received: "
+        << p.name << ":" << p.age << " ###" << std::endl;
+}
 
-void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
+
+void dieHandler(socket::Facade_ptr facade,
+                socket::Session_ptr session,
                 socket::ReceiveEvent& event)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
@@ -59,6 +80,7 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
+    eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.

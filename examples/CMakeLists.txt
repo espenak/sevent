@@ -1,17 +1,15 @@
 include_directories(${sevent_SOURCE_DIR})
 
-add_executable(SocketExample.cc SocketExample.cc)
-target_link_libraries(SocketExample.cc sevent)
-target_link_libraries(SocketExample.cc ${Boost_LIBRARIES})
 
-function(add_sevent_executable execname)
-    add_executable(${execname} ${execname}.cc)
-    target_link_libraries(${execname} sevent)
-    target_link_libraries(${execname} ${Boost_LIBRARIES})
-endfunction(add_sevent_executable)
+function(add_sevent_example_executable execname)
+    add_executable("Sevent${execname}" ${execname}.cc)
+    target_link_libraries("Sevent${execname}" sevent)
+    target_link_libraries("Sevent${execname}" ${Boost_LIBRARIES})
+endfunction(add_sevent_example_executable)
 
-add_sevent_executable(EventExample)
-add_sevent_executable(Server)
-add_sevent_executable(Client)
+add_sevent_example_executable(SocketExample)
+add_sevent_example_executable(EventExample)
+add_sevent_example_executable(SimpleServer)
+add_sevent_example_executable(SimpleClient)
 
 add_subdirectory(showcase)

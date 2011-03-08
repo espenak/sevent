@@ -33,7 +33,7 @@ class Person
 };
 
 
-BOOST_AUTO_TEST_CASE( TestBoostSerializeMain )
+BOOST_AUTO_TEST_CASE( TestBoostSerializeCore )
 {
     // Serialize
     Person superman("Superman", 40);
@@ -42,6 +42,21 @@ BOOST_AUTO_TEST_CASE( TestBoostSerializeMain )
     // Deserialize
     Person supermanDeserialized;
     sevent::boostserialize::fromString(supermanDeserialized, serialized.c_str());
+
+    BOOST_REQUIRE_EQUAL(supermanDeserialized.name(), "Superman");
+    BOOST_REQUIRE_EQUAL(supermanDeserialized.age(), 40);
+}
+
+
+BOOST_AUTO_TEST_CASE( TestBoostSerializeConstBuffer )
+{
+    // Serialize
+    sevent::socket::ConstBuffer b = sevent::boostserialize::toConstBuffer(Person("Superman", 40));
+
+    // Deserialize
+    Person supermanDeserialized;
+    sevent::boostserialize::fromString(supermanDeserialized,
+                                       static_cast<const char*>(b.data()));
 
     BOOST_REQUIRE_EQUAL(supermanDeserialized.name(), "Superman");
     BOOST_REQUIRE_EQUAL(supermanDeserialized.age(), 40);

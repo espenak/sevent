@@ -79,18 +79,16 @@ void sendMessage(socket::Session_ptr session)
         uint16_t uint16nums[] = {10, 20, 30, 40, 50, 60};
         int32_t int32nums[] = {-5000000, 50, -50, 5000, -5000};
 
-        Person spiderman(10, "Spiderman", "spider@man.com");
-        Person batman(11, "Batman", "bat@man.com");
-        std::string spiderman_str = boostserialize::toString(spiderman);
-        std::string batman_str = boostserialize::toString(batman);
+        // Note that we do not use boostserialize::toConstBuffer, because the
+        // string would go out of scope before the vector is sent!
+        std::string spiderman = boostserialize::toString(Person(10, "Spiderman", "spider@man.com"));
+        std::string batman = boostserialize::toString(Person(10, "Batman", "bat@man.com"));
 
         socket::ConstBufferVector vec;
-        vec.push_back(socket::ConstBuffer(spiderman_str.c_str(),
-                                          spiderman_str.size()));
+        vec.push_back(socket::ConstBuffer(spiderman));
         endiansafe::pushBack(vec, uint16nums, 6);
         endiansafe::pushBack(vec, int32nums, 5);
-        vec.push_back(socket::ConstBuffer(batman_str.c_str(),
-                                          batman_str.size()));
+        vec.push_back(socket::ConstBuffer(batman));
         session->sendEvent(NUM_ID, vec);
     }
 }

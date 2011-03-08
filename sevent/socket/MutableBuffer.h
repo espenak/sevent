@@ -11,7 +11,8 @@ namespace sevent
     {
         /** Mutable (changable/non-const) buffer.
          * The data is stored as a boost::shared_array, and will be deallocated
-         * with the buffer unless you have another reference to it. */
+         * with the buffer unless you have another reference to it (use
+         * sharedArray() to get a reference). */
         class MutableBuffer
         {
             public:
@@ -19,21 +20,31 @@ namespace sevent
                     _data(data), _size(size) {}
                 virtual ~MutableBuffer(){}
 
+                /** Return a pointer to the data in the buffer cast to a
+                 * pointer of the given temlate type. */
                 template<typename T>
                 T* data()
                 {
                     return reinterpret_cast<T*>(_data.get());
                 }
 
+                /** Return number of bytes in the buffer. */
                 bufsize_t size()
                 {
                     return _size;
                 }
 
+                /** Shortcut for size()/sizeof(T). */
                 template<typename T>
                 bufsize_t numElements()
                 {
                     return _size / sizeof(T);
+                }
+
+                /** Return the shared_array containing the data. */
+                boost::shared_array<char> sharedArray()
+                {
+                    return _data;
                 }
             private:
                 boost::shared_array<char> _data;

@@ -20,11 +20,14 @@
  * features in the library, like endian-safe array-transfer, and
  * boost-serialized object transfer.
  *
- * \subsection Client Client.cc
- * \include Client.cc
+ * \subsection SimpleClient SimpleClient.cc
+ * \include SimpleClient.cc
  *
- * \subsection Server Server.cc
- * \include Server.cc
+ * \subsection SimpleServer SimpleServer.cc
+ * \include SimpleServer.cc
+ *
+ * \subsection SerializablePerson SerializablePerson.h
+ * \include SerializablePerson.h
  * */
 
 #include "socket.h"
