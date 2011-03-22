@@ -42,12 +42,18 @@ namespace sevent
                 virtual Address_ptr getRemoteEndpointAddress() = 0;
 
             public:
-                void setAllEventsHandler(allEventsHandler_t allEventHandler);
+                /** Set the disconnect handler. Normally forwarded/set in
+                 * SessionRegistry::setDisconnectHandler(). */
                 void setDisconnectHandler(disconnectHandler_t disconnectHandler);
 
+                /** Set the all-events-handler. Normally forwarded/set in
+                 * SessionRegistry::setAllEventsHandler(). The default
+                 * handler is defaultAllEventsHandler(). */
+                void setAllEventsHandler(allEventsHandler_t allEventHandler);
             protected:
                 virtual void close() = 0;
-            protected:
+            public:
+                /** Print some debugging info about the event. */
                 static void defaultAllEventsHandler(Session_ptr socketSession,
                                                     ReceiveEvent& event);
             protected:

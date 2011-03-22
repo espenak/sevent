@@ -12,6 +12,10 @@ namespace sevent
                 virtual ~Listener()
                 {
                 };
+
+                /** Create listening socket and register as accept-handler
+                 * for this socket. Returns at once. Client connections (accept)
+                 * is handled by the worker threads. */
                 virtual void listen(Address_ptr address) = 0;
         };
 

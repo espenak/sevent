@@ -20,7 +20,18 @@ namespace sevent
                 virtual ~SessionRegistry();
                 void add(Session_ptr session);
                 void remove(Session_ptr session);
+
+                /** Set the disconnect handler. This is forwarded to
+                 * Session::setDisconnectHandler() when a new session is added.
+                 *
+                 * The default handler removes the session from the registry.
+                 * Custom handlers MUST remember to do the same. */
                 void setDisconnectHandler(Session::disconnectHandler_t disconnectHandler);
+
+                /** Set the all-events-handler. This is forwarded to
+                 * Session::setAllEventsHandler() when a new session is added.
+                 *
+                 * The default is to keep Session::defaultAllEventsHandler(). */
                 void setAllEventsHandler(Session::allEventsHandler_t allEventsHandler);
 
             private:
