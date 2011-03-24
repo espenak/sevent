@@ -3,6 +3,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/access.hpp>
+#include <boost/functional/hash.hpp>
 #include <ostream>
 
 namespace sevent
@@ -38,6 +39,8 @@ namespace sevent
                 const std::string& host() const;
                 unsigned short port() const;
                 std::string str() const;
+
+          friend std::size_t hash_value(Address const& a);
 
             private:
                 std::string _host;

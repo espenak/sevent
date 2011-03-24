@@ -35,6 +35,16 @@ namespace sevent
         {
             return _host + ":" + boost::lexical_cast<std::string>(_port);
         }
+     
+      std::size_t hash_value(Address const& a)
+    {
+      std::size_t seed = 0;
+      boost::hash_combine(seed, a._host);
+      boost::hash_combine(seed, a._port);
+      
+      return seed;
+    }
+
 
         std::ostream& operator<<(std::ostream& out, const Address& address)
         {
