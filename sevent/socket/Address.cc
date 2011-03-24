@@ -45,6 +45,11 @@ namespace sevent
       return seed;
     }
 
+      bool operator==(Address const& a1, Address const& a2)
+      {
+        return ( a1._host == a2._host ) && ( a1._port == a2._port );
+      }
+
 
         std::ostream& operator<<(std::ostream& out, const Address& address)
         {
