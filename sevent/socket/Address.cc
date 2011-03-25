@@ -50,14 +50,18 @@ namespace sevent
         return ( a1._host == a2._host ) && ( a1._port == a2._port );
       }
 
-
+      bool operator<(Address const& a1, Address const& a2)
+      {
+        return ( a1._host < a2._host ) && ( a1._port < a2._port );
+      }
+      
         std::ostream& operator<<(std::ostream& out, const Address& address)
         {
             out << address.host() << ":" << address.port();
             return out;
         }
 
-        std::ostream& operator<<(std::ostream& out, const Address_ptr address)
+      std::ostream& operator<<(std::ostream& out, const Address_ptr address)
         {
             out << address->host() << ":" << address->port();
             return out;

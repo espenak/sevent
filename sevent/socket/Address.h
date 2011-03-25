@@ -42,6 +42,7 @@ namespace sevent
 
           friend std::size_t hash_value(Address const& a);
           friend bool operator==(Address const& a1, Address const& a2);
+          friend bool operator<(Address const& a1, Address const& a2);
 
             private:
                 std::string _host;
