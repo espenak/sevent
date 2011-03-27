@@ -52,7 +52,9 @@ namespace sevent
 
       bool operator<(Address const& a1, Address const& a2)
       {
-        return ( a1._host < a2._host ) && ( a1._port < a2._port );
+        std::string s1( a1._host + boost::lexical_cast<std::string>(a1._port));
+        std::string s2( a2._host + boost::lexical_cast<std::string>(a2._port));
+        return ( s1 < s2 );
       }
       
         std::ostream& operator<<(std::ostream& out, const Address& address)
