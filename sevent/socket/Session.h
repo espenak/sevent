@@ -24,6 +24,10 @@ namespace sevent
             public:
                 virtual ~Session();
 
+                /** Send an event with no data buffer.
+                 * Blocks until the event is completely sent. */
+                virtual void sendEvent(unsigned eventid) = 0;
+
                 /** Send an event with a single data buffer.
                  * Blocks until the event and all it's data is completely sent. */
                 virtual void sendEvent(unsigned eventid, const ConstBuffer& data) = 0;

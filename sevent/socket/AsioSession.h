@@ -40,6 +40,7 @@ namespace sevent
             public:
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
+                virtual void sendEvent(unsigned eventid);
                 virtual void sendEvent(unsigned eventid, const socket::ConstBuffer& data);
                 virtual void sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs);
                 virtual void receiveEvents();

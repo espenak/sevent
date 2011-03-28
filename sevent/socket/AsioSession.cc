@@ -55,6 +55,14 @@ namespace sevent
                                boost::asio::transfer_all());
         }
 
+        void AsioSession::sendEvent(unsigned eventid)
+        {
+            boost::lock_guard<boost::mutex> lock(_sendLock);
+            sendHeader(eventid, 0);
+            //sendData(data);
+            //std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
+        }
+
         void AsioSession::sendEvent(unsigned eventid, const socket::ConstBuffer& data)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
