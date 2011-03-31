@@ -22,6 +22,8 @@ BOOST_AUTO_TEST_CASE( Sanity )
     session->sendEvent(2020, ConstBuffer("Wor", 4));
     session->sendEvent(3030, ConstBuffer("Wo", 3));
     session->sendEvent(4040, ConstBuffer("W", 2));
+    session->sendEvent(5050);
+
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 4);
 }
