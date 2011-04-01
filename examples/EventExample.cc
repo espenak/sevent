@@ -83,9 +83,9 @@ int main(int argc, const char *argv[])
     boost::shared_ptr<std::string> hello = boost::make_shared<std::string>("Hello");
     boost::shared_ptr<std::string> cruel = boost::make_shared<std::string>("cruel");
     boost::shared_ptr<std::string> world = boost::make_shared<std::string>("world");
-    session1->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(hello));
-    session2->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(cruel));
-    session3->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(world));
+    //session1->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(hello));
+    //session2->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(cruel));
+    //session3->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(world));
     session2->sendEvent(DIE_ID);
 
     // Always nice to know who you are communicating with..

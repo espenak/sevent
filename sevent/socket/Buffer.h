@@ -16,9 +16,15 @@ namespace sevent
         };
         typedef boost::shared_ptr<Serialized> Serialized_ptr;
 
+        class BufferBase
+        {
+            public:
+                virtual Serialized_ptr serialize() = 0;
+        };
+
         /** Mutable (changable/non-const) buffer. */
         template<typename T, typename SerializeCls>
-        class Buffer
+        class Buffer : public BufferBase
         {
             public:
                 Buffer(boost::shared_ptr<T> data) :
@@ -30,7 +36,7 @@ namespace sevent
                     return _data;
                 }
 
-                const Serialized serialize()
+                Serialized_ptr serialize()
                 {
                     return SerializeCls::serialize(_data);
                 }
@@ -45,11 +51,10 @@ namespace sevent
                 boost::shared_ptr<T> _data;
         };
 
-        template<typename T, typename SerializeCls>
         class BufferVector {
             public:
-                typedef boost::shared_ptr< Buffer<T, SerializeCls> > Buffer_ptr;
-                typedef std::vector<Buffer_ptr> Vector_t;
+                typedef boost::shared_ptr<BufferBase> BufferBase_ptr;
+                typedef std::vector<BufferBase_ptr> Vector_t;
                 typedef boost::shared_ptr<Vector_t> Vector_t_ptr;
 
             public:
@@ -58,8 +63,15 @@ namespace sevent
                     _vector = boost::make_shared<Vector_t>();
                 }
 
+                template<typename T, typename SerializeCls>
+                void at(unsigned index)
+                {
+                    return boost::dynamic_pointer_cast< Buffer<T, SerializeCls> >(_vector->at(index));
+                }
+
             private:
                 Vector_t_ptr _vector;
         };
+
     } // namespace socket
 } // namespace sevent
