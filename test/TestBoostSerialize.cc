@@ -7,6 +7,8 @@
 #include <iostream>
 #include "sevent/BoostSerialize.h"
 
+using namespace sevent;
+
 
 /** Serializable Person */
 class Person
@@ -60,4 +62,17 @@ BOOST_AUTO_TEST_CASE( TestBoostSerializeConstBuffer )
 
     BOOST_REQUIRE_EQUAL(supermanDeserialized.name(), "Superman");
     BOOST_REQUIRE_EQUAL(supermanDeserialized.age(), 40);
+}
+
+BOOST_AUTO_TEST_CASE( TestBoostSerializer )
+{
+    // Serialize
+    boost::shared_ptr<Person> superman = boost::make_shared<Person>("Superman", 40);
+    socket::Serialized_ptr serialized = boostserialize::Serializer::serialize<Person>(superman);
+    std::cout << serialized->data() << std::endl;
+
+    // Deserialize
+    socket::Buffer<Person, boostserialize::Serializer> supermanDeserialized = boostserialize::Serializer::deserialize<Person>(serialized->data(), serialized->size());
+    BOOST_REQUIRE_EQUAL(supermanDeserialized.data()->name(), "Superman");
+    BOOST_REQUIRE_EQUAL(supermanDeserialized.data()->age(), 40);
 }

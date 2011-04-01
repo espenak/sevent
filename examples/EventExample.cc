@@ -6,6 +6,8 @@
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
 #include "sevent/socket.h"
+#include "sevent/socket/Buffer.h"
+#include "sevent/BoostSerialize.h"
 #include "sevent/EventHandlerMap.h"
 
 
@@ -78,10 +80,13 @@ int main(int argc, const char *argv[])
 
     // Lets send a couple of events! Note that the received order is not
     // guaranteed, so we might die before all messages are received!
-    session1->sendEvent(HELLO_ID, socket::ConstBuffer("Hello", 6));
-    session2->sendEvent(HELLO_ID, socket::ConstBuffer("Cruel", 6));
-    session3->sendEvent(HELLO_ID, socket::ConstBuffer("World", 6));
-    session2->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
+    //boost::shared_ptr<std::string> hello = boost::make_shared<std::string>("Hello");
+    //boost::shared_ptr<std::string> cruel = boost::make_shared<std::string>("cruel");
+    //boost::shared_ptr<std::string> world = boost::make_shared<std::string>("world");
+    //session1->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(hello));
+    //session2->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(cruel));
+    //session3->sendEvent(HELLO_ID, socket::Buffer<std::string, boostserialize::Serializer>(world));
+    session2->sendEvent(DIE_ID);
 
     // Always nice to know who you are communicating with..
     {

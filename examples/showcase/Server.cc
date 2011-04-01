@@ -58,9 +58,12 @@ void numHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     Person spiderman;
     boostserialize::fromString(spiderman, event.first()->data<char>());
 
+    boost::shared_ptr<Person> spiderman = event.first()->data<Person, boostserialize::Serializer>();
+
     // Notice that we have to popBackAndDecode in reverse order
     Person batman;
     boostserialize::fromString(batman, event.popBack()->data<char>());
+
 
     socket::MutableBuffer_ptr int32numsBuf = endiansafe::popBackAndDecode<int32_t>(event);
     int32_t* int32nums = int32numsBuf->data<int32_t>();

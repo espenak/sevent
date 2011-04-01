@@ -89,6 +89,14 @@ void sendMessage(socket::Session_ptr session)
         endiansafe::pushBack(vec, uint16nums, 6);
         endiansafe::pushBack(vec, int32nums, 5);
         vec.push_back(socket::ConstBuffer(batman));
+
+        //boost::shared_prt<Person> spiderman = boost::make_shared<Person>(10, "Spiderman", "spider@man.com");
+        //boost::shared_prt<Person> batman = boost::make_shared<Person>(10, "Batman", "bat@man.com");
+        //vec.push_back(socket::Buffer<Person, boostserialize::Serializer>(spiderman));
+        //endiansafe::pushBack(vec, uint16nums, 6);
+        //endiansafe::pushBack(vec, int32nums, 5);
+        //vec.push_back(socket::Buffer<Person, boostserialize::Serializer>(batman));
+
         session->sendEvent(NUM_ID, vec);
     }
 }
