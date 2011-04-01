@@ -16,10 +16,7 @@ namespace sevent
         };
         typedef boost::shared_ptr<Serialized> Serialized_ptr;
 
-        /** Mutable (changable/non-const) buffer.
-         * The data is stored as a boost::shared_array, and will be deallocated
-         * with the buffer unless you have another reference to it (use
-         * sharedArray() to get a reference). */
+        /** Mutable (changable/non-const) buffer. */
         template<typename T, typename SerializeCls>
         class Buffer
         {
