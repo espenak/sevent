@@ -19,11 +19,7 @@ namespace sevent
                 ReceiveEvent& event)
         {
             std::cout << "Event received by default all-events handler. "
-                      << std::endl << "Event id: " << event.eventid() << std::endl
-                      << "Event data size: " << event.first()->size() << std::endl
-                      << "Event data: ";
-            std::cout.write(event.first()->data<char>(), event.first()->size());
-            std::cout << std::endl;
+                      << std::endl << "Event id: " << event.eventid() << std::endl;
         }
 
         void Session::setAllEventsHandler(allEventsHandler_t allEventsHandler)

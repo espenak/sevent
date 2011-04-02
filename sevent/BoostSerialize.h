@@ -78,24 +78,26 @@ namespace sevent
                 }
         };
 
+        template<typename T>
         class Serializer
         {
             public:
-                template<typename T>
-                static socket::Serialized_ptr serialize(boost::shared_ptr<T> data)
+                typedef T basic_type;
+                typedef boost::shared_ptr<basic_type> basic_type_ptr
+            public:
+                static socket::Serialized_ptr serialize(basic_type_ptr data)
                 {
-                    return boost::make_shared< Serialized<T> >(*data);
+                    return boost::make_shared< Serialized<basic_type> >(*data);
                 }
 
-                template<typename T>
-                static socket::Buffer<T, Serializer> deserialize(const char* serialized, uint32_t datasize)
+                static boost::shared_ptr deserialize(const char* serialized, uint32_t datasize)
                 {
-                    boost::shared_ptr<T> out = boost::make_shared<T>();
+                    boost::shared_ptr<T> out = boost::make_shared<basic_type>();
                     std::stringstream stream;
                     stream << serialized;
                     iarchive_t ia(stream);
                     ia >> *out;
-                    return socket::Buffer<T, Serializer>(out);
+                    return out;
                 }
         };
     } // namespace boostserialize

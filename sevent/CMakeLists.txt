@@ -17,7 +17,7 @@ add_library(sevent STATIC
     socket/Session.cc socket/Session.h
     socket/AsioSession.cc socket/AsioSession.h
     socket/SessionRegistry.cc socket/SessionRegistry.h
-    socket/ReceiveEvent.cc socket/ReceiveEvent.h
+    socket/ReceiveEvent.h
     socket/Facade.h socket/Facade.cc
     socket/AsioFacade.cc socket/AsioFacade.h
 )

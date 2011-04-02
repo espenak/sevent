@@ -7,7 +7,7 @@
 #include <boost/ref.hpp>
 #include "sevent/socket.h"
 #include "sevent/socket/Buffer.h"
-#include "sevent/BoostSerialize.h"
+//#include "sevent/BoostSerialize.h"
 #include "sevent/EventHandlerMap.h"
 #include "sevent/StringSerializer.h"
 
@@ -31,11 +31,15 @@ void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
+
+    boost::shared_ptr<std::string> data = event.first<std::string, StringSerializer>();
+    //socket::BufferBase_ptr buffer = event.datavector->at(0);
+    //boost::shared_ptr<std::string> data = StringSerializer::deserialize(buffer->_serializedData, buffer->_serializedDataSize);
+
     std::cout << "==================================" << std::endl;
     std::cout << "Hello-event received!" << std::endl;
     std::cout << "Event id:  " << event.eventid() << std::endl;
-    std::cout << "Data:      " << event.first()->data<char>() << std::endl;
-    std::cout << "Data size: " << event.first()->size() << std::endl;
+    std::cout << "Data:      " << *data << std::endl;
     std::cout << "==================================" << std::endl;
 }
 

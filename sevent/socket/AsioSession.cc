@@ -124,7 +124,7 @@ namespace sevent
             //std::cerr << "onHeaderReceived() obtained lock" << std::endl;
             try
             {
-                socket::MutableBufferVector_ptr dataBufs = receiveAllData(numElements);
+                socket::BufferBaseVector_ptr dataBufs = receiveAllData(numElements);
                 //std::cerr << "onHeaderReceived() received all data" << std::endl;
                 socket::ReceiveEvent event(eventid, dataBufs);
                 _allEventsHandler(shared_from_this(), event);
@@ -149,7 +149,7 @@ namespace sevent
             receiveEvents();
         }
 
-        socket::MutableBuffer_ptr AsioSession::receiveData()
+        socket::BufferBase_ptr AsioSession::receiveData()
         {
             boost::array<uint32_t, 1> dataSizeBuf;
             int bytes_read = boost::asio::read(*_sock,
@@ -158,23 +158,23 @@ namespace sevent
             assert(bytes_read == sizeof(uint32_t));
             uint32_t dataSize = ntohl(dataSizeBuf[0]);
 
-            boost::shared_array<char> data = boost::shared_array<char>(new char[dataSize]);
+            char *data = new char[dataSize];
             boost::asio::read(*_sock,
-                              boost::asio::buffer(data.get(), dataSize),
+                              boost::asio::buffer(data, dataSize),
                               boost::asio::transfer_all());
 
-            socket::MutableBuffer_ptr mb;
-            mb = boost::make_shared<socket::MutableBuffer>(data, dataSize);
-            return mb;
+            socket::BufferBase_ptr buffer;
+            buffer = boost::make_shared<socket::BufferBase>(data, dataSize);
+            return buffer;
         }
 
-        socket::MutableBufferVector_ptr AsioSession::receiveAllData(unsigned numElements)
+        socket::BufferBaseVector_ptr AsioSession::receiveAllData(unsigned numElements)
         {
-            socket::MutableBufferVector_ptr dataBufs = boost::make_shared<socket::MutableBufferVector>();
+            socket::BufferBaseVector_ptr dataBufs = boost::make_shared<socket::BufferBaseVector>();
             for(int i = 0; i < numElements; i++)
             {
-                socket::MutableBuffer_ptr mb = receiveData();
-                dataBufs->push_back(mb);
+                socket::BufferBase_ptr buffer = receiveData();
+                dataBufs->push_back(buffer);
             }
             return dataBufs;
         }

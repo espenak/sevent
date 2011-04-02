@@ -18,19 +18,43 @@ namespace sevent
         typedef boost::shared_ptr<Serialized> Serialized_ptr;
 
 
+        class NullSerialized : public Serialized
+        {
+            public:
+                NullSerialized() {}
+                const char* data() const { return NULL; }
+                uint32_t size() const { return 0; }
+        };
+
+
         class BufferBase
         {
             public:
-                virtual Serialized_ptr serialize() = 0;
+                BufferBase() : _serializedData(NULL), _serializedDataSize(0), isSerialized(false) {}
+                BufferBase(char* serializedData, uint32_t serializedDataSize) :
+                    _serializedData(serializedData), _serializedDataSize(serializedDataSize), isSerialized(true) {}
+
+                virtual Serialized_ptr serialize()
+                {
+                    return boost::make_shared<NullSerialized>();
+                }
+            public:
+                char* _serializedData;
+                uint32_t _serializedDataSize;
+                bool isSerialized;
         };
         typedef boost::shared_ptr<BufferBase> BufferBase_ptr;
         typedef std::vector<BufferBase_ptr> BufferBaseVector;
         typedef boost::shared_ptr<BufferBaseVector> BufferBaseVector_ptr;
 
+
         /** Mutable (changable/non-const) buffer. */
-        template<typename T, typename SerializeCls>
+        template<typename T, typename SerializeCls >
         class Buffer : public BufferBase
         {
+                
+            public:
+                typedef T basic_type;
             public:
                 static boost::shared_ptr< Buffer<T, SerializeCls> > make(boost::shared_ptr<T> data)
                 {
@@ -39,10 +63,24 @@ namespace sevent
             public:
                 Buffer(boost::shared_ptr<T> data) :
                     _data(data) {}
-                virtual ~Buffer(){}
 
-                boost::shared_ptr<T> data()
+                virtual ~Buffer()
                 {
+                    if(isSerialized)
+                    {
+                        delete[] _serializedData;
+                    }
+                }
+
+                boost::shared_ptr<basic_type> data()
+                {
+                    // TODO lock
+                    std::cerr << "Is serialized:" << isSerialized << std::endl;
+                    if(isSerialized) {
+                        _data = SerializeCls::deserialize(_serializedData, _serializedDataSize);
+                        delete[] _serializedData;
+                        isSerialized = false;
+                    }
                     return _data;
                 }
 
@@ -51,43 +89,9 @@ namespace sevent
                     return SerializeCls::serialize(_data);
                 }
 
-            public:
-                static Buffer<T, SerializeCls> deserialize(const char* data, bufsize_t datesize)
-                {
-                    return SerializeCls::deserialize(data, datesize);
-                }
-
             private:
                 boost::shared_ptr<T> _data;
         };
-
-
-
-        //class BufferVector {
-            //public:
-                //typedef std::vector<BufferBase_ptr> Vector_t;
-                //typedef boost::shared_ptr<Vector_t> Vector_t_ptr;
-
-            //public:
-                //BufferVector()
-                //{
-                    //vector = boost::make_shared<Vector_t>();
-                //}
-
-                //template<typename T, typename SerializeCls>
-                //Buffer<T, SerializeCls> at(unsigned index)
-                //{
-                    //return boost::dynamic_pointer_cast< Buffer<T, SerializeCls> >(vector->at(index));
-                //}
-
-                //int size()
-                //{
-                    //return vector->size();
-                //}
-
-            //public:
-                //Vector_t_ptr vector;
-        //};
 
     } // namespace socket
 } // namespace sevent

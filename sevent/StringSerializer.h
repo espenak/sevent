@@ -5,7 +5,6 @@
 
 namespace sevent
 {
-    template<typename T>
     class StringSerialized : public socket::Serialized
     {
         private:
@@ -28,16 +27,14 @@ namespace sevent
     class StringSerializer
     {
         public:
-            template<typename T>
-            static socket::Serialized_ptr serialize(boost::shared_ptr<T> str)
+            static socket::Serialized_ptr serialize(boost::shared_ptr<std::string> str)
             {
-                return boost::make_shared< StringSerialized<T> >(str);
+                return boost::make_shared< StringSerialized >(str);
             }
 
-            template<typename T>
-            static socket::Buffer<T, StringSerializer> deserialize(const char* serialized, uint32_t datasize)
+            static boost::shared_ptr<std::string> deserialize(char* serialized, uint32_t datasize)
             {
-                return socket::Buffer<T, StringSerializer>(boost::make_shared<std::string>(serialized));
+                return boost::make_shared<std::string>(serialized);
             }
     };
 } // namespace sevent
