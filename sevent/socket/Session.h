@@ -35,7 +35,7 @@ namespace sevent
 
                 /** Send an event with several data buffers.
                  * Blocks until the event and all it's data is completely sent. */
-                virtual void sendEvent(unsigned eventid, socket::BufferVector dataBufs) = 0;
+                virtual void sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs) = 0;
 
                 /** Add a asynchrone event-listener.
                  * This method should return at once, and make the

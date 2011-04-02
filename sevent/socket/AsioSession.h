@@ -42,7 +42,7 @@ namespace sevent
                 virtual ~AsioSession();
                 virtual void sendEvent(unsigned eventid);
                 virtual void sendEvent(unsigned eventid, socket::BufferBase_ptr buffer);
-                virtual void sendEvent(unsigned eventid, socket::BufferVector dataBufs);
+                virtual void sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs);
                 virtual void receiveEvents();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();

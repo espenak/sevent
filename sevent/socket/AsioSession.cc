@@ -64,17 +64,16 @@ namespace sevent
 
         void AsioSession::sendEvent(unsigned eventid, socket::BufferBase_ptr buffer)
         {
-            boost::lock_guard<boost::mutex> lock(_sendLock);
-            sendHeader(eventid, 1);
-            sendData(*(buffer->serialize()));
+            socket::BufferBaseVector_ptr dataBufs = boost::make_shared<socket::BufferBaseVector>();
+            dataBufs->push_back(buffer);
+            sendEvent(eventid, dataBufs);
         }
 
-        void AsioSession::sendEvent(unsigned eventid, socket::BufferVector dataBufs)
+        void AsioSession::sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
-            sendHeader(eventid, dataBufs.size());
-            std::vector<socket::BufferBase_ptr>& vec = *(dataBufs.vector);
-            BOOST_FOREACH(socket::BufferBase_ptr buffer, vec)
+            sendHeader(eventid, dataBufs->size());
+            BOOST_FOREACH(socket::BufferBase_ptr buffer, *dataBufs)
             {
                 sendData(*(buffer->serialize()));
             }
