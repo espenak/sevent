@@ -1,4 +1,5 @@
 #pragma once
+#include "Buffer.h"
 #include "ReceiveEvent.h"
 #include "Service.h"
 #include "Address.h"

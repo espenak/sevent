@@ -67,12 +67,12 @@ namespace sevent
                     result = stream.str();
                 }
 
-                const char* data()
+                const char* data() const
                 {
                     return result.c_str();
                 }
 
-                uint32_t size()
+                uint32_t size() const
                 {
                     return result.size();
                 }

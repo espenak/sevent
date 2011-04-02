@@ -41,14 +41,14 @@ namespace sevent
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
                 virtual void sendEvent(unsigned eventid);
-                virtual void sendEvent(unsigned eventid, const socket::ConstBuffer& data);
-                virtual void sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs);
+                virtual void sendEvent(unsigned eventid, socket::BufferBase_ptr buffer);
+                virtual void sendEvent(unsigned eventid, socket::BufferVector dataBufs);
                 virtual void receiveEvents();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
                 void sendHeader(unsigned eventid, int numElements);
-                void sendData(const socket::ConstBuffer& data);
+                void sendData(const socket::Serialized& data);
 
                 socket::MutableBuffer_ptr receiveData();
                 socket::MutableBufferVector_ptr receiveAllData(unsigned numElements);

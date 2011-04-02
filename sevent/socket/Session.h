@@ -6,6 +6,7 @@
 #include "Address.h"
 #include "ReceiveEvent.h"
 #include "ConstBuffer.h"
+#include "Buffer.h"
 
 namespace sevent
 {
@@ -30,11 +31,11 @@ namespace sevent
 
                 /** Send an event with a single data buffer.
                  * Blocks until the event and all it's data is completely sent. */
-                virtual void sendEvent(unsigned eventid, const ConstBuffer& data) = 0;
+                virtual void sendEvent(unsigned eventid, socket::BufferBase_ptr buffer) = 0;
 
                 /** Send an event with several data buffers.
                  * Blocks until the event and all it's data is completely sent. */
-                virtual void sendEvent(unsigned eventid, const ConstBufferVector& dataBufs) = 0;
+                virtual void sendEvent(unsigned eventid, socket::BufferVector dataBufs) = 0;
 
                 /** Add a asynchrone event-listener.
                  * This method should return at once, and make the

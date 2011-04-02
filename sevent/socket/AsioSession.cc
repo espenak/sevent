@@ -42,7 +42,7 @@ namespace sevent
                                boost::asio::transfer_all());
         }
 
-        void AsioSession::sendData(const socket::ConstBuffer& data)
+        void AsioSession::sendData(const socket::Serialized& data)
         {
             uint32_t sizeNetworkOrder = htonl(data.size());
             const char* s = (const char*) data.data();
@@ -59,25 +59,24 @@ namespace sevent
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
             sendHeader(eventid, 0);
-            //sendData(data);
             //std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
         }
 
-        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBuffer& data)
+        void AsioSession::sendEvent(unsigned eventid, socket::BufferBase_ptr buffer)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
             sendHeader(eventid, 1);
-            sendData(data);
-            //std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
+            sendData(*(buffer->serialize()));
         }
 
-        void AsioSession::sendEvent(unsigned eventid, const socket::ConstBufferVector& dataBufs)
+        void AsioSession::sendEvent(unsigned eventid, socket::BufferVector dataBufs)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
             sendHeader(eventid, dataBufs.size());
-            BOOST_FOREACH(const socket::ConstBuffer& data, dataBufs)
+            std::vector<socket::BufferBase_ptr>& vec = *(dataBufs.vector);
+            BOOST_FOREACH(socket::BufferBase_ptr buffer, vec)
             {
-                sendData(data);
+                sendData(*(buffer->serialize()));
             }
         }
 
