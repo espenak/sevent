@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <cstring>
 #include "socket.h"
 
 namespace sevent
@@ -8,33 +9,34 @@ namespace sevent
     class StringSerialized : public socket::Serialized
     {
         private:
-            boost::shared_ptr<std::string> _str;
+            boost::shared_ptr<char> _str;
         public:
-            StringSerialized(boost::shared_ptr<std::string> str) : _str(str)
+            StringSerialized(boost::shared_ptr<char> str) : _str(str)
         {}
 
             const char* data() const
             {
-                return _str->c_str();
+                return _str.get();
             }
 
             uint32_t size() const
             {
-                return _str->size();
+                return std::strlen(_str.get());
             }
     };
 
     class StringSerializer
     {
         public:
-            static socket::Serialized_ptr serialize(boost::shared_ptr<std::string> str)
+            static socket::Serialized_ptr serialize(boost::shared_ptr<char> str)
             {
-                return boost::make_shared< StringSerialized >(str);
+                return boost::make_shared<StringSerialized>(str);
             }
 
-            static boost::shared_ptr<std::string> deserialize(char* serialized, uint32_t datasize)
+            static boost::shared_ptr<char> deserialize(char* serialized, uint32_t datasize)
             {
-                return boost::make_shared<std::string>(serialized);
+                boost::shared_ptr<char> str = boost::shared_ptr<char>(new char[10]);
+                return str;
             }
     };
 } // namespace sevent

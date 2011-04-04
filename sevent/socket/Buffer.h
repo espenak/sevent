@@ -2,6 +2,9 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include "size.h"
 
 
@@ -36,6 +39,7 @@ namespace sevent
 
                 virtual Serialized_ptr serialize()
                 {
+                    std::cerr << "YOOOO" << std::endl;
                     return boost::make_shared<NullSerialized>();
                 }
             public:
@@ -52,7 +56,6 @@ namespace sevent
         template<typename T, typename SerializeCls >
         class Buffer : public BufferBase
         {
-                
             public:
                 typedef T basic_type;
             public:
@@ -64,22 +67,16 @@ namespace sevent
                 Buffer(boost::shared_ptr<T> data) :
                     _data(data) {}
 
-                virtual ~Buffer()
-                {
-                    if(isSerialized)
-                    {
-                        delete[] _serializedData;
-                    }
-                }
+                virtual ~Buffer() {}
 
                 boost::shared_ptr<basic_type> data()
                 {
-                    // TODO lock
-                    std::cerr << "Is serialized:" << isSerialized << std::endl;
-                    if(isSerialized) {
-                        _data = SerializeCls::deserialize(_serializedData, _serializedDataSize);
-                        delete[] _serializedData;
-                        isSerialized = false;
+                    {
+                        //boost::lock_guard<boost::mutex> lock(_freeSerializedDatalock);
+                        std::cerr << "Is serialized:" << isSerialized << std::endl;
+                        if(isSerialized) {
+                            _data = SerializeCls::deserialize(_serializedData, _serializedDataSize);
+                        }
                     }
                     return _data;
                 }
@@ -91,6 +88,7 @@ namespace sevent
 
             private:
                 boost::shared_ptr<T> _data;
+                boost::mutex _freeSerializedDatalock;
         };
 
     } // namespace socket

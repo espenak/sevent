@@ -1,6 +1,8 @@
+add_boost_test(TestSocketEvent TestEvent.cc)
+target_link_libraries(TestSocketEvent sevent)
 
-add_boost_test(TestSocketFacade TestFacade.cc)
-target_link_libraries(TestSocketFacade sevent)
+#add_boost_test(TestSocketFacade TestFacade.cc)
+#target_link_libraries(TestSocketFacade sevent)
 
 #add_boost_test(TestSocketFacadeMultiClient TestFacadeMultiClient.cc)
 #target_link_libraries(TestSocketFacadeMultiClient sevent)

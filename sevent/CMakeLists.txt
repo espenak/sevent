@@ -6,6 +6,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 add_library(sevent STATIC
     EventHandlerMap.cc EventHandlerMap.h
+    StringSerializer.h
 
     socket/Service.h
     socket/AsioService.cc socket/AsioService.h

@@ -30,9 +30,9 @@ enum EventIds
 void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
                   socket::ReceiveEvent& event)
 {
-    boost::lock_guard<boost::mutex> lock(stream_lock);
 
     boost::shared_ptr<std::string> data = event.first<std::string, StringSerializer>();
+    boost::lock_guard<boost::mutex> lock(stream_lock);
     //socket::BufferBase_ptr buffer = event.datavector->at(0);
     //boost::shared_ptr<std::string> data = StringSerializer::deserialize(buffer->_serializedData, buffer->_serializedDataSize);
 
@@ -41,6 +41,7 @@ void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     std::cout << "Event id:  " << event.eventid() << std::endl;
     std::cout << "Data:      " << *data << std::endl;
     std::cout << "==================================" << std::endl;
+    facade->service()->stop();
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -85,13 +86,9 @@ int main(int argc, const char *argv[])
 
     // Lets send a couple of events! Note that the received order is not
     // guaranteed, so we might die before all messages are received!
-    boost::shared_ptr<std::string> hello = boost::make_shared<std::string>("Hello");
-    boost::shared_ptr<std::string> cruel = boost::make_shared<std::string>("cruel");
-    boost::shared_ptr<std::string> world = boost::make_shared<std::string>("world");
+    boost::shared_ptr<std::string> hello = boost::shared_ptr<std::string>(new std::string("Hello"));
     session1->sendEvent(HELLO_ID, socket::Buffer<std::string, StringSerializer>::make(hello));
-    session2->sendEvent(HELLO_ID, socket::Buffer<std::string, StringSerializer>::make(cruel));
-    session3->sendEvent(HELLO_ID, socket::Buffer<std::string, StringSerializer>::make(world));
-    session2->sendEvent(DIE_ID);
+    //session2->sendEvent(DIE_ID);
 
     // Always nice to know who you are communicating with..
     {

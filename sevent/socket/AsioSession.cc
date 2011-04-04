@@ -120,15 +120,12 @@ namespace sevent
             uint32_t numElements = ntohl(_headerBuf[1]);
             //std::cerr << "onHeaderReceived() eventid:" << eventid
                 //<< ", numElements:" << numElements << std::endl;
+
+            socket::BufferBaseVector_ptr dataBufs;
             _receiveLock.lock();
-            //std::cerr << "onHeaderReceived() obtained lock" << std::endl;
             try
             {
-                socket::BufferBaseVector_ptr dataBufs = receiveAllData(numElements);
-                //std::cerr << "onHeaderReceived() received all data" << std::endl;
-                socket::ReceiveEvent event(eventid, dataBufs);
-                _allEventsHandler(shared_from_this(), event);
-                //std::cerr << "onHeaderReceived() invoked allEventsHandler" << std::endl;
+                dataBufs = receiveAllData(numElements);
                 _receiveLock.unlock();
             }
             catch(boost::system::system_error& error)
@@ -145,6 +142,9 @@ namespace sevent
                 _receiveLock.unlock();
                 BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
             }
+
+            socket::ReceiveEvent event(eventid, dataBufs);
+            _allEventsHandler(shared_from_this(), event);
             //std::cerr << "onHeaderReceived() finished!" << std::endl;
             receiveEvents();
         }
