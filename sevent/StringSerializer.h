@@ -11,8 +11,7 @@ namespace sevent
         private:
             boost::shared_ptr<char> _str;
         public:
-            StringSerialized(boost::shared_ptr<char> str) : _str(str)
-        {}
+            StringSerialized(boost::shared_ptr<char> str) : _str(str) {}
 
             const char* data() const
             {
@@ -35,7 +34,7 @@ namespace sevent
 
             static boost::shared_ptr<char> deserialize(char* serialized, uint32_t datasize)
             {
-                boost::shared_ptr<char> str = boost::shared_ptr<char>(new char[10]);
+                boost::shared_ptr<char> str = boost::shared_ptr<char>(serialized);
                 return str;
             }
     };

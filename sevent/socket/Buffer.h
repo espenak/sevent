@@ -33,19 +33,20 @@ namespace sevent
         class BufferBase
         {
             public:
-                BufferBase() : _serializedData(NULL), _serializedDataSize(0), isSerialized(false) {}
+                BufferBase() :
+                    _serializedData(NULL), _serializedDataSize(0)
+                {}
+
                 BufferBase(char* serializedData, uint32_t serializedDataSize) :
-                    _serializedData(serializedData), _serializedDataSize(serializedDataSize), isSerialized(true) {}
+                    _serializedData(serializedData), _serializedDataSize(serializedDataSize) {}
 
                 virtual Serialized_ptr serialize()
                 {
-                    std::cerr << "YOOOO" << std::endl;
                     return boost::make_shared<NullSerialized>();
                 }
-            public:
+            protected:
                 char* _serializedData;
                 uint32_t _serializedDataSize;
-                bool isSerialized;
         };
         typedef boost::shared_ptr<BufferBase> BufferBase_ptr;
         typedef std::vector<BufferBase_ptr> BufferBaseVector;
@@ -65,18 +66,24 @@ namespace sevent
                 }
             public:
                 Buffer(boost::shared_ptr<T> data) :
-                    _data(data) {}
+                    _data(data), serializedIsCached(false) {}
 
                 virtual ~Buffer() {}
 
                 boost::shared_ptr<basic_type> data()
                 {
-                    {
+                    if(!_data) {
                         //boost::lock_guard<boost::mutex> lock(_freeSerializedDatalock);
-                        std::cerr << "Is serialized:" << isSerialized << std::endl;
-                        if(isSerialized) {
-                            _data = SerializeCls::deserialize(_serializedData, _serializedDataSize);
+                        if(!serializedIsCached) {
+                            // TODO: Fix this so a workaround is not needed.
+                            // For some reason, using _data here does not work.
+                            // As a workaround, we use a separate shared_ptr
+                            // to cache data from deserialize.
+                            _dataFromDeserialize = SerializeCls::deserialize(_serializedData,
+                                                                             _serializedDataSize);
+                            serializedIsCached = true;
                         }
+                        return _dataFromDeserialize;
                     }
                     return _data;
                 }
@@ -88,7 +95,9 @@ namespace sevent
 
             private:
                 boost::shared_ptr<T> _data;
+                boost::shared_ptr<T> _dataFromDeserialize;
                 boost::mutex _freeSerializedDatalock;
+                bool serializedIsCached;
         };
 
     } // namespace socket

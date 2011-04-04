@@ -5,60 +5,106 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/shared_array.hpp>
 #include <cstring>
-#include "sevent/StringSerializer.h"
 #include "sevent/socket/Event.h"
 #include "sevent/socket/Buffer.h"
 #include <iostream>
 
-using namespace sevent::socket;
-using sevent::StringSerializer;
-typedef Buffer<char, StringSerializer> StringBuffer;
+using namespace sevent;
+//using sevent::StringSerializer;
+//typedef Buffer<char, StringSerializer> StringBuffer;
 
-//BOOST_AUTO_TEST_CASE( VectorInOut )
-//{
-    //const char *helloString = "Hello";
-    //boost::shared_ptr<char> hello = boost::shared_ptr<char>(new char[std::strlen(helloString)]);
-    //std::strcpy(hello.get(), helloString);
 
-    //BufferBaseVector_ptr vec = boost::make_shared<BufferBaseVector>();
-    //vec->push_back(Buffer<char, StringSerializer>::make(hello));
 
-    //boost::shared_ptr<StringBuffer> buf = boost::static_pointer_cast<StringBuffer>(vec->at(0));
-    //boost::shared_ptr<char> helloOut = buf->data();
-    //BOOST_REQUIRE_EQUAL(*helloOut, *hello);
-//}
+struct CharArray
+{
+    boost::shared_array<char> array;
+    unsigned size;
 
-//BOOST_AUTO_TEST_CASE( EventNoSerialization )
-//{
-    //const char *helloString = "Hello";
-    //boost::shared_ptr<char> hello = boost::shared_ptr<char>(new char[std::strlen(helloString)]);
-    //std::strcpy(hello.get(), helloString);
+    CharArray(boost::shared_array<char> array_, unsigned size_) :
+        array(array_), size(size_)
+    {}
 
-    //BufferBaseVector_ptr vec = boost::make_shared<BufferBaseVector>();
-    //vec->push_back(Buffer<char, StringSerializer>::make(hello));
+    CharArray(const std::string& str) :
+        array(new char[str.size()]), size(str.size())
+    {
+        memcpy(array.get(), str.c_str(), size);
+    }
+};
+typedef boost::shared_ptr<CharArray> CharArray_ptr;
 
-    //Event_ptr e = boost::make_shared<Event>(10, vec);
-    //boost::shared_ptr<char> helloOut = e->first<char, StringSerializer>();
-    //BOOST_REQUIRE_EQUAL(*helloOut, *hello);
-//}
+class CharArraySerialized : public socket::Serialized
+{
+    private:
+        CharArray_ptr _array;
+    public:
+        CharArraySerialized(CharArray_ptr array) : _array(array) {}
+        const char* data() const { return _array->array.get(); }
+        uint32_t size() const { return _array->size; }
+};
+
+class CharArraySerializer
+{
+    public:
+        static socket::Serialized_ptr serialize(CharArray_ptr array)
+        {
+            return boost::make_shared<CharArraySerialized>(array);
+        }
+
+        static CharArray_ptr deserialize(char* serialized, uint32_t datasize)
+        {
+            boost::shared_array<char> charArray = boost::shared_array<char>(serialized);
+            return boost::make_shared<CharArray>(charArray, datasize);
+        }
+};
+
+typedef socket::Buffer<CharArray, CharArraySerializer> CharArrayBuffer;
+
+
+
+
+
+BOOST_AUTO_TEST_CASE( VectorInOut )
+{
+    CharArray_ptr array = boost::make_shared<CharArray>("Hello World");
+    socket::BufferBaseVector_ptr vec = boost::make_shared<socket::BufferBaseVector>();
+    vec->push_back(boost::make_shared<CharArrayBuffer>(array));
+
+    boost::shared_ptr<CharArrayBuffer> buf = boost::static_pointer_cast<CharArrayBuffer>(vec->at(0));
+    CharArray_ptr out = buf->data();
+    BOOST_REQUIRE_EQUAL(out->array.get(), "Hello World");
+}
+
+BOOST_AUTO_TEST_CASE( EventNoSerialization )
+{
+    CharArray_ptr array = boost::make_shared<CharArray>("Hello World");
+    socket::BufferBaseVector_ptr vec = boost::make_shared<socket::BufferBaseVector>();
+    vec->push_back(boost::make_shared<CharArrayBuffer>(array));
+
+    socket::Event_ptr e = boost::make_shared<socket::Event>(10, vec);
+    CharArray_ptr out = e->first<CharArray, CharArraySerializer>();
+    BOOST_REQUIRE_EQUAL(out->array.get(), "Hello World");
+}
+
+
+
 
 BOOST_AUTO_TEST_CASE( EventSerialization )
 {
-    const char *helloString = "Hello";
-    boost::shared_ptr<char> hello = boost::shared_ptr<char>(new char[std::strlen(helloString)]);
-    std::strcpy(hello.get(), helloString);
-    boost::shared_ptr<StringBuffer> buf = boost::make_shared<StringBuffer>(hello);
-    Serialized_ptr serialized = buf->serialize();
 
-    BufferBaseVector_ptr vec = boost::make_shared<BufferBaseVector>();
+    CharArray_ptr array = boost::make_shared<CharArray>("Hello World");
+    boost::shared_ptr<CharArrayBuffer> buf = boost::make_shared<CharArrayBuffer>(array);
+    socket::Serialized_ptr serialized = buf->serialize();
+    BOOST_REQUIRE_EQUAL(serialized->data(), "Hello World");
+
+    socket::BufferBaseVector_ptr vec = boost::make_shared<socket::BufferBaseVector>();
     char* serializedData = new char[serialized->size()];
     std::memcpy(serializedData, serialized->data(), serialized->size());
-    BOOST_REQUIRE_EQUAL(serializedData, "Hello");
-    vec->push_back(boost::make_shared<BufferBase>(serializedData, serialized->size()));
+    BOOST_REQUIRE_EQUAL(serializedData, "Hello World");
+    vec->push_back(boost::make_shared<socket::BufferBase>(serializedData, serialized->size()));
 
-    Event_ptr e = boost::make_shared<Event>(10, vec);
-    boost::shared_ptr<char> helloOut = e->first<char, StringSerializer>();
-    //std::cerr << helloOut << std::endl;
-    //BOOST_REQUIRE_EQUAL(*helloOut, *hello);
+    socket::Event_ptr e = boost::make_shared<socket::Event>(10, vec);
+    CharArray_ptr out = e->first<CharArray, CharArraySerializer>();
+    BOOST_REQUIRE_EQUAL(out->array.get(), "Hello World");
 }
