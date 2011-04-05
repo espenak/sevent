@@ -15,18 +15,28 @@
 #include <iostream>
 
 
-struct ConstCharArray;
-typedef boost::shared_ptr<ConstCharArray> ConstCharArray_ptr;
-struct ConstCharArray
+class BaseSerializeResult
 {
-    const char* data;
-    unsigned size;
-    ConstCharArray(const char* data_, unsigned size_) : data(data_), size(size_) {}
+    public:
+        virtual const char* data() const = 0;
+        virtual unsigned size() const = 0;
+};
+typedef boost::shared_ptr<BaseSerializeResult> BaserSerializeResult_ptr;
 
-    static ConstCharArray_ptr make(const char* data, unsigned size)
-    {
-        return boost::make_shared<ConstCharArray>(data, size);
-    }
+class SerializeResult : public BaseSerializeResult
+{
+    public:
+        static BaserSerializeResult_ptr make(const char* data, unsigned size)
+        {
+            return boost::make_shared<SerializeResult>(data, size);
+        }
+    public:
+        SerializeResult(const char* data, unsigned size) : _data(data), _size(size) {}
+        const char* data() const { return _data; }
+        unsigned size() const { return _size; }
+    private:
+        const char* _data;
+        unsigned _size;
 };
 
 struct MutableCharArray
@@ -39,7 +49,7 @@ typedef boost::shared_ptr<MutableCharArray> MutableCharArray_ptr;
 typedef std::vector<MutableCharArray_ptr> MutableCharArrayVector;
 typedef boost::shared_ptr<MutableCharArrayVector> MutableCharArrayVector_ptr;
 
-typedef boost::function<ConstCharArray_ptr (boost::any& data)> serialize_t;
+typedef boost::function<BaserSerializeResult_ptr (boost::any& data)> serialize_t;
 typedef boost::function<boost::any (MutableCharArray_ptr serialized)> deserialize_t;
 struct SerializePair
 {
@@ -72,7 +82,7 @@ class Buffer
         Buffer(boost::any anydata, serialize_t serializeFunc) :
             _anydata(anydata), _serializeFunc(serializeFunc) {}
 
-        ConstCharArray_ptr serialize()
+        BaserSerializeResult_ptr serialize()
         {
             return _serializeFunc(_anydata);
         }
@@ -109,14 +119,14 @@ typedef Array<int> IntArray;
 typedef boost::shared_ptr<IntArray> IntArray_ptr;
 
 
-ConstCharArray_ptr serializeIntArray(boost::any& data)
+BaserSerializeResult_ptr serializeIntArray(boost::any& data)
 {
     IntArray_ptr a = boost::any_cast<IntArray_ptr>(data);
     for(int i = 0; i < a->size; i++)
     {
         a->sharedarr[i] --;
     }
-    return ConstCharArray::make(reinterpret_cast<const char*>(a->sharedarr.get()),
+    return SerializeResult::make(reinterpret_cast<const char*>(a->sharedarr.get()),
                                 a->size*sizeof(int));
 }
 
@@ -128,6 +138,29 @@ boost::any deserializeIntArray(MutableCharArray_ptr serialized)
     return arr;
 }
 SerializePair IntSerializer(serializeIntArray, deserializeIntArray);
+
+
+
+//BaserSerializeResult_ptr stringPrefixSerializer(boost::any& data)
+//{
+    //typedef boost::shared_ptr<std::string> String_ptr;
+    //String_ptr s = boost::any_cast<String_ptr>(data);
+    //std::stringstream ss;
+    //ss << "Serialized:" << *s;
+    //return SerializeResult::make(reinterpret_cast<const char*>(a->sharedarr.get()),
+                                //a->size*sizeof(int));
+//}
+
+//boost::any stringPrefixDeSerializer(MutableCharArray_ptr serialized)
+//{
+    //int* data = reinterpret_cast<int*>(serialized->data);
+    //IntArray_ptr arr = boost::make_shared<IntArray>(boost::shared_array<int>(data),
+                                                    //serialized->size/sizeof(int));
+    //return arr;
+//}
+//SerializePair StringWithPrefixSerializer(stringPrefixSerializer,
+                                         //stringPrefixDeSerializer);
+
 
 
 class Event;
@@ -172,7 +205,7 @@ class Event
             return at<T>(0, serializer);
         }
 
-        ConstCharArray_ptr serialize_at(int index)
+        BaserSerializeResult_ptr serialize_at(int index)
         {
             return _buffers.at(index)->serialize();
         }
@@ -245,13 +278,13 @@ BOOST_FIXTURE_TEST_SUITE(BasicSuite, EventFixture)
 
 BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 {
-    ConstCharArray_ptr serialized = inputArray->serialize();
+    BaserSerializeResult_ptr serialized = inputArray->serialize();
 
     // Simulate network transfer (copy the serialized data)
-    char* receivedData = new char[serialized->size];
-    std::memcpy(receivedData, serialized->data, serialized->size);
+    char* receivedData = new char[serialized->size()];
+    std::memcpy(receivedData, serialized->data(), serialized->size());
     MutableCharArray_ptr received = boost::make_shared<MutableCharArray>(receivedData,
-                                                                         serialized->size);
+                                                                         serialized->size());
 
     // Deserialize the "received data"
     Buffer_ptr output = Buffer::deserialize(received, serializeIntArray, deserializeIntArray);
@@ -276,13 +309,13 @@ BOOST_AUTO_TEST_CASE(TestEvent)
 
 BOOST_AUTO_TEST_CASE(TestEventSerialized)
 {
-    ConstCharArray_ptr serializedArray = inputArray->serialize();
+    BaserSerializeResult_ptr serializedArray = inputArray->serialize();
 
     // Simulate network transfer (copy the serialized data)
-    char* receivedData = new char[serializedArray->size];
-    std::memcpy(receivedData, serializedArray->data, serializedArray->size);
+    char* receivedData = new char[serializedArray->size()];
+    std::memcpy(receivedData, serializedArray->data(), serializedArray->size());
     MutableCharArray_ptr received = boost::make_shared<MutableCharArray>(receivedData,
-                                                                         serializedArray->size);
+                                                                         serializedArray->size());
     MutableCharArrayVector_ptr serialized = boost::make_shared<MutableCharArrayVector>();
     serialized->push_back(received);
 
