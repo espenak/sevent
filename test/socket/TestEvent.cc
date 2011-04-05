@@ -12,13 +12,19 @@
 #include <iostream>
 
 
+struct ConstCharArray;
+typedef boost::shared_ptr<ConstCharArray> ConstCharArray_ptr;
 struct ConstCharArray
 {
     const char* data;
     unsigned size;
     ConstCharArray(const char* data_, unsigned size_) : data(data_), size(size_) {}
+
+    static ConstCharArray_ptr make(const char* data, unsigned size)
+    {
+        return boost::make_shared<ConstCharArray>(data, size);
+    }
 };
-typedef boost::shared_ptr<ConstCharArray> ConstCharArray_ptr;
 
 struct MutableCharArray
 {
@@ -82,11 +88,11 @@ class Array
     public:
         typedef T value_type;
         typedef boost::shared_array<value_type> value_shared_array;
-        value_shared_array data;
+        value_shared_array sharedarr;
         unsigned size;
     public:
-        Array(value_shared_array data_, unsigned size_) :
-            data(data_), size(size_) {}
+        Array(value_shared_array sharedarr_, unsigned size_) :
+            sharedarr(sharedarr_), size(size_) {}
 };
 typedef Array<int> IntArray;
 typedef boost::shared_ptr<IntArray> IntArray_ptr;
@@ -95,8 +101,8 @@ typedef boost::shared_ptr<IntArray> IntArray_ptr;
 ConstCharArray_ptr serializeInt(boost::any& data)
 {
     IntArray_ptr a = boost::any_cast<IntArray_ptr>(data);
-    return boost::make_shared<ConstCharArray>(reinterpret_cast<const char*>(a->data.get()),
-                                          a->size*sizeof(int));
+    return ConstCharArray::make(reinterpret_cast<const char*>(a->sharedarr.get()),
+                                a->size*sizeof(int));
 }
 
 boost::any deserializeInt(MutableCharArray_ptr serialized)
@@ -109,13 +115,47 @@ boost::any deserializeInt(MutableCharArray_ptr serialized)
 }
 
 
-BOOST_AUTO_TEST_CASE(VectorInOut)
+
+class Event;
+typedef boost::shared_ptr<Event> Event_ptr;
+class Event
 {
+    private:
+        unsigned _eventid;
+        BufferVector _buffers;
+    public:
+        static Event_ptr make(unsigned eventid, Buffer_ptr first)
+        {
+            return boost::make_shared<Event>(eventid, first);
+        }
+
+    public:
+        Event(unsigned eventid) :
+            _eventid(eventid)
+        {}
+
+        Event(unsigned eventid, Buffer_ptr first) :
+            _eventid(eventid)
+        {
+            _buffers.push_back(first);
+        }
+
+        template<typename T>
+        T first(serialize_t serializeFunc, deserialize_t deserializeFunc)
+        {
+            return _buffers.at(0)->data<T>();
+        }
+};
+
+
+BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
+{
+    // Create and serialize an array
     boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
     intarr[0] = 10;
     intarr[1] = 20;
     Buffer_ptr input = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
-                                serializeInt);
+                                    serializeInt);
     ConstCharArray_ptr serialized = input->serialize();
 
     // Simulate network transfer (copy the serialized data)
@@ -127,14 +167,24 @@ BOOST_AUTO_TEST_CASE(VectorInOut)
     // Deserialize the "received data"
     Buffer_ptr output = Buffer::deserialize(received, serializeInt, deserializeInt);
     IntArray_ptr aOut = output->data<IntArray_ptr>();
-    std::cerr 
-        << aOut->data[0] << ":"
-        << aOut->data[1] << ":"
-        << aOut->size << std::endl;
-
-    //BufferVector vec;
-    //std::string s = "Hello world";
-    //int i = 10;
-    //BOOST_REQUIRE_EQUAL();
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
+    BOOST_REQUIRE_EQUAL(aOut->size, 2);
 }
 
+
+
+BOOST_AUTO_TEST_CASE(TestEvent)
+{
+    boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
+    intarr[0] = 10;
+    intarr[1] = 20;
+    Buffer_ptr inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
+                                    serializeInt);
+
+    Event_ptr eventIn = Event::make(1010, inputArray);
+    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(serializeInt, deserializeInt);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
+    BOOST_REQUIRE_EQUAL(aOut->size, 2);
+}
