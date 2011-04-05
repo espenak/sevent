@@ -90,7 +90,6 @@ class Buffer
 
 
 
-//typedef std::pair<boost::any, serialize_t> Buffer;
 typedef std::vector<Buffer_ptr> BufferVector;
 
 
@@ -110,22 +109,25 @@ typedef Array<int> IntArray;
 typedef boost::shared_ptr<IntArray> IntArray_ptr;
 
 
-ConstCharArray_ptr serializeInt(boost::any& data)
+ConstCharArray_ptr serializeIntArray(boost::any& data)
 {
     IntArray_ptr a = boost::any_cast<IntArray_ptr>(data);
+    for(int i = 0; i < a->size; i++)
+    {
+        a->sharedarr[i] --;
+    }
     return ConstCharArray::make(reinterpret_cast<const char*>(a->sharedarr.get()),
                                 a->size*sizeof(int));
 }
 
-boost::any deserializeInt(MutableCharArray_ptr serialized)
+boost::any deserializeIntArray(MutableCharArray_ptr serialized)
 {
     int* data = reinterpret_cast<int*>(serialized->data);
-    assert((serialized->size % sizeof(int)) == 0);
     IntArray_ptr arr = boost::make_shared<IntArray>(boost::shared_array<int>(data),
                                                     serialized->size/sizeof(int));
     return arr;
 }
-SerializePair intSerializer(serializeInt, deserializeInt);
+SerializePair IntSerializer(serializeIntArray, deserializeIntArray);
 
 
 class Event;
@@ -222,16 +224,28 @@ class Event
         boost::mutex _lock;
 };
 
+struct EventFixture
+{
+    Buffer_ptr inputArray;
+
+    EventFixture ()
+    {
+        boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
+        intarr[0] = 10;
+        intarr[1] = 20;
+        inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
+                                serializeIntArray);
+    }
+
+    ~EventFixture () {}
+};
+
+BOOST_FIXTURE_TEST_SUITE(BasicSuite, EventFixture)
+
 
 BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 {
-    // Create and serialize an array
-    boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
-    intarr[0] = 10;
-    intarr[1] = 20;
-    Buffer_ptr input = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
-                                    serializeInt);
-    ConstCharArray_ptr serialized = input->serialize();
+    ConstCharArray_ptr serialized = inputArray->serialize();
 
     // Simulate network transfer (copy the serialized data)
     char* receivedData = new char[serialized->size];
@@ -240,10 +254,10 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
                                                                          serialized->size);
 
     // Deserialize the "received data"
-    Buffer_ptr output = Buffer::deserialize(received, serializeInt, deserializeInt);
+    Buffer_ptr output = Buffer::deserialize(received, serializeIntArray, deserializeIntArray);
     IntArray_ptr aOut = output->data<IntArray_ptr>();
-    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
-    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 9); // The array serializer reduce values by one..
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 19);
     BOOST_REQUIRE_EQUAL(aOut->size, 2);
 }
 
@@ -251,15 +265,9 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 
 BOOST_AUTO_TEST_CASE(TestEvent)
 {
-    boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
-    intarr[0] = 10;
-    intarr[1] = 20;
-    Buffer_ptr inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
-                                    serializeInt);
-
     Event_ptr eventIn = Event::make(1010, inputArray);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
-    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(intSerializer);
+    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(IntSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
@@ -268,11 +276,6 @@ BOOST_AUTO_TEST_CASE(TestEvent)
 
 BOOST_AUTO_TEST_CASE(TestEventSerialized)
 {
-    boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
-    intarr[0] = 10;
-    intarr[1] = 20;
-    Buffer_ptr inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
-                                         serializeInt);
     ConstCharArray_ptr serializedArray = inputArray->serialize();
 
     // Simulate network transfer (copy the serialized data)
@@ -285,9 +288,12 @@ BOOST_AUTO_TEST_CASE(TestEventSerialized)
 
     Event_ptr eventIn = Event::make(1010, serialized);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), true);
-    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(intSerializer);
+    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(IntSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
-    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
-    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 9);  // The array serializer reduce values by one..
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 19);
     BOOST_REQUIRE_EQUAL(aOut->size, 2);
 }
+
+
+BOOST_AUTO_TEST_SUITE_END()
