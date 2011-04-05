@@ -8,6 +8,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/function.hpp>
 #include <boost/any.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <cstring>
 #include <iostream>
 
@@ -33,9 +34,18 @@ struct MutableCharArray
     MutableCharArray(char* data_, unsigned size_) : data(data_), size(size_) {}
 };
 typedef boost::shared_ptr<MutableCharArray> MutableCharArray_ptr;
+typedef std::vector<MutableCharArray_ptr> MutableCharArrayVector;
+typedef boost::shared_ptr<MutableCharArrayVector> MutableCharArrayVector_ptr;
 
 typedef boost::function<ConstCharArray_ptr (boost::any& data)> serialize_t;
 typedef boost::function<boost::any (MutableCharArray_ptr serialized)> deserialize_t;
+struct SerializePair
+{
+    serialize_t serializeFunc;
+    deserialize_t deserializeFunc;
+    SerializePair(serialize_t serializeFunc_, deserialize_t deserializeFunc_) :
+        serializeFunc(serializeFunc_), deserializeFunc(deserializeFunc_) {}
+};
 
 
 class Buffer;
@@ -113,20 +123,21 @@ boost::any deserializeInt(MutableCharArray_ptr serialized)
                                                     serialized->size/sizeof(int));
     return arr;
 }
-
+SerializePair intSerializer(serializeInt, deserializeInt);
 
 
 class Event;
 typedef boost::shared_ptr<Event> Event_ptr;
 class Event
 {
-    private:
-        unsigned _eventid;
-        BufferVector _buffers;
     public:
         static Event_ptr make(unsigned eventid, Buffer_ptr first)
         {
             return boost::make_shared<Event>(eventid, first);
+        }
+        static Event_ptr make(unsigned eventid, MutableCharArrayVector_ptr serialized)
+        {
+            return boost::make_shared<Event>(eventid, serialized);
         }
 
     public:
@@ -140,11 +151,59 @@ class Event
             _buffers.push_back(first);
         }
 
+        Event(unsigned eventid, MutableCharArrayVector_ptr serialized) :
+            _eventid(eventid), _buffers(serialized->size()), _serialized(serialized),
+            _isSerialized(serialized->size(), true)
+        {}
+
         template<typename T>
-        T first(serialize_t serializeFunc, deserialize_t deserializeFunc)
+        T first(const SerializePair& serializer)
         {
-            return _buffers.at(0)->data<T>();
+            return buffer_at(0, serializer)->data<T>();
         }
+
+        Buffer_ptr buffer_at(int index, const SerializePair& serializer)
+        {
+            if(isSerialized(index))
+            {
+                MutableCharArray_ptr mutarr = _serialized->at(index);
+                Buffer_ptr buffer = Buffer::deserialize(mutarr,
+                                                        serializer.serializeFunc,
+                                                        serializer.deserializeFunc);
+                mutarr.reset(); // Free the MutableCharArray_ptr (data ownership is given to the deserializer)
+                insert(index, buffer);
+            }
+            return _buffers.at(index);
+        }
+
+        ConstCharArray_ptr serialize_at(int index)
+        {
+            return _buffers.at(index)->serialize();
+        }
+
+        void push_back(Buffer_ptr buffer)
+        {
+            _buffers.push_back(buffer);
+            _isSerialized.push_back(false);
+        }
+
+        bool isSerialized(int index)
+        {
+            return _serialized && _isSerialized[index];
+        }
+
+    private:
+        void insert(unsigned index, Buffer_ptr buffer)
+        {
+            _buffers[index] = buffer;
+            _isSerialized[index] = false;
+        }
+
+    private:
+        unsigned _eventid;
+        BufferVector _buffers;
+        MutableCharArrayVector_ptr _serialized;
+        boost::dynamic_bitset<> _isSerialized;
 };
 
 
@@ -183,7 +242,35 @@ BOOST_AUTO_TEST_CASE(TestEvent)
                                     serializeInt);
 
     Event_ptr eventIn = Event::make(1010, inputArray);
-    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(serializeInt, deserializeInt);
+    BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
+    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(intSerializer);
+    BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
+    BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
+    BOOST_REQUIRE_EQUAL(aOut->size, 2);
+}
+
+BOOST_AUTO_TEST_CASE(TestEventSerialized)
+{
+    boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
+    intarr[0] = 10;
+    intarr[1] = 20;
+    Buffer_ptr inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
+                                         serializeInt);
+    ConstCharArray_ptr serializedArray = inputArray->serialize();
+
+    // Simulate network transfer (copy the serialized data)
+    char* receivedData = new char[serializedArray->size];
+    std::memcpy(receivedData, serializedArray->data, serializedArray->size);
+    MutableCharArray_ptr received = boost::make_shared<MutableCharArray>(receivedData,
+                                                                         serializedArray->size);
+    MutableCharArrayVector_ptr serialized = boost::make_shared<MutableCharArrayVector>();
+    serialized->push_back(received);
+
+    Event_ptr eventIn = Event::make(1010, serialized);
+    BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), true);
+    IntArray_ptr aOut = eventIn->first<IntArray_ptr>(intSerializer);
+    BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 10);
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 20);
     BOOST_REQUIRE_EQUAL(aOut->size, 2);
