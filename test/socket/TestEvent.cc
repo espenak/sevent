@@ -9,6 +9,8 @@
 #include <boost/function.hpp>
 #include <boost/any.hpp>
 #include <boost/dynamic_bitset.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <cstring>
 #include <iostream>
 
@@ -157,23 +159,15 @@ class Event
         {}
 
         template<typename T>
-        T first(const SerializePair& serializer)
+        T at(unsigned index, const SerializePair& serializer)
         {
-            return buffer_at(0, serializer)->data<T>();
+            return buffer_at(index, serializer)->data<T>();
         }
 
-        Buffer_ptr buffer_at(int index, const SerializePair& serializer)
+        template<typename T>
+        T first(const SerializePair& serializer)
         {
-            if(isSerialized(index))
-            {
-                MutableCharArray_ptr mutarr = _serialized->at(index);
-                Buffer_ptr buffer = Buffer::deserialize(mutarr,
-                                                        serializer.serializeFunc,
-                                                        serializer.deserializeFunc);
-                mutarr.reset(); // Free the MutableCharArray_ptr (data ownership is given to the deserializer)
-                insert(index, buffer);
-            }
-            return _buffers.at(index);
+            return at<T>(0, serializer);
         }
 
         ConstCharArray_ptr serialize_at(int index)
@@ -183,6 +177,7 @@ class Event
 
         void push_back(Buffer_ptr buffer)
         {
+            boost::lock_guard<boost::mutex> lock(_lock);
             _buffers.push_back(buffer);
             _isSerialized.push_back(false);
         }
@@ -192,11 +187,31 @@ class Event
             return _serialized && _isSerialized[index];
         }
 
+        unsigned size()
+        {
+            return _buffers.size();
+        }
+
     private:
-        void insert(unsigned index, Buffer_ptr buffer)
+        void set_buffer(unsigned index, Buffer_ptr buffer)
         {
             _buffers[index] = buffer;
             _isSerialized[index] = false;
+        }
+
+        Buffer_ptr buffer_at(int index, const SerializePair& serializer)
+        {
+            boost::lock_guard<boost::mutex> lock(_lock);
+            if(isSerialized(index))
+            {
+                MutableCharArray_ptr mutarr = _serialized->at(index);
+                Buffer_ptr buffer = Buffer::deserialize(mutarr,
+                                                        serializer.serializeFunc,
+                                                        serializer.deserializeFunc);
+                mutarr.reset(); // Free the MutableCharArray_ptr (data ownership is given to the deserializer)
+                set_buffer(index, buffer);
+            }
+            return _buffers.at(index);
         }
 
     private:
@@ -204,6 +219,7 @@ class Event
         BufferVector _buffers;
         MutableCharArrayVector_ptr _serialized;
         boost::dynamic_bitset<> _isSerialized;
+        boost::mutex _lock;
 };
 
 
