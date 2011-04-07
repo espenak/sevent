@@ -11,10 +11,11 @@
  * */
 
 
-#include "socket.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
+#include "socket.h"
+#include "event/Event.h"
 
 namespace sevent
 {
@@ -27,9 +28,7 @@ namespace sevent
         class HandlerMap
         {
             public:
-                typedef boost::function<void(socket::Facade_ptr facade,
-                                             socket::Session_ptr session,
-                                             socket::ReceiveEvent& event)> handler_t;
+                typedef socket::Facade::allEventsHandler_t handler_t;
             private:
                 struct Handler
                 {
@@ -42,15 +41,15 @@ namespace sevent
                 virtual ~HandlerMap();
                 static HandlerMap_ptr make();
             public:
-                bool contains(socket::ReceiveEvent::eventId_t eventid);
-                void addEventHandler(socket::ReceiveEvent::eventId_t eventid,
+                bool contains(eventid_t eventid);
+                void addEventHandler(eventid_t eventid,
                                      handler_t handler);
                 void triggerEvent(socket::Facade_ptr facade,
                                   socket::Session_ptr session,
-                                  socket::ReceiveEvent& event);
+                                  Event_ptr event);
 
             private:
-                boost::unordered_map<socket::ReceiveEvent::eventId_t, Handler_ptr> _handlers;
+                boost::unordered_map<eventid_t, Handler_ptr> _handlers;
                 boost::mutex _lock;
         };
         
@@ -68,7 +67,7 @@ namespace sevent
         void simpleAllEventsHandler(event::HandlerMap_ptr eventHandlerMap,
                                      socket::Facade_ptr facade,
                                      socket::Session_ptr session,
-                                     socket::ReceiveEvent& event);
+                                     Event_ptr event);
 
     } // namespace event
 } // namespace sevent

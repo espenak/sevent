@@ -8,8 +8,8 @@ function(add_sevent_example_executable execname)
 endfunction(add_sevent_example_executable)
 
 #add_sevent_example_executable(SocketExample)
-add_sevent_example_executable(EventExample)
-#add_sevent_example_executable(SimpleServer)
-#add_sevent_example_executable(SimpleClient)
+#add_sevent_example_executable(EventExample)
+add_sevent_example_executable(SimpleServer)
+add_sevent_example_executable(SimpleClient)
 
 #add_subdirectory(showcase)

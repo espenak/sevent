@@ -31,6 +31,5 @@
  * */
 
 #include "socket.h"
+#include "event/Event.h"
 #include "EventHandlerMap.h"
-#include "EndianSafe.h"
-#include "BoostSerialize.h"

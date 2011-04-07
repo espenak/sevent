@@ -1,7 +1,5 @@
 #pragma once
-#include "Buffer.h"
-#include "ReceiveEvent.h"
-#include "Service.h"
+#include "sevent/event/Event.h"
 #include "Address.h"
 #include "Service.h"
 #include "Listener.h"
@@ -32,7 +30,7 @@ namespace sevent
                 typedef boost::function<void(
                     Facade_ptr facade,
                     Session_ptr session,
-                    ReceiveEvent& event)> allEventsHandler_t;
+                    event::Event_ptr event)> allEventsHandler_t;
 
                 typedef boost::function<void(Facade_ptr facade)> workerThread_t;
             public:

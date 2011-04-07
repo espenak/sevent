@@ -4,11 +4,9 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/array.hpp>
+#include <boost/exception/all.hpp>
 #include <vector>
 #include "Session.h"
-#include "ConstBuffer.h"
-#include "MutableBuffer.h"
-#include <boost/exception/all.hpp>
 
 namespace sevent
 {
@@ -40,18 +38,17 @@ namespace sevent
             public:
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
-                virtual void sendEvent(unsigned eventid);
-                virtual void sendEvent(unsigned eventid, socket::BufferBase_ptr buffer);
-                virtual void sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs);
+                //virtual void sendEvent(unsigned eventid);
+                virtual void sendEvent(event::Event_ptr event);
                 virtual void receiveEvents();
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
                 void sendHeader(unsigned eventid, int numElements);
-                void sendData(const socket::Serialized& data);
+                void sendData(serialize::BaseResult_ptr data);
 
-                socket::BufferBase_ptr receiveData();
-                socket::BufferBaseVector_ptr receiveAllData(unsigned numElements);
+                datastruct::MutableCharArray_ptr receiveData();
+                datastruct::MutableCharArrayVector_ptr receiveAllData(unsigned numElements);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
             protected:
@@ -59,7 +56,6 @@ namespace sevent
             private:
                 socket_ptr _sock;
                 unsigned dataBufsReceived;
-                std::vector<socket::MutableBuffer> _dataBuffers;
                 boost::mutex _sendLock;
                 boost::mutex _receiveLock;
                 boost::mutex _closeMutex;

@@ -12,7 +12,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 #include "sevent/sevent.h"
-#include "SerializablePerson.h"
+#include "sevent/serialize/String.h"
+//#include "SerializablePerson.h"
 
 
 using namespace sevent;
@@ -33,40 +34,41 @@ enum EventIds
 // for multiple events!
 void helloHandler(socket::Facade_ptr facade,
                   socket::Session_ptr session,
-                  socket::ReceiveEvent& event)
+                  event::Event_ptr event)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
+    typedef boost::shared_ptr<std::string> String_ptr;
+    String_ptr data = event->first<String_ptr>(serialize::String);
     std::cout << "==================================" << std::endl;
     std::cout << "Hello-event received!" << std::endl;
-    std::cout << "Event id:  " << event.eventid() << std::endl;
-    std::cout << "Data:      " << event.first()->data<char>() << std::endl;
-    std::cout << "Data size: " << event.first()->size() << std::endl;
+    std::cout << "Event id:  " << event->eventid() << std::endl;
+    std::cout << "Data:      " << *data << std::endl;
     std::cout << "Sender: " << session->getRemoteEndpointAddress() << std::endl;
     std::cout << "Receiver: " << session->getLocalEndpointAddress() << std::endl;
     std::cout << "==================================" << std::endl;
 }
 
 
-void personHandler(socket::Facade_ptr facade,
-                   socket::Session_ptr session,
-                   socket::ReceiveEvent& event)
-{
-    Person p;
-    sevent::boostserialize::fromString(p, event.first()->data<char>());
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "### Person-event received: "
-        << p.name << ":" << p.age << " ###" << std::endl;
-}
+//void personHandler(socket::Facade_ptr facade,
+                   //socket::Session_ptr session,
+                   //socket::ReceiveEvent& event)
+//{
+    //Person p;
+    //sevent::boostserialize::fromString(p, event.first()->data<char>());
+    //boost::lock_guard<boost::mutex> lock(stream_lock);
+    //std::cout << "### Person-event received: "
+        //<< p.name << ":" << p.age << " ###" << std::endl;
+//}
 
 
-void dieHandler(socket::Facade_ptr facade,
-                socket::Session_ptr session,
-                socket::ReceiveEvent& event)
-{
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "*** DIE-event received ***" << std::endl;
-    facade->service()->stop();
-}
+//void dieHandler(socket::Facade_ptr facade,
+                //socket::Session_ptr session,
+                //socket::ReceiveEvent& event)
+//{
+    //boost::lock_guard<boost::mutex> lock(stream_lock);
+    //std::cout << "*** DIE-event received ***" << std::endl;
+    //facade->service()->stop();
+//}
 
 
 
@@ -80,8 +82,8 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
-    eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
-    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    //eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
+    //eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     facade->setWorkerThreads(1, boost::bind(event::simpleAllEventsHandler,

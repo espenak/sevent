@@ -6,6 +6,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/foreach.hpp>
 #include <arpa/inet.h>
+#include "sevent/serialize/Result.h"
 
 namespace sevent
 {
@@ -42,40 +43,32 @@ namespace sevent
                                boost::asio::transfer_all());
         }
 
-        void AsioSession::sendData(const socket::Serialized& data)
+        void AsioSession::sendData(serialize::BaseResult_ptr data)
         {
-            uint32_t sizeNetworkOrder = htonl(data.size());
-            const char* s = (const char*) data.data();
+            uint32_t sizeNetworkOrder = htonl(data->size());
             boost::asio::write(*_sock,
                                boost::asio::buffer(&sizeNetworkOrder,
                                                    sizeof(uint32_t)),
                                boost::asio::transfer_all());
             boost::asio::write(*_sock,
-                               boost::asio::buffer(data.data(), data.size()),
+                               boost::asio::buffer(data->data(), data->size()),
                                boost::asio::transfer_all());
         }
 
-        void AsioSession::sendEvent(unsigned eventid)
+        //void AsioSession::sendEvent(unsigned eventid)
+        //{
+            //boost::lock_guard<boost::mutex> lock(_sendLock);
+            //sendHeader(eventid, 0);
+            ////std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
+        //}
+
+        void AsioSession::sendEvent(event::Event_ptr event)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
-            sendHeader(eventid, 0);
-            //std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
-        }
-
-        void AsioSession::sendEvent(unsigned eventid, socket::BufferBase_ptr buffer)
-        {
-            socket::BufferBaseVector_ptr dataBufs = boost::make_shared<socket::BufferBaseVector>();
-            dataBufs->push_back(buffer);
-            sendEvent(eventid, dataBufs);
-        }
-
-        void AsioSession::sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs)
-        {
-            boost::lock_guard<boost::mutex> lock(_sendLock);
-            sendHeader(eventid, dataBufs->size());
-            BOOST_FOREACH(socket::BufferBase_ptr buffer, *dataBufs)
+            sendHeader(event->eventid(), event->size());
+            for(int i = 0; i < event->size(); i++)
             {
-                sendData(*(buffer->serialize()));
+                sendData(event->serialize_at(i));
             }
         }
 
@@ -121,7 +114,7 @@ namespace sevent
             //std::cerr << "onHeaderReceived() eventid:" << eventid
                 //<< ", numElements:" << numElements << std::endl;
 
-            socket::BufferBaseVector_ptr dataBufs;
+            datastruct::MutableCharArrayVector_ptr dataBufs;
             _receiveLock.lock();
             try
             {
@@ -143,13 +136,13 @@ namespace sevent
                 BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
             }
 
-            socket::ReceiveEvent event(eventid, dataBufs);
+            event::Event_ptr event = event::Event::make(eventid, dataBufs);
             _allEventsHandler(shared_from_this(), event);
             //std::cerr << "onHeaderReceived() finished!" << std::endl;
             receiveEvents();
         }
 
-        socket::BufferBase_ptr AsioSession::receiveData()
+        datastruct::MutableCharArray_ptr AsioSession::receiveData()
         {
             boost::array<uint32_t, 1> dataSizeBuf;
             int bytes_read = boost::asio::read(*_sock,
@@ -162,18 +155,15 @@ namespace sevent
             boost::asio::read(*_sock,
                               boost::asio::buffer(data, dataSize),
                               boost::asio::transfer_all());
-
-            socket::BufferBase_ptr buffer;
-            buffer = boost::make_shared<socket::BufferBase>(data, dataSize);
-            return buffer;
+            return boost::make_shared<datastruct::MutableCharArray>(data, dataSize);
         }
 
-        socket::BufferBaseVector_ptr AsioSession::receiveAllData(unsigned numElements)
+        datastruct::MutableCharArrayVector_ptr AsioSession::receiveAllData(unsigned numElements)
         {
-            socket::BufferBaseVector_ptr dataBufs = boost::make_shared<socket::BufferBaseVector>();
+            datastruct::MutableCharArrayVector_ptr dataBufs = boost::make_shared<datastruct::MutableCharArrayVector>();
             for(int i = 0; i < numElements; i++)
             {
-                socket::BufferBase_ptr buffer = receiveData();
+                datastruct::MutableCharArray_ptr buffer = receiveData();
                 dataBufs->push_back(buffer);
             }
             return dataBufs;

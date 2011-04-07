@@ -4,9 +4,7 @@
 #include <string>
 #include "SessionRegistryForwardDecl.h"
 #include "Address.h"
-#include "ReceiveEvent.h"
-#include "ConstBuffer.h"
-#include "Buffer.h"
+#include "sevent/event/Event.h"
 
 namespace sevent
 {
@@ -19,23 +17,18 @@ namespace sevent
             friend class SessionRegistry; // enable it to close() when removing sessions
             public:
                 typedef boost::function<void(Session_ptr socketSession,
-                                             ReceiveEvent& event)> allEventsHandler_t;
-                typedef boost::function<void(Session_ptr socketSession)>
-                disconnectHandler_t;
+                                             event::Event_ptr event)> allEventsHandler_t;
+                typedef boost::function<void(Session_ptr socketSession)> disconnectHandler_t;
             public:
                 virtual ~Session();
 
                 /** Send an event with no data buffer.
                  * Blocks until the event is completely sent. */
-                virtual void sendEvent(unsigned eventid) = 0;
+                //virtual void sendEvent(unsigned eventid) = 0;
 
                 /** Send an event with a single data buffer.
                  * Blocks until the event and all it's data is completely sent. */
-                virtual void sendEvent(unsigned eventid, socket::BufferBase_ptr buffer) = 0;
-
-                /** Send an event with several data buffers.
-                 * Blocks until the event and all it's data is completely sent. */
-                virtual void sendEvent(unsigned eventid, socket::BufferBaseVector_ptr dataBufs) = 0;
+                virtual void sendEvent(event::Event_ptr event) = 0;
 
                 /** Add a asynchrone event-listener.
                  * This method should return at once, and make the
@@ -60,7 +53,7 @@ namespace sevent
             public:
                 /** Print some debugging info about the event. */
                 static void defaultAllEventsHandler(Session_ptr socketSession,
-                                                    ReceiveEvent& event);
+                                                    event::Event_ptr event);
             protected:
                 allEventsHandler_t _allEventsHandler;
                 disconnectHandler_t _disconnectHandler;
