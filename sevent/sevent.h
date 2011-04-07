@@ -30,6 +30,5 @@
  * \include SerializablePerson.h
  * */
 
+#include "event.h"
 #include "socket.h"
-#include "event/Event.h"
-#include "event/HandlerMap.h"

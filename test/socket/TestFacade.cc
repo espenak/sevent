@@ -5,58 +5,50 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include "sevent/socket/Facade.h"
-#include "sevent/StringSerializer.h"
+#include "sevent/event.h"
+#include "sevent/serialize/String.h"
 #include "helpers.h"
 #include <iostream>
 
 using namespace sevent::socket;
-using sevent::StringSerializer;
+using namespace sevent;
+using sevent::event::Buffer;
+using sevent::event::Event;
 
+typedef boost::shared_ptr<std::string> String_ptr;
 
 BOOST_FIXTURE_TEST_SUITE(BasicSuite, BasicFixture)
 
+
 BOOST_AUTO_TEST_CASE( Sanity )
 {
-    CountingAllEventsHandler allEventsHandler(4);
+    CountingAllEventsHandler allEventsHandler(5);
     facade->setWorkerThreads(1,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
-    session->sendEvent(1010, Buffer<std::string, StringSerializer>::make(boost::make_shared<std::string>("Hello")));
-    session->sendEvent(2010, Buffer<std::string, StringSerializer>::make(boost::make_shared<std::string>("Wor")));
-    session->sendEvent(3010, Buffer<std::string, StringSerializer>::make(boost::make_shared<std::string>("ld")));
-    session->sendEvent(4010, Buffer<std::string, StringSerializer>::make(boost::make_shared<std::string>("!")));
-    session->sendEvent(5050);
+
+    String_ptr hello = boost::make_shared<std::string>("Hello");
+    String_ptr cruel = boost::make_shared<std::string>("supercruel");
+    String_ptr world = boost::make_shared<std::string>("world!");
+
+    session->sendEvent(Event::make(1010));
+    session->sendEvent(Event::make(2020,
+                                   Buffer::make(hello, serialize::String)));
+    session->sendEvent(Event::make(3030,
+                                   Buffer::make(cruel, serialize::String)));
+    session->sendEvent(Event::make(4040,
+                                   Buffer::make(world, serialize::String)));
+    event::Event_ptr event = Event::make(5050);
+    event->push_back(Buffer::make(hello, serialize::String));
+    event->push_back(Buffer::make(cruel, serialize::String));
+    event->push_back(Buffer::make(world, serialize::String));
+    session->sendEvent(event);
 
     facade->joinAllWorkerThreads();
-    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 4);
+    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 5);
 }
+
 
 /*
-BOOST_AUTO_TEST_CASE( SanityMultiBuffer )
-{
-    CountingAllEventsHandler allEventsHandler(3);
-    facade->setWorkerThreads(1,
-            boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
-    ConstBufferVector v;
-    v.push_back(ConstBuffer("Hel", 4));
-    v.push_back(ConstBuffer("crue", 5));
-    v.push_back(ConstBuffer("worlddd", 8));
-    v.push_back(ConstBuffer("tu", 2));
-    session->sendEvent(1010, v);
-
-    ConstBufferVector v2;
-    v2.push_back(ConstBuffer("Yo", 3));
-    v2.push_back(ConstBuffer("dude", 5));
-    session->sendEvent(2020, v2);
-
-    ConstBufferVector v3;
-    v3.push_back(ConstBuffer("T", 2));
-    v3.push_back(ConstBuffer("es", 3));
-    v3.push_back(ConstBuffer("t", 2));
-    session->sendEvent(3030, v3);
-
-    facade->joinAllWorkerThreads();
-    BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), 3);
-}
 
 BOOST_AUTO_TEST_CASE( ListenDuplicate )
 {

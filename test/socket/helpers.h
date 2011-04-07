@@ -16,7 +16,7 @@ class CountingAllEventsHandler
         {}
 
         void operator()(sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session, sevent::socket::ReceiveEvent& event)
+                sevent::socket::Session_ptr session, sevent::event::Event_ptr event)
         {
             doSomething(facade, session, event);
             boost::lock_guard<boost::mutex> lock(counter_lock);
@@ -30,7 +30,7 @@ class CountingAllEventsHandler
         virtual void doSomething(
                 sevent::socket::Facade_ptr facade,
                 sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent& event) {}
+                sevent::event::Event_ptr event) {}
 
         unsigned counter() const
         {
