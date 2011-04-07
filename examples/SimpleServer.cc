@@ -74,6 +74,11 @@ void helloHandler(socket::Facade_ptr facade,
 
 int main(int argc, const char *argv[])
 {
+    if(argc < 3)
+    {
+        std::cout << "Usage: " << argv[0] << " <ip> <port>" << std::endl;
+        return 1;
+    }
     std::string host(argv[1]);
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
 
