@@ -10,7 +10,7 @@ namespace sevent
         serialize::BaseResult_ptr serializeString(boost::any& data)
         {
             String_ptr s = boost::any_cast<String_ptr>(data);
-            return boost::make_shared<serialize::ConstPtrResult>(s->c_str(), s->size());
+            return boost::make_shared<serialize::ConstPtrResult>(s->c_str(), s->size()+1);
         }
 
         boost::any deserializeString(datastruct::MutableCharArray_ptr serialized)
