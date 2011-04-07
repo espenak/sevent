@@ -6,7 +6,7 @@
 #include <boost/array.hpp>
 #include <boost/exception/all.hpp>
 #include <vector>
-#include "Session.h"
+#include "sevent/socket/Session.h"
 
 namespace sevent
 {
