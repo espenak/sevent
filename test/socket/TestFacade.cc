@@ -176,35 +176,6 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThread )
 }
 
 
-/*
-
-class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
-{
-    public:
-        LongStreamMultibufEventsHandler(int expectedCalls, std::string expectedMessage) :
-            CountingAllEventsHandler(expectedCalls),
-            _expectedMessage(expectedMessage)
-
-        {}
-
-        virtual void doSomething(
-                sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent& event)
-        {
-            std::string msg(event.first()->data<char>());
-            BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
-            BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
-            BOOST_REQUIRE_EQUAL(event.first()->size(), _expectedMessage.size()+1);
-            //std::cout << msg << std::endl;
-        }
-    private:
-        std::string _expectedMessage;
-};
-
-
-
-
 
 
 class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
@@ -220,25 +191,23 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
             _expectedMessage3(expectedMessage3)
         {}
 
-        virtual void doSomething(
-                sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent& event)
+        virtual void doSomething(Facade_ptr facade,
+                                 Session_ptr session,
+                                 event::Event_ptr event)
         {
-            BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
+            BOOST_REQUIRE_EQUAL(event->eventid(), 2020);
 
             // It should work just like a "single message" event with the first
             // element
-            std::string msg(event.first()->data<char>());
-            BOOST_REQUIRE_EQUAL(msg, _expectedMessage1);
-            BOOST_REQUIRE_EQUAL(event.first()->size(), _expectedMessage1.size()+1);
+            String_ptr firstmsg = event->first<String_ptr>(serialize::String);
+            BOOST_REQUIRE_EQUAL(*firstmsg, _expectedMessage1);
 
-            std::string msg1(event.datavector->at(0)->data<char>());
-            std::string msg2(event.datavector->at(1)->data<char>());
-            std::string msg3(event.datavector->at(2)->data<char>());
-            BOOST_REQUIRE_EQUAL(msg1, _expectedMessage1);
-            BOOST_REQUIRE_EQUAL(msg2, _expectedMessage2);
-            BOOST_REQUIRE_EQUAL(msg3, _expectedMessage3);
+            String_ptr msg0 = event->at<String_ptr>(0, serialize::String);
+            String_ptr msg1 = event->at<String_ptr>(1, serialize::String);
+            String_ptr msg2 = event->at<String_ptr>(2, serialize::String);
+            BOOST_REQUIRE_EQUAL(*msg0, _expectedMessage1);
+            BOOST_REQUIRE_EQUAL(*msg1, _expectedMessage2);
+            BOOST_REQUIRE_EQUAL(*msg2, _expectedMessage3);
         }
     private:
         std::string _expectedMessage1;
@@ -259,22 +228,21 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThreadMultiBuf )
     facade->setWorkerThreads(8,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    std::string msg1(3000, 'x');
-    std::string msg2(9000, 'y');
-    std::string msg3(6000, 'z');
+    String_ptr msg1 = boost::make_shared<std::string>(3000, 'x');
+    String_ptr msg2 = boost::make_shared<std::string>(9000, 'y');
+    String_ptr msg3 = boost::make_shared<std::string>(6000, 'z');
     for(int i=0; i<max; i++)
     {
-        ConstBufferVector v;
-        v.push_back(ConstBuffer(msg1.c_str(), msg1.size()+1));
-        v.push_back(ConstBuffer(msg2.c_str(), msg2.size()+1));
-        v.push_back(ConstBuffer(msg3.c_str(), msg3.size()+1));
-        session->sendEvent(2020, v);
+        event::Event_ptr event = Event::make(2020);
+        event->push_back(Buffer::make(msg1, serialize::String));
+        event->push_back(Buffer::make(msg2, serialize::String));
+        event->push_back(Buffer::make(msg3, serialize::String));
+        session->sendEvent(event);
     }
 
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
 }
-*/
 
 
 BOOST_AUTO_TEST_SUITE_END()
