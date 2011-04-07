@@ -15,26 +15,26 @@ namespace sevent
         class Buffer
         {
             public:
-                static Buffer_ptr make(boost::any anydata, serialize_t serializeFunc)
+                static Buffer_ptr make(boost::any anydata,
+                                       const SerializePair& serializer)
                 {
-                    return boost::make_shared<Buffer>(anydata, serializeFunc);
+                    return boost::make_shared<Buffer>(anydata, serializer);
                 }
 
                 static Buffer_ptr deserialize(MutableCharArray_ptr serialized,
-                                              serialize_t serializeFunc,
-                                              deserialize_t deserializeFunc)
+                                              const SerializePair& serializer)
                 {
-                    boost::any anydata = deserializeFunc(serialized);
-                    return Buffer::make(anydata, serializeFunc);
+                    boost::any anydata = serializer.deserializeFunc(serialized);
+                    return Buffer::make(anydata, serializer);
                 }
 
             public:
-                Buffer(boost::any anydata, serialize_t serializeFunc) :
-                    _anydata(anydata), _serializeFunc(serializeFunc) {}
+                Buffer(boost::any anydata, const SerializePair& serializer) :
+                    _anydata(anydata), _serializer(serializer) {}
 
                 BaseSerializeResult_ptr serialize()
                 {
-                    return _serializeFunc(_anydata);
+                    return _serializer.serializeFunc(_anydata);
                 }
 
                 template<typename T> T data()
@@ -44,7 +44,7 @@ namespace sevent
 
             private:
                 boost::any _anydata;
-                serialize_t _serializeFunc;
+                SerializePair _serializer;
         };
     } // namespace socket
 } // namespace sevent

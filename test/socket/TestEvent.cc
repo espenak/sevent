@@ -78,11 +78,11 @@ struct EventFixture
         intarr[0] = 10;
         intarr[1] = 20;
         inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
-                                serializeIntArray);
+                                  IntSerializer);
 
         String_ptr instr = boost::make_shared<std::string>();
         instr->assign("Hello World");
-        inputString = Buffer::make(instr, serializeString);
+        inputString = Buffer::make(instr, StringSerializer);
     }
 
     ~EventFixture () {}
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
                                                                          serialized->size());
 
     // Deserialize the "received data"
-    Buffer_ptr output = Buffer::deserialize(received, serializeIntArray, deserializeIntArray);
+    Buffer_ptr output = Buffer::deserialize(received, IntSerializer);
     IntArray_ptr aOut = output->data<IntArray_ptr>();
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 9); // The array serializer reduce values by one..
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 19);

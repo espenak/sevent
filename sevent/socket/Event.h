@@ -95,8 +95,7 @@ namespace sevent
                     {
                         MutableCharArray_ptr mutarr = _serialized->at(index);
                         Buffer_ptr buffer = Buffer::deserialize(mutarr,
-                                                                serializer.serializeFunc,
-                                                                serializer.deserializeFunc);
+                                                                serializer);
                         mutarr.reset(); // Free the MutableCharArray_ptr (data ownership is given to the deserializer)
                         set_buffer(index, buffer);
                     }
