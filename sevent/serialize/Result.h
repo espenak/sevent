@@ -4,25 +4,26 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace serialize
     {
-        class BaseSerializeResult
+        class BaseResult
         {
             public:
                 virtual const char* data() const = 0;
                 virtual unsigned size() const = 0;
         };
-        typedef boost::shared_ptr<BaseSerializeResult> BaseSerializeResult_ptr;
+        typedef boost::shared_ptr<BaseResult> BaseResult_ptr;
 
-        class SerializeResult : public BaseSerializeResult
+
+        class Result : public BaseResult
         {
             public:
-                static BaseSerializeResult_ptr make(const char* data, unsigned size)
+                static BaseResult_ptr make(const char* data, unsigned size)
                 {
-                    return boost::make_shared<SerializeResult>(data, size);
+                    return boost::make_shared<Result>(data, size);
                 }
             public:
-                SerializeResult(const char* data, unsigned size) : _data(data), _size(size) {}
+                Result(const char* data, unsigned size) : _data(data), _size(size) {}
                 const char* data() const { return _data; }
                 unsigned size() const { return _size; }
             private:
@@ -30,10 +31,11 @@ namespace sevent
                 unsigned _size;
         };
 
-        class StringSerializeResult: public BaseSerializeResult
+
+        class StringResult: public BaseResult
         {
             public:
-                StringSerializeResult(const std::string& data) : _data(data) {}
+                StringResult(const std::string& data) : _data(data) {}
                 const char* data() const { return _data.c_str(); }
                 unsigned size() const { return _data.size(); }
             private:

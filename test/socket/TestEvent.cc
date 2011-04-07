@@ -6,7 +6,7 @@
 #include <iostream>
 #include "sevent/event/Event.h"
 
-using namespace sevent::socket;
+using namespace sevent;
 
 
 template<typename T>
@@ -25,64 +25,70 @@ typedef Array<int> IntArray;
 typedef boost::shared_ptr<IntArray> IntArray_ptr;
 
 
-BaseSerializeResult_ptr serializeIntArray(boost::any& data)
+
+/////////////////////////////////
+// Serializers for testing.
+/////////////////////////////////
+
+serialize::BaseResult_ptr serializeIntArray(boost::any& data)
 {
     IntArray_ptr a = boost::any_cast<IntArray_ptr>(data);
     for(int i = 0; i < a->size; i++)
     {
         a->sharedarr[i] --;
     }
-    return SerializeResult::make(reinterpret_cast<const char*>(a->sharedarr.get()),
-                                a->size*sizeof(int));
+    return serialize::Result::make(reinterpret_cast<const char*>(a->sharedarr.get()),
+                                   a->size*sizeof(int));
 }
 
-boost::any deserializeIntArray(MutableCharArray_ptr serialized)
+boost::any deserializeIntArray(datastruct::MutableCharArray_ptr serialized)
 {
     int* data = reinterpret_cast<int*>(serialized->data);
     IntArray_ptr arr = boost::make_shared<IntArray>(boost::shared_array<int>(data),
                                                     serialized->size/sizeof(int));
     return arr;
 }
-SerializePair IntSerializer(serializeIntArray, deserializeIntArray);
+serialize::Pair IntSerializer(serializeIntArray, deserializeIntArray);
 
 
 
 typedef boost::shared_ptr<std::string> String_ptr;
-BaseSerializeResult_ptr serializeString(boost::any& data)
+serialize::BaseResult_ptr serializeString(boost::any& data)
 {
     String_ptr s = boost::any_cast<String_ptr>(data);
     std::stringstream ss;
     ss << "Serialized:" << *s;
-    return boost::make_shared<StringSerializeResult>(ss.str());
+    return boost::make_shared<serialize::StringResult>(ss.str());
 }
 
-boost::any deserializeString(MutableCharArray_ptr serialized)
+boost::any deserializeString(datastruct::MutableCharArray_ptr serialized)
 {
     String_ptr s = boost::make_shared<std::string>(serialized->data);
     s->insert(0, "De");
     return s;
 }
-SerializePair StringSerializer(serializeString,
+serialize::Pair StringSerializer(serializeString,
                                deserializeString);
+
 
 
 
 struct EventFixture
 {
-    Buffer_ptr inputArray;
-    Buffer_ptr inputString;
+    event::Buffer_ptr inputArray;
+    event::Buffer_ptr inputString;
 
     EventFixture ()
     {
         boost::shared_array<int> intarr = boost::shared_array<int>(new int[2]);
         intarr[0] = 10;
         intarr[1] = 20;
-        inputArray = Buffer::make(boost::make_shared<IntArray>(intarr, 2),
+        inputArray = event::Buffer::make(boost::make_shared<IntArray>(intarr, 2),
                                   IntSerializer);
 
         String_ptr instr = boost::make_shared<std::string>();
         instr->assign("Hello World");
-        inputString = Buffer::make(instr, StringSerializer);
+        inputString = event::Buffer::make(instr, StringSerializer);
     }
 
     ~EventFixture () {}
@@ -93,16 +99,16 @@ BOOST_FIXTURE_TEST_SUITE(BasicSuite, EventFixture)
 
 BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 {
-    BaseSerializeResult_ptr serialized = inputArray->serialize();
+    serialize::BaseResult_ptr serialized = inputArray->serialize();
 
     // Simulate network transfer (copy the serialized data)
     char* receivedData = new char[serialized->size()];
     std::memcpy(receivedData, serialized->data(), serialized->size());
-    MutableCharArray_ptr received = boost::make_shared<MutableCharArray>(receivedData,
+    datastruct::MutableCharArray_ptr received = boost::make_shared<datastruct::MutableCharArray>(receivedData,
                                                                          serialized->size());
 
     // Deserialize the "received data"
-    Buffer_ptr output = Buffer::deserialize(received, IntSerializer);
+    event::Buffer_ptr output = event::Buffer::deserialize(received, IntSerializer);
     IntArray_ptr aOut = output->data<IntArray_ptr>();
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[0], 9); // The array serializer reduce values by one..
     BOOST_REQUIRE_EQUAL(aOut->sharedarr[1], 19);
@@ -113,7 +119,7 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 
 BOOST_AUTO_TEST_CASE(TestEvent)
 {
-    Event_ptr eventIn = Event::make(1010, inputArray);
+    event::Event_ptr eventIn = event::Event::make(1010, inputArray);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     IntArray_ptr aOut = eventIn->first<IntArray_ptr>(IntSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
@@ -123,27 +129,27 @@ BOOST_AUTO_TEST_CASE(TestEvent)
 }
 
 
-MutableCharArray_ptr copyIntoMutArray(BaseSerializeResult_ptr serialized)
+datastruct::MutableCharArray_ptr copyIntoMutArray(serialize::BaseResult_ptr serialized)
 {
     char* receivedData = new char[serialized->size()];
     std::memcpy(receivedData, serialized->data(), serialized->size());
-    return boost::make_shared<MutableCharArray>(receivedData,
+    return boost::make_shared<datastruct::MutableCharArray>(receivedData,
                                                 serialized->size());
 }
 
 
 BOOST_AUTO_TEST_CASE(TestEventSerialized)
 {
-    BaseSerializeResult_ptr serializedArray = inputArray->serialize();
-    BaseSerializeResult_ptr serializedString = inputString->serialize();
+    serialize::BaseResult_ptr serializedArray = inputArray->serialize();
+    serialize::BaseResult_ptr serializedString = inputString->serialize();
     BOOST_REQUIRE_EQUAL(serializedString->data(), "Serialized:Hello World");
 
     // Simulate network transfer (copy the serialized data)
-    MutableCharArrayVector_ptr serialized = boost::make_shared<MutableCharArrayVector>();
+    datastruct::MutableCharArrayVector_ptr serialized = boost::make_shared<datastruct::MutableCharArrayVector>();
     serialized->push_back(copyIntoMutArray(serializedArray));
     serialized->push_back(copyIntoMutArray(serializedString));
 
-    Event_ptr eventIn = Event::make(1010, serialized);
+    event::Event_ptr eventIn = event::Event::make(1010, serialized);
     BOOST_REQUIRE_EQUAL(eventIn->size(), 2);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), true);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(1), true);

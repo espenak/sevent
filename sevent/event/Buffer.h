@@ -3,12 +3,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/any.hpp>
-#include "sevent/serialize/SerializePair.h"
+#include "sevent/serialize/Pair.h"
 
 
 namespace sevent
 {
-    namespace socket
+    namespace event
     {
         class Buffer;
         typedef boost::shared_ptr<Buffer> Buffer_ptr;
@@ -16,23 +16,23 @@ namespace sevent
         {
             public:
                 static Buffer_ptr make(boost::any anydata,
-                                       const SerializePair& serializer)
+                                       const serialize::Pair& serializer)
                 {
                     return boost::make_shared<Buffer>(anydata, serializer);
                 }
 
-                static Buffer_ptr deserialize(MutableCharArray_ptr serialized,
-                                              const SerializePair& serializer)
+                static Buffer_ptr deserialize(datastruct::MutableCharArray_ptr serialized,
+                                              const serialize::Pair& serializer)
                 {
                     boost::any anydata = serializer.deserializeFunc(serialized);
                     return Buffer::make(anydata, serializer);
                 }
 
             public:
-                Buffer(boost::any anydata, const SerializePair& serializer) :
+                Buffer(boost::any anydata, const serialize::Pair& serializer) :
                     _anydata(anydata), _serializer(serializer) {}
 
-                BaseSerializeResult_ptr serialize()
+                serialize::BaseResult_ptr serialize()
                 {
                     return _serializer.serializeFunc(_anydata);
                 }
@@ -44,7 +44,7 @@ namespace sevent
 
             private:
                 boost::any _anydata;
-                SerializePair _serializer;
+                serialize::Pair _serializer;
         };
     } // namespace socket
 } // namespace sevent

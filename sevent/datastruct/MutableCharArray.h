@@ -4,7 +4,7 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace datastruct
     {
         struct MutableCharArray
         {

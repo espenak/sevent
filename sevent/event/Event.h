@@ -7,7 +7,7 @@
 
 namespace sevent
 {
-    namespace socket
+    namespace event
     {
         class Event;
         typedef boost::shared_ptr<Event> Event_ptr;
@@ -21,7 +21,7 @@ namespace sevent
                 {
                     return boost::make_shared<Event>(eventid, first);
                 }
-                static Event_ptr make(unsigned eventid, MutableCharArrayVector_ptr serialized)
+                static Event_ptr make(unsigned eventid, datastruct::MutableCharArrayVector_ptr serialized)
                 {
                     return boost::make_shared<Event>(eventid, serialized);
                 }
@@ -37,7 +37,7 @@ namespace sevent
                     _buffers.push_back(first);
                 }
 
-                Event(unsigned eventid, MutableCharArrayVector_ptr serialized) :
+                Event(unsigned eventid, datastruct::MutableCharArrayVector_ptr serialized) :
                     _eventid(eventid), _buffers(serialized->size()), _serialized(serialized),
                     _isSerialized(serialized->size())
                 {
@@ -48,18 +48,18 @@ namespace sevent
                 }
 
                 template<typename T>
-                T at(unsigned index, const SerializePair& serializer)
+                T at(unsigned index, const serialize::Pair& serializer)
                 {
                     return buffer_at(index, serializer)->data<T>();
                 }
 
                 template<typename T>
-                T first(const SerializePair& serializer)
+                T first(const serialize::Pair& serializer)
                 {
                     return at<T>(0, serializer);
                 }
 
-                BaseSerializeResult_ptr serialize_at(int index)
+                serialize::BaseResult_ptr serialize_at(int index)
                 {
                     return _buffers.at(index)->serialize();
                 }
@@ -88,15 +88,15 @@ namespace sevent
                     _isSerialized[index] = false;
                 }
 
-                Buffer_ptr buffer_at(int index, const SerializePair& serializer)
+                Buffer_ptr buffer_at(int index, const serialize::Pair& serializer)
                 {
                     boost::lock_guard<boost::mutex> lock(_lock);
                     if(isSerialized(index))
                     {
-                        MutableCharArray_ptr mutarr = _serialized->at(index);
+                        datastruct::MutableCharArray_ptr mutarr = _serialized->at(index);
                         Buffer_ptr buffer = Buffer::deserialize(mutarr,
                                                                 serializer);
-                        mutarr.reset(); // Free the MutableCharArray_ptr (data ownership is given to the deserializer)
+                        mutarr.reset(); // Free the datastruct::MutableCharArray_ptr (data ownership is given to the deserializer)
                         set_buffer(index, buffer);
                     }
                     return _buffers.at(index);
@@ -105,7 +105,7 @@ namespace sevent
             private:
                 unsigned _eventid;
                 BufferVector _buffers;
-                MutableCharArrayVector_ptr _serialized;
+                datastruct::MutableCharArrayVector_ptr _serialized;
                 boost::dynamic_bitset<> _isSerialized;
                 boost::mutex _lock;
         };
