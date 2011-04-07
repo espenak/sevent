@@ -2,9 +2,9 @@
 #define BOOST_TEST_MODULE TestCallbacks
 #include <boost/test/unit_test.hpp>
 #include <string>
-#include "sevent/sevent.h"
+#include "sevent/socket/Facade.h"
+#include "sevent/event.h"
 using namespace sevent::socket;
-
 
 
 void allEventsHandler(bool* called,

@@ -5,13 +5,19 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket/Facade.h"
-#include "helpers.h"
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+#include "sevent/socket/Facade.h"
+#include "sevent/event.h"
+#include "sevent/serialize/String.h"
+#include "helpers.h"
 
 using namespace sevent::socket;
+using namespace sevent;
+using sevent::event::Buffer;
+using sevent::event::Event;
 
+typedef boost::shared_ptr<std::string> String_ptr;
 
 
 boost::mutex assert_lock;
@@ -22,21 +28,19 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
             CountingAllEventsHandler(expectedCalls)
         {}
 
-        virtual void doSomething(
-                sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent& event)
+        virtual void doSomething(Facade_ptr facade,
+                                 Session_ptr session,
+                                 event::Event_ptr event)
         {
-            std::string msg(event.first()->data<char>());
+            String_ptr msg = event->first<String_ptr>(serialize::String);
             std::string expectedMessage("hello");
-            expectedMessage += boost::lexical_cast<std::string>(event.eventid());
+            expectedMessage += boost::lexical_cast<std::string>(event->eventid());
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
             {
                 boost::lock_guard<boost::mutex> lock(assert_lock);
-                BOOST_REQUIRE_EQUAL(msg, expectedMessage);
-                BOOST_REQUIRE(event.eventid() >= 2000);
-                BOOST_REQUIRE(event.eventid() <= 2004);
-                BOOST_REQUIRE_EQUAL(event.first()->size(), expectedMessage.size()+1);
+                BOOST_REQUIRE_EQUAL(*msg, expectedMessage);
+                BOOST_REQUIRE(event->eventid() >= 2000);
+                BOOST_REQUIRE(event->eventid() <= 2004);
             }
         }
     private:
@@ -46,14 +50,16 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
 
 
 void sendMessagesThread(Session_ptr session, int id, int messageCount,
-        const std::string msg, int sleep)
+                        std::string& msg, int sleep)
 {
     if(sleep) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(sleep));
     }
     for(int i=0; i<messageCount; i++)
     {
-        session->sendEvent(id, ConstBuffer(msg.c_str(), msg.size()+1));
+        session->sendEvent(Event::make(id,
+                                       Buffer::make(boost::make_shared<std::string>(msg),
+                                                    serialize::String)));
     }
 }
 
@@ -121,6 +127,5 @@ BOOST_AUTO_TEST_CASE( LongStreamMultiThreadMultiClientMessWithOrder )
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
