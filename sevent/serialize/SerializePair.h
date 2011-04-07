@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/function.hpp>
 #include "SerializeResult.h"
-#include "MutableCharArray.h"
+#include "sevent/datastruct/MutableCharArray.h"
 
 namespace sevent
 {

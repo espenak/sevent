@@ -2,9 +2,9 @@
 #define BOOST_TEST_MODULE TestEvent
 #include <boost/test/unit_test.hpp>
 #include <boost/shared_array.hpp>
-#include "sevent/socket/Event.h"
 #include <cstring>
 #include <iostream>
+#include "sevent/event/Event.h"
 
 using namespace sevent::socket;
 

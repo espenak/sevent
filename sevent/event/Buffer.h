@@ -3,7 +3,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/any.hpp>
-#include "SerializePair.h"
+#include "sevent/serialize/SerializePair.h"
 
 
 namespace sevent
