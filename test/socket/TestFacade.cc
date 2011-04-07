@@ -93,7 +93,6 @@ BOOST_AUTO_TEST_CASE( Disconnect )
 
 
 
-/*
 
 class LongStreamEventsHandler : public CountingAllEventsHandler
 {
@@ -104,15 +103,13 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
 
         {}
 
-        virtual void doSomething(
-                sevent::socket::Facade_ptr facade,
-                sevent::socket::Session_ptr session,
-                sevent::socket::ReceiveEvent& event)
+        virtual void doSomething(Facade_ptr facade,
+                                 Session_ptr session,
+                                 event::Event_ptr event)
         {
-            std::string msg(event.first()->data<char>());
-            BOOST_REQUIRE_EQUAL(msg, _expectedMessage);
-            BOOST_REQUIRE_EQUAL(event.eventid(), 2020);
-            BOOST_REQUIRE_EQUAL(event.first()->size(), _expectedMessage.size()+1);
+            String_ptr msg = event->first<String_ptr>(serialize::String);
+            BOOST_REQUIRE_EQUAL(*msg, _expectedMessage);
+            BOOST_REQUIRE_EQUAL(event->eventid(), 2020);
         }
     private:
         std::string _expectedMessage;
@@ -127,15 +124,17 @@ BOOST_AUTO_TEST_CASE( LongStreamSingleThread )
     facade->setWorkerThreads(1,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    std::string msg("Hello world");
+    String_ptr msg = boost::make_shared<std::string>("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
+        session->sendEvent(Event::make(2020,
+                                       Buffer::make(msg, serialize::String)));
     }
 
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
 }
+
 
 BOOST_AUTO_TEST_CASE( LongStreamMultiThread )
 {
@@ -145,10 +144,11 @@ BOOST_AUTO_TEST_CASE( LongStreamMultiThread )
     facade->setWorkerThreads(8,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    std::string msg("Hello world");
+    String_ptr msg = boost::make_shared<std::string>("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
+        session->sendEvent(Event::make(2020,
+                                       Buffer::make(msg, serialize::String)));
     }
 
     facade->joinAllWorkerThreads();
@@ -164,16 +164,19 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThread )
     facade->setWorkerThreads(8,
             boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    std::string msg(10000, 'x');
+    String_ptr msg = boost::make_shared<std::string>(10000, 'x');
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(2020, ConstBuffer(msg.c_str(), msg.size()+1));
+        session->sendEvent(Event::make(2020,
+                                       Buffer::make(msg, serialize::String)));
     }
 
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), max);
 }
 
+
+/*
 
 class LongStreamMultibufEventsHandler : public CountingAllEventsHandler
 {
