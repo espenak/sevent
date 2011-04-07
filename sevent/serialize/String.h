@@ -1,4 +1,6 @@
 #pragma once
+#include "Result.h"
+#include "Pair.h"
 
 namespace sevent
 {

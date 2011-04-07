@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/any.hpp>
 #include <boost/function.hpp>
 #include "Result.h"
 #include "sevent/datastruct/MutableCharArray.h"

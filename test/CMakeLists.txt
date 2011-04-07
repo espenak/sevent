@@ -14,3 +14,4 @@ endfunction(add_boost_test)
 add_boost_test(TestEvent TestEvent.cc)
 
 add_subdirectory(socket)
+add_subdirectory(serialize)
