@@ -6,6 +6,7 @@
 #include <iostream>
 #include "sevent/event/Event.h"
 #include "sevent/datastruct/SharedArray.h"
+#include "sevent/serialize/SharedArray.h"
 
 using namespace sevent;
 
@@ -53,7 +54,7 @@ boost::any deserializeString(datastruct::MutableCharArray_ptr serialized)
     return s;
 }
 serialize::Pair StringTestSerializer(serializeString,
-                               deserializeString);
+                                     deserializeString);
 
 
 
