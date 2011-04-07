@@ -48,7 +48,6 @@ BOOST_AUTO_TEST_CASE( Sanity )
 }
 
 
-/*
 
 BOOST_AUTO_TEST_CASE( ListenDuplicate )
 {
@@ -73,7 +72,6 @@ BOOST_AUTO_TEST_CASE( ConnectToInvalidPort )
 //}
 
 
-
 void stoppingDisconnectHandler(Facade_ptr facade,
                                Session_ptr session)
 {
@@ -95,6 +93,7 @@ BOOST_AUTO_TEST_CASE( Disconnect )
 
 
 
+/*
 
 class LongStreamEventsHandler : public CountingAllEventsHandler
 {
