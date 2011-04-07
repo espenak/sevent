@@ -16,3 +16,4 @@ src/.DS_Store
 .settings/
 .DS_Store
 tags
+.local.vimrc
