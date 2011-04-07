@@ -22,11 +22,7 @@ namespace sevent
             public:
                 virtual ~Session();
 
-                /** Send an event with no data buffer.
-                 * Blocks until the event is completely sent. */
-                //virtual void sendEvent(unsigned eventid) = 0;
-
-                /** Send an event with a single data buffer.
+                /** Send an event.
                  * Blocks until the event and all it's data is completely sent. */
                 virtual void sendEvent(event::Event_ptr event) = 0;
 
@@ -34,7 +30,6 @@ namespace sevent
                  * This method should return at once, and make the
                  * workerthreads receive the event. */
                 virtual void receiveEvents() = 0;
-
                 
                 virtual Address_ptr getLocalEndpointAddress() = 0;
                 virtual Address_ptr getRemoteEndpointAddress() = 0;

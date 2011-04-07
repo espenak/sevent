@@ -12,7 +12,6 @@ namespace sevent
 {
     namespace asiosocket
     {
-
         class AsioSession;
         typedef boost::shared_ptr<AsioSession> AsioSession_ptr;
 
@@ -38,7 +37,6 @@ namespace sevent
             public:
                 AsioSession(socket_ptr sock);
                 virtual ~AsioSession();
-                //virtual void sendEvent(unsigned eventid);
                 virtual void sendEvent(event::Event_ptr event);
                 virtual void receiveEvents();
                 virtual socket::Address_ptr getLocalEndpointAddress();

@@ -3,6 +3,7 @@
 #include <boost/thread.hpp>
 #include "sevent/sevent.h"
 #include "sevent/serialize/String.h"
+#include "sevent/serialize/Boost.h"
 #include "SerializablePerson.h"
 
 
@@ -41,6 +42,7 @@ int main(int argc, const char *argv[])
     String_ptr hello = boost::make_shared<std::string>("Hello");
     String_ptr cruel = boost::make_shared<std::string>("supercruel");
     String_ptr world = boost::make_shared<std::string>("world!");
+    Person_ptr superman = boost::make_shared<Person>("Superman", 39);
 
     // Send the events
     session->sendEvent(Event::make(HELLO_ID,
@@ -49,7 +51,8 @@ int main(int argc, const char *argv[])
                                    Buffer::make(cruel, serialize::String)));
     session->sendEvent(Event::make(HELLO_ID,
                                    Buffer::make(world, serialize::String)));
-    //session->sendEvent(PERSON_ID, boostserialize::toConstBuffer(Person("Superman", 39)));
+    session->sendEvent(Event::make(PERSON_ID,
+                                   Buffer::make(superman, serialize::Boost<Person>())));
     session->sendEvent(Event::make(DIE_ID));
     return 0;
 }

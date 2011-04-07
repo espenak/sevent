@@ -18,7 +18,6 @@ namespace sevent
             String_ptr s = boost::make_shared<std::string>(serialized->data);
             return s;
         }
-        serialize::Pair String(serializeString,
-                               deserializeString);
+        Pair String(serializeString, deserializeString);
     } // namespace serialize
 } // namespace sevent

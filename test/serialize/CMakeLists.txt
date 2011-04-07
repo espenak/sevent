@@ -1,1 +1,2 @@
 add_boost_test(TestStringSerialize TestStringSerialize.cc)
+add_boost_test(TestBoostSerialize TestBoostSerialize.cc)

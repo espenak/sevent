@@ -23,3 +23,5 @@ class Person
             ar & age & name;
         }
 };
+
+typedef boost::shared_ptr<Person> Person_ptr;

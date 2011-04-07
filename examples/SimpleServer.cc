@@ -13,7 +13,8 @@
 #include <boost/ref.hpp>
 #include "sevent/sevent.h"
 #include "sevent/serialize/String.h"
-//#include "SerializablePerson.h"
+#include "sevent/serialize/Boost.h"
+#include "SerializablePerson.h"
 
 
 using namespace sevent;
@@ -49,16 +50,15 @@ void helloHandler(socket::Facade_ptr facade,
 }
 
 
-//void personHandler(socket::Facade_ptr facade,
-                   //socket::Session_ptr session,
-                   //socket::ReceiveEvent& event)
-//{
-    //Person p;
-    //sevent::boostserialize::fromString(p, event.first()->data<char>());
-    //boost::lock_guard<boost::mutex> lock(stream_lock);
-    //std::cout << "### Person-event received: "
-        //<< p.name << ":" << p.age << " ###" << std::endl;
-//}
+void personHandler(socket::Facade_ptr facade,
+                   socket::Session_ptr session,
+                   event::Event_ptr event)
+{
+    Person_ptr p = event->first<Person_ptr>(serialize::Boost<Person>());
+    boost::lock_guard<boost::mutex> lock(stream_lock);
+    std::cout << "### Person-event received: "
+        << p->name << ":" << p->age << " ###" << std::endl;
+}
 
 
 void dieHandler(socket::Facade_ptr facade,
@@ -87,7 +87,7 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
-    //eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
+    eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
     eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
