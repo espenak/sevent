@@ -1,4 +1,4 @@
-#include "EventHandlerMap.h"
+#include "HandlerMap.h"
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 

@@ -14,8 +14,8 @@
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
-#include "socket.h"
-#include "event/Event.h"
+#include "sevent/socket.h"
+#include "Event.h"
 
 namespace sevent
 {
