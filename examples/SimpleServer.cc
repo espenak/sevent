@@ -61,14 +61,14 @@ void helloHandler(socket::Facade_ptr facade,
 //}
 
 
-//void dieHandler(socket::Facade_ptr facade,
-                //socket::Session_ptr session,
-                //socket::ReceiveEvent& event)
-//{
-    //boost::lock_guard<boost::mutex> lock(stream_lock);
-    //std::cout << "*** DIE-event received ***" << std::endl;
-    //facade->service()->stop();
-//}
+void dieHandler(socket::Facade_ptr facade,
+                socket::Session_ptr session,
+                event::Event_ptr event)
+{
+    boost::lock_guard<boost::mutex> lock(stream_lock);
+    std::cout << "*** DIE-event received ***" << std::endl;
+    facade->service()->stop();
+}
 
 
 
@@ -88,10 +88,10 @@ int main(int argc, const char *argv[])
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
     //eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
-    //eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(1, boost::bind(event::simpleAllEventsHandler,
+    facade->setWorkerThreads(5, boost::bind(event::simpleAllEventsHandler,
                                             eventHandlerMap,
                                             _1, _2, _3));
 

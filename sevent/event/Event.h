@@ -19,6 +19,10 @@ namespace sevent
                 typedef std::vector<Buffer_ptr> BufferVector;
 
             public:
+                static Event_ptr make(eventid_t eventid)
+                {
+                    return boost::make_shared<Event>(eventid);
+                }
                 static Event_ptr make(eventid_t eventid, Buffer_ptr first)
                 {
                     return boost::make_shared<Event>(eventid, first);

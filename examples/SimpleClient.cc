@@ -50,6 +50,6 @@ int main(int argc, const char *argv[])
     session->sendEvent(Event::make(HELLO_ID,
                                    Buffer::make(world, serialize::String)));
     //session->sendEvent(PERSON_ID, boostserialize::toConstBuffer(Person("Superman", 39)));
-    //session->sendEvent(DIE_ID, socket::ConstBuffer(0, 0));
+    session->sendEvent(Event::make(DIE_ID));
     return 0;
 }
