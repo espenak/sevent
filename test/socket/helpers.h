@@ -64,17 +64,3 @@ struct BasicFixture {
     ~BasicFixture () {}
 };
 
-
-//void sendSizedMessages(sevent::socket::Session_ptr session, unsigned id,
-        //unsigned messageCount, unsigned messageSize)
-//{
-    //char *buf = new char[messageSize];
-    //for(unsigned i = 0; i < messageSize; i++)
-    //{
-        //buf[i] = 'x';
-    //}
-    //for(unsigned i=0; i<messageCount; i++)
-    //{
-        //session->sendEvent(id, sevent::socket::ConstBuffer(buf, messageSize));
-    //}
-//}

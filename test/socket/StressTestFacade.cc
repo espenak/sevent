@@ -1,16 +1,22 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE StressTestSocketFacade
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "sevent/socket/Facade.h"
+#include "sevent/event.h"
+#include "sevent/serialize/String.h"
 #include "helpers.h"
-#include <iostream>
 
 using namespace sevent::socket;
+using namespace sevent;
+using sevent::event::Buffer;
+using sevent::event::Event;
 
+typedef boost::shared_ptr<std::string> String_ptr;
 
 
 struct StressFixture
@@ -33,6 +39,18 @@ struct StressFixture
 };
 
 
+void sendSizedMessages(Session_ptr session, unsigned id,
+        unsigned messageCount, unsigned messageSize)
+{
+    String_ptr msg = boost::make_shared<std::string>(messageSize, 'x');
+    for(unsigned i=0; i<messageCount; i++)
+    {
+        session->sendEvent(Event::make(id,
+                                       Buffer::make(msg, serialize::String)));
+    }
+}
+
+
 
 boost::mutex assert_lock;
 class LongMessagesHandler : public CountingAllEventsHandler
@@ -44,20 +62,20 @@ class LongMessagesHandler : public CountingAllEventsHandler
         {
         }
 
-        virtual void doSomething(
-            sevent::socket::Facade_ptr facade,
-            sevent::socket::Session_ptr session,
-            sevent::socket::ReceiveEvent& event)
+        virtual void doSomething(Facade_ptr facade,
+                                 Session_ptr session,
+                                 event::Event_ptr event)
         {
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
+            String_ptr msg = event->first<String_ptr>(serialize::String);
             {
                 boost::lock_guard<boost::mutex> lock(assert_lock);
-                BOOST_REQUIRE_EQUAL(event.first()->size(), _messageSize);
+                BOOST_REQUIRE_EQUAL(msg->size(), _messageSize);
             }
             for(unsigned i = 0; i < _messageSize; i++)
             {
                 boost::lock_guard<boost::mutex> lock(assert_lock);
-                BOOST_REQUIRE_EQUAL(event.first()->data<char>()[i], 'x');
+                BOOST_REQUIRE_EQUAL((*msg)[i], 'x');
             }
         }
     private:
@@ -83,6 +101,7 @@ BOOST_AUTO_TEST_CASE( BigMessage )
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), messageCount);
 }
 
+
 BOOST_AUTO_TEST_CASE( BigMessages )
 {
     BOOST_TEST_MESSAGE("Testing sending 5 1mb messages in a row.");
@@ -98,6 +117,7 @@ BOOST_AUTO_TEST_CASE( BigMessages )
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), messageCount);
 }
+
 
 BOOST_AUTO_TEST_CASE( BigMessagesMultipleThreadsOnOneSession )
 {

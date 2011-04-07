@@ -10,7 +10,7 @@ using namespace sevent::socket;
 void allEventsHandler(bool* called,
                       Facade_ptr facade,
                       Session_ptr session,
-                      ReceiveEvent& event)
+                      sevent::event::Event_ptr event)
 {
     *called = true;
 }
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( TestCallbacksMain )
 
     Facade_ptr clientFacade = Facade::make();
     Session_ptr session = clientFacade->connect(listenAddr);
-    session->sendEvent(101, ConstBuffer(0, 0));
+    session->sendEvent(sevent::event::Event::make(1010));
     clientFacade->sessionRegistry()->remove(session); // Closes the session, which should make severFacade invoke it's disconnectHandler.
 
     serverFacade->joinAllWorkerThreads();
