@@ -9,6 +9,8 @@ namespace sevent
 {
     namespace event
     {
+        typedef unsigned eventid_t;
+        
         class Event;
         typedef boost::shared_ptr<Event> Event_ptr;
         class Event
@@ -17,7 +19,7 @@ namespace sevent
                 typedef std::vector<Buffer_ptr> BufferVector;
 
             public:
-                static Event_ptr make(unsigned eventid, Buffer_ptr first)
+                static Event_ptr make(eventid_t eventid, Buffer_ptr first)
                 {
                     return boost::make_shared<Event>(eventid, first);
                 }
@@ -81,6 +83,11 @@ namespace sevent
                     return _buffers.size();
                 }
 
+                eventid_t eventid()
+                {
+                    return _eventid;
+                }
+
             private:
                 void set_buffer(unsigned index, Buffer_ptr buffer)
                 {
@@ -103,7 +110,7 @@ namespace sevent
                 }
 
             private:
-                unsigned _eventid;
+                eventid_t _eventid;
                 BufferVector _buffers;
                 datastruct::MutableCharArrayVector_ptr _serialized;
                 boost::dynamic_bitset<> _isSerialized;
