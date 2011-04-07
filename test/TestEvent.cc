@@ -6,7 +6,6 @@
 #include <iostream>
 #include "sevent/event/Event.h"
 #include "sevent/datastruct/SharedArray.h"
-#include "sevent/serialize/SharedArray.h"
 
 using namespace sevent;
 

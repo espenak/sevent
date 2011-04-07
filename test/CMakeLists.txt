@@ -11,5 +11,6 @@ function(add_boost_test testname)
 endfunction(add_boost_test)
 
 #add_boost_test(TestBoostSerialize TestBoostSerialize.cc)
+add_boost_test(TestEvent TestEvent.cc)
 
 add_subdirectory(socket)
