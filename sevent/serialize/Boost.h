@@ -50,8 +50,5 @@ namespace sevent
                                BoostSerialize<value_type>::deserialize)
             {}
         };
-
-        //Pair Boost(serialize,
-                   //deserialize);
     } // namespace serialize
 } // namespace sevent
