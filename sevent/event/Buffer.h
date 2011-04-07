@@ -46,5 +46,5 @@ namespace sevent
                 boost::any _anydata;
                 serialize::Pair _serializer;
         };
-    } // namespace socket
-} // namespace sevent
+    }
+}

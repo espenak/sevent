@@ -15,15 +15,20 @@ namespace sevent
         typedef boost::shared_ptr<BaseResult> BaseResult_ptr;
 
 
-        class Result : public BaseResult
+        /** This result only contains a pointer to data stored somewhere
+         * else. Usable when serialization results in a pointer to
+         * data which does not go out of context before the event is
+         * sent. */
+        class ConstPtrResult : public BaseResult
         {
             public:
                 static BaseResult_ptr make(const char* data, unsigned size)
                 {
-                    return boost::make_shared<Result>(data, size);
+                    return boost::make_shared<ConstPtrResult>(data, size);
                 }
             public:
-                Result(const char* data, unsigned size) : _data(data), _size(size) {}
+                ConstPtrResult(const char* data, unsigned size) :
+                    _data(data), _size(size) {}
                 const char* data() const { return _data; }
                 unsigned size() const { return _size; }
             private:
@@ -32,6 +37,8 @@ namespace sevent
         };
 
 
+        /** String serialization result. If serialization results
+         * in a string, this is the appropriate result class. */
         class StringResult: public BaseResult
         {
             public:
@@ -42,5 +49,5 @@ namespace sevent
                 std::string _data;
 
         };
-    } // namespace socket
-} // namespace sevent
+    }
+}

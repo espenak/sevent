@@ -109,5 +109,5 @@ namespace sevent
                 boost::dynamic_bitset<> _isSerialized;
                 boost::mutex _lock;
         };
-    } // namespace socket
-} // namespace sevent
+    }
+}

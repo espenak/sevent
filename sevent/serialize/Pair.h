@@ -16,5 +16,5 @@ namespace sevent
             Pair(serialize_t serializeFunc_, deserialize_t deserializeFunc_) :
                 serializeFunc(serializeFunc_), deserializeFunc(deserializeFunc_) {}
         };
-    } // namespace socket
-} // namespace sevent
+    }
+}
