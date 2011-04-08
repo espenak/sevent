@@ -34,7 +34,7 @@ namespace sevent
             event::eventid_t::header_network_type header = eventid.serializeHeader();
             boost::asio::write(*_sock,
                                boost::asio::buffer(&header,
-                                                   event::eventid_t::headerNetworkSize()),
+                                                   event::eventid_t::headerSerializedSize()),
                                boost::asio::transfer_all());
             //if(eventid.hasBody())
             //{
@@ -44,11 +44,21 @@ namespace sevent
 
         event::eventid_t_ptr AsioSession::receiveEventId()
         {
-            //boost::array<event::, 1> buf;
-            //int bytes_read = boost::asio::read(*_sock,
-                                               //boost::asio::buffer(buf),
-                                               //boost::asio::transfer_all());
-            return event::eventid_t::make(ntohl(_headerBuf[0]));
+            event::eventid_t::header_type header = event::eventid_t::deserializeHeader(_headerBuf[0]);
+
+            //if(event::eventid_t::hasBody())
+            //{
+                //unsigned bodySerializedSize = event::eventid_t::bodySerializedSize(header);
+                //boost::array<char, bodySerializedSize> buf;
+                //int bytes_read = boost::asio::read(*_sock,
+                                                   //boost::asio::buffer(buf),
+                                                   //boost::asio::transfer_all());
+                //return event::eventid_t::makeFromNetwork(header, buf.data());
+            //}
+            //else
+            //{
+                return event::eventid_t::makeFromNetwork(header, NULL);
+            //}
         }
 
         void AsioSession::sendNumElements(uint32_t numElements)
@@ -150,7 +160,7 @@ namespace sevent
                                           << BoostSystemMsg(error.message()));
                 }
             }
-            else if(bytesTransferred != event::eventid_t::headerNetworkSize())
+            else if(bytesTransferred != event::eventid_t::headerSerializedSize())
             {
                 throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }

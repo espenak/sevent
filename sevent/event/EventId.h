@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
+#include <arpa/inet.h>
 
 namespace sevent
 {
@@ -21,36 +22,44 @@ namespace sevent
                     return boost::make_shared<NumericEventId>(value);
                 }
 
-                //static makeFromNetwork()
-                //{
-                    
-                //}
+                /**
+                 * @param body The serialized body. Goes out of context.
+                 */
+                static NumericEventId_ptr makeFromNetwork(header_type header, char* body)
+                {
+                    return make(header);
+                }
 
-                //static header_type deserializeHeader(const char* header)
-                //{
-                    //header_type header = static_cast<header_type>(*header);
-                //}
-
-                //static uint8_t bodySize( )
-                //{
-                    //return 0;
-                //}
-                static unsigned headerNetworkSize()
+                /** Number of bytes occupied by the serialized header. */
+                static unsigned headerSerializedSize()
                 {
                     return sizeof(uint32_t);
+                }
+
+                static header_type deserializeHeader(header_network_type header)
+                {
+                    return ntohl(header);
+                }
+
+                /** Number of bytes occupied by the serialized body. */
+                static uint8_t bodySerializedSize(header_type header)
+                {
+                    return 0;
+                }
+
+                static bool hasBody()
+                {
+                    return false;
                 }
 
             public:
                 NumericEventId(value_type value) :
                     _value(value) {}
 
-                // TODO: use a pair?
                 header_network_type serializeHeader()
                 {
                     return htonl(_value);
                 }
-
-
 
                 const value_type& value()
                 {
