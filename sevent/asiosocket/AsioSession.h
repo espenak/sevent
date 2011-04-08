@@ -42,7 +42,8 @@ namespace sevent
                 virtual socket::Address_ptr getLocalEndpointAddress();
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
-                void sendHeader(unsigned eventid, int numElements);
+                void sendEventId(event::eventid_t& eventid);
+                void sendNumElements(int numElements);
                 void sendData(serialize::BaseResult_ptr data);
 
                 datastruct::MutableCharArray_ptr receiveData();

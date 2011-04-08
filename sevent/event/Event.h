@@ -4,13 +4,12 @@
 #include <boost/dynamic_bitset.hpp>
 #include <boost/thread/mutex.hpp>
 #include "Buffer.h"
+#include "EventId.h"
 
 namespace sevent
 {
     namespace event
     {
-        typedef unsigned eventid_t;
-        
         class Event;
         typedef boost::shared_ptr<Event> Event_ptr;
         class Event
@@ -19,31 +18,32 @@ namespace sevent
                 typedef std::vector<Buffer_ptr> BufferVector;
 
             public:
-                static Event_ptr make(eventid_t eventid)
+                static Event_ptr make(eventid_t::value_typeref eventid)
                 {
                     return boost::make_shared<Event>(eventid);
                 }
-                static Event_ptr make(eventid_t eventid, Buffer_ptr first)
+                static Event_ptr make(eventid_t::value_typeref eventid, Buffer_ptr first)
                 {
                     return boost::make_shared<Event>(eventid, first);
                 }
-                static Event_ptr make(unsigned eventid, datastruct::MutableCharArrayVector_ptr serialized)
+                static Event_ptr make(eventid_t::value_typeref eventid,
+                                      datastruct::MutableCharArrayVector_ptr serialized)
                 {
                     return boost::make_shared<Event>(eventid, serialized);
                 }
 
             public:
-                Event(unsigned eventid) :
+                Event(eventid_t::value_typeref eventid) :
                     _eventid(eventid)
                 {}
 
-                Event(unsigned eventid, Buffer_ptr first) :
+                Event(eventid_t::value_typeref eventid, Buffer_ptr first) :
                     _eventid(eventid)
                 {
                     _buffers.push_back(first);
                 }
 
-                Event(unsigned eventid, datastruct::MutableCharArrayVector_ptr serialized) :
+                Event(eventid_t::value_typeref eventid, datastruct::MutableCharArrayVector_ptr serialized) :
                     _eventid(eventid), _buffers(serialized->size()), _serialized(serialized),
                     _isSerialized(serialized->size())
                 {
@@ -87,7 +87,12 @@ namespace sevent
                     return _buffers.size();
                 }
 
-                eventid_t eventid()
+                const eventid_t::value_typeref eventid()
+                {
+                    return _eventid.value();
+                }
+
+                eventid_t& eventid_object()
                 {
                     return _eventid;
                 }

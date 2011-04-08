@@ -29,14 +29,22 @@ namespace sevent
         }
 
 
-        void AsioSession::sendHeader(unsigned eventid, int numElements)
+        void AsioSession::sendEventId(event::eventid_t& eventid)
         {
-            uint32_t eventIdNetworkOrder = htonl(eventid);
-            uint32_t numElementsNetworkOrder = htonl(numElements);
+            event::eventid_t::header_network_t header = eventid.headerNetworkSafe();
             boost::asio::write(*_sock,
-                               boost::asio::buffer(&eventIdNetworkOrder,
-                                                  sizeof(uint32_t)),
+                               boost::asio::buffer(&header,
+                                                   eventid.headerNetworkSize()),
                                boost::asio::transfer_all());
+            if(eventid.hasBody())
+            {
+                // TODO
+            }
+        }
+
+        void AsioSession::sendNumElements(int numElements)
+        {
+            uint32_t numElementsNetworkOrder = htonl(numElements);
             boost::asio::write(*_sock,
                                boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)),
@@ -55,17 +63,11 @@ namespace sevent
                                boost::asio::transfer_all());
         }
 
-        //void AsioSession::sendEvent(unsigned eventid)
-        //{
-            //boost::lock_guard<boost::mutex> lock(_sendLock);
-            //sendHeader(eventid, 0);
-            ////std::cerr << "Sent data: " << static_cast<const char*>(data.data()) << std::endl;
-        //}
-
         void AsioSession::sendEvent(event::Event_ptr event)
         {
             boost::lock_guard<boost::mutex> lock(_sendLock);
-            sendHeader(event->eventid(), event->size());
+            sendEventId(event->eventid_object());
+            sendNumElements(event->size());
             for(int i = 0; i < event->size(); i++)
             {
                 sendData(event->serialize_at(i));

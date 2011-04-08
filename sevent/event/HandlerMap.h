@@ -16,6 +16,7 @@
 #include <boost/unordered_map.hpp>
 #include "sevent/socket.h"
 #include "Event.h"
+#include "EventId.h"
 
 namespace sevent
 {
@@ -41,15 +42,15 @@ namespace sevent
                 virtual ~HandlerMap();
                 static HandlerMap_ptr make();
             public:
-                bool contains(eventid_t eventid);
-                void addEventHandler(eventid_t eventid,
+                bool contains(eventid_t::value_typeref eventid);
+                void addEventHandler(eventid_t::value_typeref eventid,
                                      handler_t handler);
                 void triggerEvent(socket::Facade_ptr facade,
                                   socket::Session_ptr session,
                                   Event_ptr event);
 
             private:
-                boost::unordered_map<eventid_t, Handler_ptr> _handlers;
+                boost::unordered_map<eventid_t::value_type, Handler_ptr> _handlers;
                 boost::mutex _lock;
         };
         

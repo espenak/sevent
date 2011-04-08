@@ -20,13 +20,13 @@ namespace sevent
             return HandlerMap_ptr(new HandlerMap());
         }
 
-        bool HandlerMap::contains(eventid_t eventid)
+        bool HandlerMap::contains(eventid_t::value_typeref eventid)
         {
             boost::lock_guard<boost::mutex> lock(_lock);
             return _handlers.find(eventid) != _handlers.end();
         }
 
-        void HandlerMap::addEventHandler(eventid_t eventid,
+        void HandlerMap::addEventHandler(eventid_t::value_typeref eventid,
                                          handler_t handler)
         {
             Handler_ptr ev = Handler_ptr(new Handler());
