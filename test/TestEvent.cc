@@ -9,10 +9,10 @@
 
 using namespace sevent;
 
-#ifdef SEVENT_USE_STRING_ID
-    std::string eventid1("sevent::test::EventOne");
-#else
+#ifdef SEVENT_USE_INT_ID
     uint32_t eventid1(1010);
+#else
+    std::string eventid1("sevent::test::EventOne");
 #endif
 
 

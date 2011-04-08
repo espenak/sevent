@@ -63,16 +63,16 @@ struct BasicFixture {
     ~BasicFixture () {}
 };
 
-#ifdef SEVENT_USE_STRING_ID
-    std::string eventid1("sevent::test::EventOne");
-    std::string eventid2("sevent::test::EventTwo");
-    std::string eventid3("sevent::test::EventThree");
-    std::string eventid4("sevent::test::EventFour");
-    std::string eventid5("sevent::test::EventFive");
-#else
+#ifdef SEVENT_USE_INT_ID
     uint32_t eventid1(1010);
     uint32_t eventid2(2020);
     uint32_t eventid3(3030);
     uint32_t eventid4(4040);
     uint32_t eventid5(5050);
+#else
+    std::string eventid1("sevent::test::EventOne");
+    std::string eventid2("sevent::test::EventTwo");
+    std::string eventid3("sevent::test::EventThree");
+    std::string eventid4("sevent::test::EventFour");
+    std::string eventid5("sevent::test::EventFive");
 #endif

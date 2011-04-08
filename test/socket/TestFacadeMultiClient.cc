@@ -34,12 +34,12 @@ class LongStreamMultiClientEventsHandler : public CountingAllEventsHandler
         {
             String_ptr msg = event->first<String_ptr>(serialize::String);
             std::string expectedMessage("hello");
-#ifdef SEVENT_USE_STRING_ID
-            int evid = boost::lexical_cast<int>(event->eventid());
-            expectedMessage += event->eventid();
-#else
+#ifdef SEVENT_USE_INT_ID
             int evid = event->eventid();
             expectedMessage += boost::lexical_cast<std::string>(event->eventid());
+#else
+            int evid = boost::lexical_cast<int>(event->eventid());
+            expectedMessage += event->eventid();
 #endif
             // Need to lock since BOOST_REQUIRE_* is not threadsafe
             {
@@ -64,10 +64,10 @@ void sendMessagesThread(Session_ptr session, int id, int messageCount,
     }
     for(int i=0; i<messageCount; i++)
     {
-#ifdef SEVENT_USE_STRING_ID
-        std::string theid = boost::lexical_cast<std::string>(id);
-#else
+#ifdef SEVENT_USE_INT_ID
         int theid = id;
+#else
+        std::string theid = boost::lexical_cast<std::string>(id);
 #endif
         session->sendEvent(Event::make(theid,
                                        Buffer::make(boost::make_shared<std::string>(msg),
