@@ -4,7 +4,7 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 
-add_library(sevent STATIC
+set(sevent_sources
     datastruct/SharedArray.h
     datastruct/MutableCharArray.h
 
@@ -33,5 +33,7 @@ add_library(sevent STATIC
     event/Event.h
     event/Buffer.h
 )
+
+add_library(sevent STATIC ${sevent_sources})
 target_link_libraries(sevent ${Boost_LIBRARIES})
 set_target_properties(sevent PROPERTIES COMPILE_FLAGS -fPIC)

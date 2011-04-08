@@ -1,88 +1,18 @@
 #pragma once
-#include <stdint.h>
+#define SEVENT_USE_STRING_ID
 #include <boost/shared_ptr.hpp>
-#include <utility>
-#include <arpa/inet.h>
+#include "NumericEventId.h"
+#include "StringEventId.h"
 
 namespace sevent
 {
     namespace event
     {
-        struct EventIdBodySerialized
-        {
-            unsigned size;
-            char* data;
-            EventIdBodySerialized(unsigned size_, char* data_) :
-                size(size_), data(data_) {}
-        };
-
-
-        class NumericEventId;
-        typedef boost::shared_ptr<NumericEventId> NumericEventId_ptr;
-        class NumericEventId
-        {
-            public:
-                typedef uint32_t value_type;
-                typedef uint32_t value_typeref;
-                typedef uint32_t header_type;
-                typedef uint32_t header_network_type;
-            public:
-                /**
-                 * @param body The serialized body. Goes out of context.
-                 */
-                static NumericEventId_ptr makeFromNetwork(header_type header, char* body)
-                {
-                    return boost::make_shared<NumericEventId>(header);
-                }
-
-                /** Number of bytes occupied by the serialized header. */
-                static unsigned headerSerializedSize()
-                {
-                    return sizeof(uint32_t);
-                }
-
-                static header_type deserializeHeader(header_network_type header)
-                {
-                    return ntohl(header);
-                }
-
-                /** Number of bytes occupied by the serialized body. */
-                static uint8_t bodySerializedSize(header_type header)
-                {
-                    return 0;
-                }
-
-                static bool hasBody()
-                {
-                    return false;
-                }
-
-            public:
-                NumericEventId(value_type value) :
-                    _value(value) {}
-
-                header_network_type serializeHeader()
-                {
-                    return htonl(_value);
-                }
-
-                EventIdBodySerialized serializeBody()
-                {
-                    return EventIdBodySerialized(0, NULL);
-                }
-
-                const value_type& value()
-                {
-                    return _value;
-                }
-
-                
-            private:
-                value_type _value;
-        };
-
-
+#ifdef SEVENT_USE_STRING_ID
+        typedef StringEventId eventid_t;
+#else
         typedef NumericEventId eventid_t;
+#endif
         typedef boost::shared_ptr<eventid_t> eventid_t_ptr;
     } // namespace socket
 } // namespace sevent

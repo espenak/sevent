@@ -30,14 +30,14 @@ BOOST_AUTO_TEST_CASE( Sanity )
     String_ptr cruel = boost::make_shared<std::string>("supercruel");
     String_ptr world = boost::make_shared<std::string>("world!");
 
-    session->sendEvent(Event::make(1010));
-    session->sendEvent(Event::make(2020,
+    session->sendEvent(Event::make(eventid1));
+    session->sendEvent(Event::make(eventid2,
                                    Buffer::make(hello, serialize::String)));
-    session->sendEvent(Event::make(3030,
+    session->sendEvent(Event::make(eventid3,
                                    Buffer::make(cruel, serialize::String)));
-    session->sendEvent(Event::make(4040,
+    session->sendEvent(Event::make(eventid4,
                                    Buffer::make(world, serialize::String)));
-    event::Event_ptr event = Event::make(5050);
+    event::Event_ptr event = Event::make(eventid5);
     event->push_back(Buffer::make(hello, serialize::String));
     event->push_back(Buffer::make(cruel, serialize::String));
     event->push_back(Buffer::make(world, serialize::String));
@@ -109,7 +109,7 @@ class LongStreamEventsHandler : public CountingAllEventsHandler
         {
             String_ptr msg = event->first<String_ptr>(serialize::String);
             BOOST_REQUIRE_EQUAL(*msg, _expectedMessage);
-            BOOST_REQUIRE_EQUAL(event->eventid(), 2020);
+            BOOST_REQUIRE_EQUAL(event->eventid(), eventid2);
         }
     private:
         std::string _expectedMessage;
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( LongStreamSingleThread )
     String_ptr msg = boost::make_shared<std::string>("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(Event::make(2020,
+        session->sendEvent(Event::make(eventid2,
                                        Buffer::make(msg, serialize::String)));
     }
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE( LongStreamMultiThread )
     String_ptr msg = boost::make_shared<std::string>("Hello world");
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(Event::make(2020,
+        session->sendEvent(Event::make(eventid2,
                                        Buffer::make(msg, serialize::String)));
     }
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThread )
     String_ptr msg = boost::make_shared<std::string>(10000, 'x');
     for(int i=0; i<max; i++)
     {
-        session->sendEvent(Event::make(2020,
+        session->sendEvent(Event::make(eventid2,
                                        Buffer::make(msg, serialize::String)));
     }
 
@@ -195,7 +195,7 @@ class LongMultibufStreamEventsHandler : public CountingAllEventsHandler
                                  Session_ptr session,
                                  event::Event_ptr event)
         {
-            BOOST_REQUIRE_EQUAL(event->eventid(), 2020);
+            BOOST_REQUIRE_EQUAL(event->eventid(), eventid2);
 
             // It should work just like a "single message" event with the first
             // element
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE( LongStreamBigMessageMultiThreadMultiBuf )
     String_ptr msg3 = boost::make_shared<std::string>(6000, 'z');
     for(int i=0; i<max; i++)
     {
-        event::Event_ptr event = Event::make(2020);
+        event::Event_ptr event = Event::make(eventid2);
         event->push_back(Buffer::make(msg1, serialize::String));
         event->push_back(Buffer::make(msg2, serialize::String));
         event->push_back(Buffer::make(msg3, serialize::String));

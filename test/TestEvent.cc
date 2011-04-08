@@ -9,6 +9,11 @@
 
 using namespace sevent;
 
+#ifdef SEVENT_USE_STRING_ID
+    std::string eventid1("sevent::test::EventOne");
+#else
+    uint32_t eventid1(1010);
+#endif
 
 
 /////////////////////////////////
@@ -104,7 +109,7 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
 
 BOOST_AUTO_TEST_CASE(TestEvent)
 {
-    event::Event_ptr eventIn = event::Event::make(1010, inputArray);
+    event::Event_ptr eventIn = event::Event::make(eventid1, inputArray);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     datastruct::Uint32SharedArray_ptr aOut = eventIn->first<datastruct::Uint32SharedArray_ptr>(Uint32TestSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
@@ -134,7 +139,7 @@ BOOST_AUTO_TEST_CASE(TestEventSerialized)
     serialized->push_back(copyIntoMutArray(serializedArray));
     serialized->push_back(copyIntoMutArray(serializedString));
 
-    event::Event_ptr eventIn = event::Event::make(1010, serialized);
+    event::Event_ptr eventIn = event::Event::make(eventid1, serialized);
     BOOST_REQUIRE_EQUAL(eventIn->size(), 2);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), true);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(1), true);

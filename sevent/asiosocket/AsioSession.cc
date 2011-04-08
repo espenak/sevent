@@ -52,10 +52,11 @@ namespace sevent
 
             if(event::eventid_t::hasBody())
             {
-                unsigned bodySerializedSize = event::eventid_t::bodySerializedSize(header);
+                uint8_t bodySerializedSize = event::eventid_t::bodySerializedSize(header);
                 boost::shared_array<char> body = boost::shared_array<char>(new char[bodySerializedSize]); // Using shared array to avoid memory leaks on transfer exceptions
                 int bytes_read = boost::asio::read(*_sock,
-                                                   boost::asio::buffer(body.get(), bodySerializedSize),
+                                                   boost::asio::buffer(body.get(),
+                                                                       bodySerializedSize),
                                                    boost::asio::transfer_all());
                 return event::eventid_t::makeFromNetwork(header, body.get());
             }
@@ -129,11 +130,16 @@ namespace sevent
             //uint32_t numElements = ntohl(_headerBuf[1]);
             //std::cerr << "onHeaderReceived() eventid:" << eventid
                 //<< ", numElements:" << numElements << std::endl;
-            event::eventid_t_ptr eventid = receiveEventId();
-            uint32_t numElements = receiveNumElements();
 
+            event::eventid_t_ptr eventid;
             datastruct::MutableCharArrayVector_ptr dataBufs;
-            dataBufs = receiveAllDataAndHandleErrors(numElements);
+            {
+                boost::lock_guard<boost::mutex> lock(_receiveLock);
+                eventid = receiveEventId();
+                uint32_t numElements = receiveNumElements();
+
+                dataBufs = receiveAllDataAndHandleErrors(numElements);
+            }
 
             event::Event_ptr event = event::Event::make(eventid->value(), dataBufs);
             _allEventsHandler(shared_from_this(), event);
@@ -166,7 +172,7 @@ namespace sevent
             }
             else if(bytesTransferred != event::eventid_t::headerSerializedSize())
             {
-                throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
+                throw std::runtime_error("bytesTransferred is incorrect"); // This is a bug, because transfer_all() should make this impossible.
             }
             return true;
         }
@@ -200,7 +206,6 @@ namespace sevent
 
         datastruct::MutableCharArrayVector_ptr AsioSession::receiveAllDataAndHandleErrors(unsigned numElements)
         {
-            boost::lock_guard<boost::mutex> lock(_receiveLock);
             try
             {
                 return receiveAllData(numElements);
