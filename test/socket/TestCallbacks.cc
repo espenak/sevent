@@ -4,6 +4,7 @@
 #include <string>
 #include "sevent/socket/Facade.h"
 #include "sevent/event.h"
+#include "helpers.h"
 using namespace sevent::socket;
 
 
@@ -57,7 +58,7 @@ BOOST_AUTO_TEST_CASE( TestCallbacksMain )
 
     Facade_ptr clientFacade = Facade::make();
     Session_ptr session = clientFacade->connect(listenAddr);
-    session->sendEvent(sevent::event::Event::make(1010));
+    session->sendEvent(sevent::event::Event::make(eventid1));
     clientFacade->sessionRegistry()->remove(session); // Closes the session, which should make severFacade invoke it's disconnectHandler.
 
     serverFacade->joinAllWorkerThreads();

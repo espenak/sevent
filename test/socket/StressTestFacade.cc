@@ -39,13 +39,12 @@ struct StressFixture
 };
 
 
-void sendSizedMessages(Session_ptr session, unsigned id,
-        unsigned messageCount, unsigned messageSize)
+void sendSizedMessages(Session_ptr session, unsigned messageCount, unsigned messageSize)
 {
     String_ptr msg = boost::make_shared<std::string>(messageSize, 'x');
     for(unsigned i=0; i<messageCount; i++)
     {
-        session->sendEvent(Event::make(id,
+        session->sendEvent(Event::make(eventid1,
                                        Buffer::make(msg, serialize::String)));
     }
 }
@@ -95,7 +94,7 @@ BOOST_AUTO_TEST_CASE( BigMessage )
     facade->setWorkerThreads(workerThreadCount,
                              boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    sendSizedMessages(session, 2004, messageCount, messageSize);
+    sendSizedMessages(session, messageCount, messageSize);
 
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), messageCount);
@@ -112,7 +111,7 @@ BOOST_AUTO_TEST_CASE( BigMessages )
     facade->setWorkerThreads(workerThreadCount,
                              boost::bind(boost::ref(allEventsHandler), _1, _2, _3));
 
-    sendSizedMessages(session, 2004, messageCount, messageSize);
+    sendSizedMessages(session, messageCount, messageSize);
 
     facade->joinAllWorkerThreads();
     BOOST_REQUIRE_EQUAL(allEventsHandler.counter(), messageCount);
@@ -138,7 +137,7 @@ BOOST_AUTO_TEST_CASE( BigMessagesMultipleThreadsOnOneSession )
     for(unsigned i = 0; i < threadCount; i++)
     {
         boost::thread* t = new boost::thread(sendSizedMessages, session,
-                                             2004, messageCount/threadCount,
+                                             messageCount/threadCount,
                                              messageSize);
         group.add_thread(t);
     }
@@ -168,7 +167,7 @@ BOOST_AUTO_TEST_CASE( BigMessagesMultipleThreadsOnMultipleSessions )
     {
         sessions[i] = facade->connect(listenAddr);
         boost::thread* t = new boost::thread(sendSizedMessages, sessions[i],
-                                             2004, messageCount/clientCount,
+                                             messageCount/clientCount,
                                              messageSize);
         group.add_thread(t);
     }
@@ -198,7 +197,7 @@ BOOST_AUTO_TEST_CASE( BigMessagesThreaded )
     {
         sessions[i] = facade->connect(listenAddr);
         boost::thread* t = new boost::thread(sendSizedMessages, sessions[i],
-                                             2004, messageCount/clientCount,
+                                             messageCount/clientCount,
                                              messageSize);
         group.add_thread(t);
     }
