@@ -43,7 +43,11 @@ namespace sevent
                 virtual socket::Address_ptr getRemoteEndpointAddress();
             private:
                 void sendEventId(event::eventid_t& eventid);
-                void sendNumElements(int numElements);
+                event::eventid_t_ptr receiveEventId();
+
+                void sendNumElements(uint32_t numElements);
+                uint32_t receiveNumElements();
+
                 void sendData(serialize::BaseResult_ptr data);
 
                 datastruct::MutableCharArray_ptr receiveData();
@@ -61,7 +65,7 @@ namespace sevent
                 boost::mutex _sendLock;
                 boost::mutex _receiveLock;
                 boost::mutex _closeMutex;
-                boost::array<uint32_t, 2> _headerBuf;
+                boost::array<event::eventid_t::header_network_type, 1> _headerBuf;
         };
 
     } // namespace asiosocket

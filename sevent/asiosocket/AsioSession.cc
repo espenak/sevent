@@ -31,24 +31,42 @@ namespace sevent
 
         void AsioSession::sendEventId(event::eventid_t& eventid)
         {
-            event::eventid_t::header_network_t header = eventid.headerNetworkSafe();
+            event::eventid_t::header_network_type header = eventid.serializeHeader();
             boost::asio::write(*_sock,
                                boost::asio::buffer(&header,
-                                                   eventid.headerNetworkSize()),
+                                                   event::eventid_t::headerNetworkSize()),
                                boost::asio::transfer_all());
-            if(eventid.hasBody())
-            {
+            //if(eventid.hasBody())
+            //{
                 // TODO
-            }
+            //}
         }
 
-        void AsioSession::sendNumElements(int numElements)
+        event::eventid_t_ptr AsioSession::receiveEventId()
+        {
+            //boost::array<event::, 1> buf;
+            //int bytes_read = boost::asio::read(*_sock,
+                                               //boost::asio::buffer(buf),
+                                               //boost::asio::transfer_all());
+            return event::eventid_t::make(ntohl(_headerBuf[0]));
+        }
+
+        void AsioSession::sendNumElements(uint32_t numElements)
         {
             uint32_t numElementsNetworkOrder = htonl(numElements);
             boost::asio::write(*_sock,
                                boost::asio::buffer(&numElementsNetworkOrder,
                                                   sizeof(uint32_t)),
                                boost::asio::transfer_all());
+        }
+
+        uint32_t AsioSession::receiveNumElements()
+        {
+            boost::array<uint32_t, 1> buf;
+            int bytes_read = boost::asio::read(*_sock,
+                                               boost::asio::buffer(buf),
+                                               boost::asio::transfer_all());
+            return ntohl(buf[0]);
         }
 
         void AsioSession::sendData(serialize::BaseResult_ptr data)
@@ -93,15 +111,17 @@ namespace sevent
             //std::cerr << "onHeaderReceived()" << std::endl;
             //std::cerr << "onHeaderReceived() no errors" << std::endl;
 
-            uint32_t eventid = ntohl(_headerBuf[0]);
-            uint32_t numElements = ntohl(_headerBuf[1]);
+            //uint32_t eventid = ntohl(_headerBuf[0]);
+            //uint32_t numElements = ntohl(_headerBuf[1]);
             //std::cerr << "onHeaderReceived() eventid:" << eventid
                 //<< ", numElements:" << numElements << std::endl;
+            event::eventid_t_ptr eventid = receiveEventId();
+            uint32_t numElements = receiveNumElements();
 
             datastruct::MutableCharArrayVector_ptr dataBufs;
             dataBufs = receiveAllDataAndHandleErrors(numElements);
 
-            event::Event_ptr event = event::Event::make(eventid, dataBufs);
+            event::Event_ptr event = event::Event::make(eventid->value(), dataBufs);
             _allEventsHandler(shared_from_this(), event);
             //std::cerr << "onHeaderReceived() finished!" << std::endl;
             receiveEvents();
@@ -130,7 +150,7 @@ namespace sevent
                                           << BoostSystemMsg(error.message()));
                 }
             }
-            else if(bytesTransferred != sizeof(uint32_t)*2)
+            else if(bytesTransferred != event::eventid_t::headerNetworkSize())
             {
                 throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
             }
