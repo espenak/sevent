@@ -51,6 +51,8 @@ namespace sevent
                 datastruct::MutableCharArrayVector_ptr receiveAllDataAndHandleErrors(unsigned numElements);
                 void onHeaderReceived(const boost::system::error_code& error,
                                       std::size_t byte_transferred);
+                bool handleOnHeaderReceivedErrors(const boost::system::error_code& error,
+                                                  std::size_t bytesTransferred);
             protected:
                 virtual void close();
             private:

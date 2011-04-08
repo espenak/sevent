@@ -83,32 +83,14 @@ namespace sevent
                                                 this, _1, _2));
         }
 
-        void AsioSession::onHeaderReceived(const boost::system::error_code & error,
+        void AsioSession::onHeaderReceived(const boost::system::error_code& error,
                                            std::size_t bytesTransferred)
         {
-            //std::cerr << "onHeaderReceived()" << std::endl;
-            if (error == boost::asio::error::eof)
+            if(!handleOnHeaderReceivedErrors(error, bytesTransferred))
             {
-                _disconnectHandler(shared_from_this());
                 return;
             }
-            else if (error)
-            {
-                if(!_sock->is_open())
-                {
-                    // This will happen if we close() the session, because
-                    // the async_read operation will get a "Operation canceled"
-                    // exception.
-                    return;
-                }
-                BOOST_THROW_EXCEPTION(ReceiveHeaderError()
-                                      << BoostSystemCondition(error.default_error_condition().message())
-                                      << BoostSystemMsg(error.message()));
-            }
-            else if(bytesTransferred != sizeof(uint32_t)*2)
-            {
-                throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
-            }
+            //std::cerr << "onHeaderReceived()" << std::endl;
             //std::cerr << "onHeaderReceived() no errors" << std::endl;
 
             uint32_t eventid = ntohl(_headerBuf[0]);
@@ -123,6 +105,36 @@ namespace sevent
             _allEventsHandler(shared_from_this(), event);
             //std::cerr << "onHeaderReceived() finished!" << std::endl;
             receiveEvents();
+        }
+
+        bool AsioSession::handleOnHeaderReceivedErrors(const boost::system::error_code& error,
+                                                       std::size_t bytesTransferred)
+        {
+            if (error == boost::asio::error::eof)
+            {
+                _disconnectHandler(shared_from_this());
+                return false;
+            }
+            else if (error)
+            {
+                if(!_sock->is_open())
+                {
+                    // This will happen if we close() the session, because
+                    // the async_read operation will get a "Operation canceled"
+                    // exception.
+                    return false;
+                } else
+                {
+                    BOOST_THROW_EXCEPTION(ReceiveHeaderError()
+                                          << BoostSystemCondition(error.default_error_condition().message())
+                                          << BoostSystemMsg(error.message()));
+                }
+            }
+            else if(bytesTransferred != sizeof(uint32_t)*2)
+            {
+                throw std::runtime_error("bytesTransferred != sizeof(uint32_t)*2"); // This is a bug, because transfer_all() should make this impossible.
+            }
+            return true;
         }
 
         datastruct::MutableCharArray_ptr AsioSession::receiveData()
