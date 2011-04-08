@@ -117,26 +117,7 @@ namespace sevent
                 //<< ", numElements:" << numElements << std::endl;
 
             datastruct::MutableCharArrayVector_ptr dataBufs;
-            _receiveLock.lock();
-            try
-            {
-                dataBufs = receiveAllData(numElements);
-                _receiveLock.unlock();
-            }
-            catch(boost::system::system_error& error)
-            {
-                _receiveLock.unlock();
-                BOOST_THROW_EXCEPTION(ReceiveDataBoostSystemError()
-                                      << BoostSystemCondition(error.code().default_error_condition().message())
-                                      << BoostSystemMsg(error.code().message()));
-            } catch(std::exception& e) {
-                _receiveLock.unlock();
-                BOOST_THROW_EXCEPTION(ReceiveDataStdError()
-                                      << StdErrorMsg(e.what()));
-            } catch(...) {
-                _receiveLock.unlock();
-                BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
-            }
+            dataBufs = receiveAllDataAndHandleErrors(numElements);
 
             event::Event_ptr event = event::Event::make(eventid, dataBufs);
             _allEventsHandler(shared_from_this(), event);
@@ -169,6 +150,26 @@ namespace sevent
                 dataBufs->push_back(buffer);
             }
             return dataBufs;
+        }
+
+        datastruct::MutableCharArrayVector_ptr AsioSession::receiveAllDataAndHandleErrors(unsigned numElements)
+        {
+            boost::lock_guard<boost::mutex> lock(_receiveLock);
+            try
+            {
+                return receiveAllData(numElements);
+            }
+            catch(boost::system::system_error& error)
+            {
+                BOOST_THROW_EXCEPTION(ReceiveDataBoostSystemError()
+                                      << BoostSystemCondition(error.code().default_error_condition().message())
+                                      << BoostSystemMsg(error.code().message()));
+            } catch(std::exception& e) {
+                BOOST_THROW_EXCEPTION(ReceiveDataStdError()
+                                      << StdErrorMsg(e.what()));
+            } catch(...) {
+                BOOST_THROW_EXCEPTION(ReceiveDataUnknownError());
+            }
         }
 
         void AsioSession::close()
