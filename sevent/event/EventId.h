@@ -1,12 +1,22 @@
 #pragma once
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
+#include <utility>
 #include <arpa/inet.h>
 
 namespace sevent
 {
     namespace event
     {
+        struct EventIdBodySerialized
+        {
+            unsigned size;
+            char* data;
+            EventIdBodySerialized(unsigned size_, char* data_) :
+                size(size_), data(data_) {}
+        };
+
+
         class NumericEventId;
         typedef boost::shared_ptr<NumericEventId> NumericEventId_ptr;
         class NumericEventId
@@ -56,6 +66,11 @@ namespace sevent
                     return htonl(_value);
                 }
 
+                EventIdBodySerialized serializeBody()
+                {
+                    return EventIdBodySerialized(0, NULL);
+                }
+
                 const value_type& value()
                 {
                     return _value;
@@ -65,6 +80,7 @@ namespace sevent
             private:
                 value_type _value;
         };
+
 
         typedef NumericEventId eventid_t;
         typedef boost::shared_ptr<eventid_t> eventid_t_ptr;

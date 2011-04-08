@@ -36,10 +36,14 @@ namespace sevent
                                boost::asio::buffer(&header,
                                                    event::eventid_t::headerSerializedSize()),
                                boost::asio::transfer_all());
-            //if(eventid.hasBody())
-            //{
-                // TODO
-            //}
+            if(event::eventid_t::hasBody())
+            {
+                event::EventIdBodySerialized bodySerialized = eventid.serializeBody();
+                boost::asio::write(*_sock,
+                                   boost::asio::buffer(bodySerialized.data,
+                                                       bodySerialized.size),
+                                   boost::asio::transfer_all());
+            }
         }
 
         event::eventid_t_ptr AsioSession::receiveEventId()
