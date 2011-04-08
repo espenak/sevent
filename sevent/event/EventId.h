@@ -17,17 +17,12 @@ namespace sevent
                 typedef uint32_t header_type;
                 typedef uint32_t header_network_type;
             public:
-                static NumericEventId_ptr make(value_typeref value)
-                {
-                    return boost::make_shared<NumericEventId>(value);
-                }
-
                 /**
                  * @param body The serialized body. Goes out of context.
                  */
                 static NumericEventId_ptr makeFromNetwork(header_type header, char* body)
                 {
-                    return make(header);
+                    return boost::make_shared<NumericEventId>(header);
                 }
 
                 /** Number of bytes occupied by the serialized header. */
