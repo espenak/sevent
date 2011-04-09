@@ -14,10 +14,38 @@ boost::mutex receivedEventsLock;
 unsigned receivedEvents = 0;
 unsigned expectedEvents;
 void instrumentationHandler(Facade_ptr facade,
+                            Session_ptr session,
+                            Event_ptr event)
+{
+    Instrumentation_ptr p = event->first<Instrumentation_ptr>(serialize::Boost<Instrumentation>());
+    //std::cout << "Instrumentation-event received! "
+        //<< p->id << ":" << p->systemLoad << std::endl;
+    boost::lock_guard<boost::mutex> lock(receivedEventsLock);
+    receivedEvents ++;
+    if(receivedEvents == expectedEvents)
+    {
+        facade->service()->stop();
+    }
+}
+
+void emptyHandler(Facade_ptr facade,
+                  Session_ptr session,
+                  Event_ptr event)
+{
+    boost::lock_guard<boost::mutex> lock(receivedEventsLock);
+    receivedEvents ++;
+    if(receivedEvents == expectedEvents)
+    {
+        facade->service()->stop();
+    }
+}
+
+void stringHandler(Facade_ptr facade,
                    Session_ptr session,
                    Event_ptr event)
 {
-    Instrumentation_ptr p = event->first<Instrumentation_ptr>(serialize::Boost<Instrumentation>());
+    typedef boost::shared_ptr<std::string> String_ptr;
+    String_ptr p = event->first<String_ptr>(serialize::String);
     //std::cout << "Instrumentation-event received! "
         //<< p->id << ":" << p->systemLoad << std::endl;
     boost::lock_guard<boost::mutex> lock(receivedEventsLock);
@@ -43,8 +71,12 @@ int main(int argc, const char *argv[])
 
     Facade_ptr facade = Facade::make();
     HandlerMap_ptr eventHandlerMap = HandlerMap::make();
-    eventHandlerMap->addEventHandler("heavy::Instrumentation",
+    eventHandlerMap->addEventHandler("heavy::instr",
                                      instrumentationHandler);
+    eventHandlerMap->addEventHandler("heavy::empty",
+                                     emptyHandler);
+    eventHandlerMap->addEventHandler("heavy::string",
+                                     stringHandler);
     facade->setWorkerThreads(5,
             boost::bind(simpleAllEventsHandler,
                         eventHandlerMap,
