@@ -48,7 +48,6 @@ enum Sizes { OneKiloByte=1024, HalfMegaByte=524288, OneMegaByte=1048576 };
 
 struct BasicFixture {
     sevent::socket::Facade_ptr facade;
-    sevent::socket::Listener_ptr listener;
     sevent::socket::Session_ptr session;
     sevent::socket::Address_ptr listenAddr;
     sevent::socket::Address_ptr sessionAddr;
@@ -56,11 +55,14 @@ struct BasicFixture {
     {
         facade = sevent::socket::Facade::make();
         listenAddr = sevent::socket::Address::make("127.0.0.1", 9091);
-        listener = facade->listen(listenAddr);
+        facade->listen(listenAddr);
         session = facade->connect(listenAddr);
     }
 
-    ~BasicFixture () {}
+    ~BasicFixture ()
+    {
+        facade->removeListener(sevent::socket::Address("127.0.0.1", 9091));
+    }
 };
 
 #ifdef SEVENT_USE_INT_ID

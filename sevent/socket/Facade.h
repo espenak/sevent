@@ -7,6 +7,7 @@
 #include "SessionRegistry.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <map>
 
 namespace sevent
 {
@@ -81,6 +82,21 @@ namespace sevent
                  * Use service()->stop() (from another thread) to stop the
                  * Service. */
                 virtual void joinAllWorkerThreads() = 0;
+
+                virtual void sendEvent(Session_ptr session,
+                                       event::Event_ptr event) = 0;
+                virtual void invokeAllEventsHandler(Session_ptr session,
+                                                    event::Event_ptr event) = 0;
+
+                void removeListener(const Address& address);
+                bool isLocalSession(Session_ptr session);
+
+            protected:
+                void saveListener(const Address& address,
+                                  Listener_ptr listener);
+
+            private:
+                std::map<Address, Listener_ptr> _listeners;
 
         };
     }

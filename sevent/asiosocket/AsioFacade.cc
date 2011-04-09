@@ -36,6 +36,7 @@ namespace sevent
                                                 workerThread_t workerThreadHandler,
                                                 allEventsHandler_t allEventsHandler)
         {
+            _allEventsHandler = allEventsHandler;
             _sessionRegistry->setAllEventsHandler(
                 boost::bind(allEventsHandler, shared_from_this(), _1, _2));
             for (unsigned x = 0; x < numberOfWorkerThreads; ++x)
@@ -49,6 +50,7 @@ namespace sevent
         {
             socket::Listener_ptr listener = boost::make_shared<AsioListener>(_service, _sessionRegistry);
             listener->listen(address);
+            saveListener(*address, listener);
             return listener;
         }
 
@@ -70,6 +72,24 @@ namespace sevent
         void AsioFacade::joinAllWorkerThreads()
         {
             _worker_threads.join_all();
+        }
+
+        void AsioFacade::sendEvent(socket::Session_ptr session,
+                                   event::Event_ptr event)
+        {
+            if(isLocalSession(session))
+            {
+                invokeAllEventsHandler(session, event);
+            } else
+            {
+                session->sendEvent(event);
+            }
+        }
+
+        void AsioFacade::invokeAllEventsHandler(socket::Session_ptr session,
+                                                event::Event_ptr event)
+        {
+            _allEventsHandler(shared_from_this(), session, event);
         }
 
         void AsioFacade::defaultWorkerThreadHandler(socket::Facade_ptr facade)

@@ -39,6 +39,10 @@ namespace sevent
                 virtual socket::Listener_ptr listen(socket::Address_ptr address);
                 virtual socket::Session_ptr connect(socket::Address_ptr address);
                 virtual void joinAllWorkerThreads();
+                virtual void sendEvent(socket::Session_ptr session,
+                                       event::Event_ptr event);
+                virtual void invokeAllEventsHandler(socket::Session_ptr session,
+                                                    event::Event_ptr event);
 
             private:
                 AsioService_ptr _service;

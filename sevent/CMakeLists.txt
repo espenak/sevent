@@ -21,7 +21,7 @@ set(sevent_sources
     socket/Listener.h
     socket/Connector.h
     socket/Session.cc socket/Session.h
-    socket/Facade.h socket/Facade.cc
+    socket/Facade.cc socket/Facade.h
 
     asiosocket/AsioFacade.cc asiosocket/AsioFacade.h
     asiosocket/AsioSession.cc asiosocket/AsioSession.h

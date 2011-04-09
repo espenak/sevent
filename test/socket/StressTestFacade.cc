@@ -22,7 +22,6 @@ typedef boost::shared_ptr<std::string> String_ptr;
 struct StressFixture
 {
     Facade_ptr facade;
-    Listener_ptr listener;
     Session_ptr session;
     Address_ptr listenAddr;
     Address_ptr sessionAddr;
@@ -31,11 +30,13 @@ struct StressFixture
     {
         facade = Facade::make();
         listenAddr = Address::make("127.0.0.1", 9091);
-        listener = facade->listen(listenAddr);
+        facade->listen(listenAddr);
         session = facade->connect(listenAddr);
     }
 
-    ~StressFixture () {}
+    ~StressFixture () {
+        facade->removeListener(Address("127.0.0.1", 9091));
+    }
 };
 
 
