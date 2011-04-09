@@ -18,54 +18,34 @@
 
 
 using namespace sevent;
-boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
-enum EventIds
-{
-    HELLO_ID = 10,
-    PERSON_ID = 15,
-    DIE_ID = 20
-};
+using namespace sevent::socket;
+using namespace sevent::event;
 
-
-// helloHandler(), personHandler() and dieHandler() handles received events.
-// All data is downloaded before the handler is called.
-//
-// Notice that all handlers get a ReceiveEvent object, which
-// contains the eventid. This means that we can use the same handler
-// for multiple events!
-void helloHandler(socket::Facade_ptr facade,
-                  socket::Session_ptr session,
-                  event::Event_ptr event)
+void helloHandler(Facade_ptr facade,
+                  Session_ptr session,
+                  Event_ptr event)
 {
-    boost::lock_guard<boost::mutex> lock(stream_lock);
     typedef boost::shared_ptr<std::string> String_ptr;
     String_ptr data = event->first<String_ptr>(serialize::String);
-    std::cout << "==================================" << std::endl;
-    std::cout << "Hello-event received!" << std::endl;
-    std::cout << "Event id:  " << event->eventid() << std::endl;
-    std::cout << "Data:      " << *data << std::endl;
-    std::cout << "Sender: " << session->getRemoteEndpointAddress() << std::endl;
-    std::cout << "Receiver: " << session->getLocalEndpointAddress() << std::endl;
-    std::cout << "==================================" << std::endl;
+    std::cout << "EventId=" << event->eventid()
+        << "  Data=" << *data << std::endl;
 }
 
 
-void personHandler(socket::Facade_ptr facade,
-                   socket::Session_ptr session,
-                   event::Event_ptr event)
+void personHandler(Facade_ptr facade,
+                   Session_ptr session,
+                   Event_ptr event)
 {
     Person_ptr p = event->first<Person_ptr>(serialize::Boost<Person>());
-    boost::lock_guard<boost::mutex> lock(stream_lock);
-    std::cout << "### Person-event received: "
-        << p->name << ":" << p->age << " ###" << std::endl;
+    std::cout << "Person-event received! "
+        << p->name << ":" << p->age << std::endl;
 }
 
 
-void dieHandler(socket::Facade_ptr facade,
-                socket::Session_ptr session,
-                event::Event_ptr event)
+void dieHandler(Facade_ptr facade,
+                Session_ptr session,
+                Event_ptr event)
 {
-    boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "*** DIE-event received ***" << std::endl;
     facade->service()->stop();
 }
@@ -76,27 +56,33 @@ int main(int argc, const char *argv[])
 {
     if(argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " <ip> <port>" << std::endl;
+        std::cout << "Usage: " << argv[0]
+            << " <ip> <port>" << std::endl;
         return 1;
     }
     std::string host(argv[1]);
     unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
 
-    socket::Facade_ptr facade = socket::Facade::make();
+    Facade_ptr facade = Facade::make();
 
     // Setup the eventhandlers
-    event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
-    eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
-    eventHandlerMap->addEventHandler(PERSON_ID, personHandler);
-    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    HandlerMap_ptr eventHandlerMap = HandlerMap::make();
+    eventHandlerMap->addEventHandler("example::Msg",
+                                     helloHandler);
+    eventHandlerMap->addEventHandler("example::Person",
+                                     personHandler);
+    eventHandlerMap->addEventHandler("example::Die",
+                                     dieHandler);
 
-    // Start 5 worker threads, and use the handler above for incoming events.
-    facade->setWorkerThreads(5, boost::bind(event::simpleAllEventsHandler,
-                                            eventHandlerMap,
-                                            _1, _2, _3));
+    // Start 5 worker threads,
+    // and use the handler above for incoming events.
+    facade->setWorkerThreads(5,
+            boost::bind(simpleAllEventsHandler,
+                        eventHandlerMap,
+                        _1, _2, _3));
 
     // Create a listening socket.
-    socket::Listener_ptr listener1 = facade->listen(socket::Address::make(host, port));
+    Listener_ptr listener1 = facade->listen(Address::make(host, port));
 
     // Wait for all work to finish. In this example this will happen
     // when the dieHandler calls facade->service()->stop().
