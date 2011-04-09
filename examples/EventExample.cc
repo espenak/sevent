@@ -5,20 +5,14 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 #include <boost/ref.hpp>
-#include "sevent/socket.h"
-#include "sevent/socket/Buffer.h"
-//#include "sevent/BoostSerialize.h"
-#include "sevent/EventHandlerMap.h"
-#include "sevent/StringSerializer.h"
+#include "sevent/sevent.h"
 
 
 using namespace sevent;
+using sevent::event::Buffer;
+using sevent::event::Event;
 boost::mutex stream_lock; // Guard the print streams to avoid thread output intertwine
-enum EventIds
-{
-    HELLO_ID = 10,
-    DIE_ID = 20
-};
+typedef boost::shared_ptr<std::string> String_ptr;
 
 
 // helloHandler() and dieHandler() handles received events.
@@ -28,24 +22,21 @@ enum EventIds
 // contains the eventid. This means that we can use the same handler
 // for multiple events!
 void helloHandler(socket::Facade_ptr facade, socket::Session_ptr session,
-                  socket::ReceiveEvent& event)
+                  event::Event_ptr event)
 {
-
-    boost::shared_ptr<std::string> data = event.first<std::string, StringSerializer>();
+    String_ptr msg = event->first<String_ptr>(serialize::String);
     boost::lock_guard<boost::mutex> lock(stream_lock);
-    //socket::BufferBase_ptr buffer = event.datavector->at(0);
-    //boost::shared_ptr<std::string> data = StringSerializer::deserialize(buffer->_serializedData, buffer->_serializedDataSize);
 
     std::cout << "==================================" << std::endl;
     std::cout << "Hello-event received!" << std::endl;
-    std::cout << "Event id:  " << event.eventid() << std::endl;
-    std::cout << "Data:      " << *data << std::endl;
+    std::cout << "Event id:  " << event->eventid() << std::endl;
+    std::cout << "Data:      " << *msg << std::endl;
     std::cout << "==================================" << std::endl;
     facade->service()->stop();
 }
 
 void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
-                socket::ReceiveEvent& event)
+                event::Event_ptr event)
 {
     boost::lock_guard<boost::mutex> lock(stream_lock);
     std::cout << "*** DIE-event received ***" << std::endl;
@@ -59,8 +50,8 @@ int main(int argc, const char *argv[])
 
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
-    eventHandlerMap->addEventHandler(HELLO_ID, helloHandler);
-    eventHandlerMap->addEventHandler(DIE_ID, dieHandler);
+    eventHandlerMap->addEventHandler("sevent::examples::Hello", helloHandler);
+    eventHandlerMap->addEventHandler("sevent::examples::Die", dieHandler);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     // Worker threads poll for IO-events, and ends up running event-handlers
@@ -84,11 +75,16 @@ int main(int argc, const char *argv[])
     socket::Session_ptr session2 = facade->connect(socket::Address::make("127.0.0.1", 9091));
     socket::Session_ptr session3 = facade->connect(socket::Address::make("127.0.0.1", 9092));
 
+    // All data must be deallocated on destruction, and it must have a
+    // serializer. Shared pointers are deallocated on destruction, and we have
+    // a StringSerializer (which does nothing to the string).
+    String_ptr hello = boost::make_shared<std::string>("Hello");
+
     // Lets send a couple of events! Note that the received order is not
     // guaranteed, so we might die before all messages are received!
-    boost::shared_ptr<std::string> hello = boost::shared_ptr<std::string>(new std::string("Hello"));
-    session1->sendEvent(HELLO_ID, socket::Buffer<std::string, StringSerializer>::make(hello));
-    //session2->sendEvent(DIE_ID);
+    session1->sendEvent(Event::make("sevent::examples::Hello",
+                                    Buffer::make(hello, serialize::String)));
+    session2->sendEvent(Event::make("sevent::examples::Die"));
 
     // Always nice to know who you are communicating with..
     {
