@@ -32,3 +32,4 @@
 
 #include "event.h"
 #include "socket.h"
+#include "serialize.h"
