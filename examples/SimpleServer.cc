@@ -1,21 +1,8 @@
-/** A server listening for 3 types of events:
- * - hello(print input)
- * - person(deserialize and print person)
- * - die(stop server)
- */
 #include <iostream>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
 #include <boost/bind.hpp>
-#include <boost/utility.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/ref.hpp>
 #include "sevent/sevent.h"
-#include "sevent/serialize/String.h"
-#include "sevent/serialize/Boost.h"
 #include "SerializablePerson.h"
-
 
 using namespace sevent;
 using namespace sevent::socket;

@@ -1,16 +1,10 @@
 #include <boost/lexical_cast.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread.hpp>
 #include "sevent/sevent.h"
-#include "sevent/serialize/String.h"
-#include "sevent/serialize/Boost.h"
 #include "SerializablePerson.h"
-
 
 using namespace sevent;
 using namespace sevent::socket;
 using namespace sevent::event;
-
 
 int main(int argc, const char *argv[])
 {
