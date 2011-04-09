@@ -48,6 +48,10 @@ namespace sevent
 
         socket::Listener_ptr AsioFacade::listen(socket::Address_ptr address)
         {
+            if(!_allEventsHandler)
+            {
+                std::runtime_error("Can not create a listener without calling setWorkerThreads first.");
+            }
             socket::Listener_ptr listener = boost::make_shared<AsioListener>(_service, _sessionRegistry);
             listener->listen(address);
             saveListener(*address, listener);
