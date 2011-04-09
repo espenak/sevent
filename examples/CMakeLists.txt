@@ -11,4 +11,7 @@ add_sevent_example_executable(EventExample)
 add_sevent_example_executable(SimpleServer)
 add_sevent_example_executable(SimpleClient)
 
+add_sevent_example_executable(HeavyLoadServer)
+add_sevent_example_executable(HeavyLoadClient)
+
 #add_subdirectory(showcase)
