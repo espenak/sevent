@@ -17,8 +17,21 @@ namespace sevent
                 typedef boost::shared_ptr<shared_array_type> shared_array_ptr;
 
             public:
-                static serialize::BaseResult_ptr serialize(boost::any& data);
-                static boost::any deserialize(datastruct::MutableCharArray_ptr serialized);
+                static serialize::BaseResult_ptr serialize(boost::any& data)
+                {
+                    shared_array_ptr a = boost::any_cast<shared_array_ptr>(data);
+                    value_type* arr = a->arr.get();
+                    return serialize::ConstPtrResult::make(reinterpret_cast<const char*>(arr),
+                                                           a->size*sizeof(value_type));
+                }
+
+                static boost::any deserialize(datastruct::MutableCharArray_ptr serialized)
+                {
+                    value_type* data = reinterpret_cast<value_type*>(serialized->data);
+                    shared_array_ptr arr = boost::make_shared<shared_array_type>(boost::shared_array<value_type>(data),
+                                                                                 serialized->size/sizeof(value_type));
+                    return arr;
+                }
         };
 
         extern Pair CharSharedArray;
