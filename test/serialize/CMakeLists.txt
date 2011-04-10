@@ -1,2 +1,5 @@
 add_boost_test(TestStringSerialize TestStringSerialize.cc)
+target_link_libraries(TestStringSerialize sevent)
+
 add_boost_test(TestBoostSerialize TestBoostSerialize.cc)
+target_link_libraries(TestBoostSerialize sevent)

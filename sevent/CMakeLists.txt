@@ -11,8 +11,8 @@ set(sevent_sources
     serialize/Boost.h
     serialize/Pair.h
     serialize/Result.h
-    serialize/SharedArray.h
-    serialize/String.h
+    serialize/SharedArray.cc serialize/SharedArray.h
+    serialize/String.cc serialize/String.h
 
     socket/Address.h socket/Address.cc
     socket/SessionRegistry.cc socket/SessionRegistry.h
