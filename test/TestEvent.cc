@@ -8,6 +8,7 @@
 #include "sevent/datastruct/SharedArray.h"
 
 using namespace sevent;
+using namespace sevent::datastruct;
 
 #ifdef SEVENT_USE_INT_ID
     uint32_t eventid1(1010);
@@ -22,7 +23,7 @@ using namespace sevent;
 
 serialize::BaseResult_ptr serializeUint32SharedArray(boost::any& data)
 {
-    datastruct::Uint32SharedArray_ptr a = boost::any_cast<datastruct::Uint32SharedArray_ptr>(data);
+    Uint32SharedArray_ptr a = boost::any_cast<Uint32SharedArray_ptr>(data);
     for(int i = 0; i < a->size; i++)
     {
         a->arr[i] --;
@@ -31,10 +32,10 @@ serialize::BaseResult_ptr serializeUint32SharedArray(boost::any& data)
                                    a->size*sizeof(uint32_t));
 }
 
-boost::any deserializeUint32SharedArray(datastruct::MutableCharArray_ptr serialized)
+boost::any deserializeUint32SharedArray(MutableCharArray_ptr serialized)
 {
     uint32_t* data = reinterpret_cast<uint32_t*>(serialized->data);
-    datastruct::Uint32SharedArray_ptr arr = boost::make_shared<datastruct::Uint32SharedArray>(boost::shared_array<uint32_t>(data),
+    Uint32SharedArray_ptr arr = boost::make_shared<Uint32SharedArray>(boost::shared_array<uint32_t>(data),
                                                     serialized->size/sizeof(uint32_t));
     return arr;
 }
@@ -51,7 +52,7 @@ serialize::BaseResult_ptr serializeString(boost::any& data)
     return boost::make_shared<serialize::StringResult>(ss.str());
 }
 
-boost::any deserializeString(datastruct::MutableCharArray_ptr serialized)
+boost::any deserializeString(MutableCharArray_ptr serialized)
 {
     String_ptr s = boost::make_shared<std::string>(serialized->data);
     s->insert(0, "De");
@@ -73,7 +74,7 @@ struct EventFixture
         boost::shared_array<uint32_t> intarr = boost::shared_array<uint32_t>(new uint32_t[2]);
         intarr[0] = 10;
         intarr[1] = 20;
-        inputArray = event::Buffer::make(boost::make_shared<datastruct::Uint32SharedArray>(intarr, 2),
+        inputArray = event::Buffer::make(boost::make_shared<Uint32SharedArray>(intarr, 2),
                                          Uint32TestSerializer);
 
         String_ptr instr = boost::make_shared<std::string>();
@@ -94,12 +95,12 @@ BOOST_AUTO_TEST_CASE(TestLowLevelSerialization)
     // Simulate network transfer (copy the serialized data)
     char* receivedData = new char[serialized->size()];
     std::memcpy(receivedData, serialized->data(), serialized->size());
-    datastruct::MutableCharArray_ptr received = boost::make_shared<datastruct::MutableCharArray>(receivedData,
+    MutableCharArray_ptr received = boost::make_shared<MutableCharArray>(receivedData,
                                                                          serialized->size());
 
     // Deserialize the "received data"
     event::Buffer_ptr output = event::Buffer::deserialize(received, Uint32TestSerializer);
-    datastruct::Uint32SharedArray_ptr aOut = output->data<datastruct::Uint32SharedArray_ptr>();
+    Uint32SharedArray_ptr aOut = output->data<Uint32SharedArray_ptr>();
     BOOST_REQUIRE_EQUAL(aOut->arr[0], 9); // The array serializer reduce values by one..
     BOOST_REQUIRE_EQUAL(aOut->arr[1], 19);
     BOOST_REQUIRE_EQUAL(aOut->size, 2);
@@ -111,19 +112,54 @@ BOOST_AUTO_TEST_CASE(TestEvent)
 {
     event::Event_ptr eventIn = event::Event::make(eventid1, inputArray);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
-    datastruct::Uint32SharedArray_ptr aOut = eventIn->first<datastruct::Uint32SharedArray_ptr>(Uint32TestSerializer);
+    Uint32SharedArray_ptr aOut = eventIn->first<Uint32SharedArray_ptr>(Uint32TestSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     BOOST_REQUIRE_EQUAL(aOut->arr[0], 10);
     BOOST_REQUIRE_EQUAL(aOut->arr[1], 20);
     BOOST_REQUIRE_EQUAL(aOut->size, 2);
 }
 
+BOOST_AUTO_TEST_CASE(TestEventPopBack)
+{
+    event::Event_ptr event = event::Event::make(eventid1);
 
-datastruct::MutableCharArray_ptr copyIntoMutArray(serialize::BaseResult_ptr serialized)
+    BOOST_REQUIRE_EQUAL(event->size(), 0);
+    event->push_back(inputArray);
+    BOOST_REQUIRE_EQUAL(event->size(), 1);
+    event->pop_back();
+    BOOST_REQUIRE_EQUAL(event->size(), 0);
+
+    event->push_back(inputArray);
+    event->push_back(inputString);
+    BOOST_REQUIRE_EQUAL(event->size(), 2);
+    event->pop_back();
+    event->pop_back();
+    BOOST_REQUIRE_EQUAL(event->size(), 0);
+
+
+    //Uint32SharedArray_ptr aOut = eventIn->back<Uint32SharedArray_ptr>(Uint32TestSerializer);
+    //BOOST_REQUIRE_EQUAL(aOut->arr[0], 10);
+}
+
+BOOST_AUTO_TEST_CASE(TestEventBack)
+{
+    event::Event_ptr event = event::Event::make(eventid1);
+    event->push_back(inputArray);
+    Uint32SharedArray_ptr aOut = event->back<Uint32SharedArray_ptr>(Uint32TestSerializer);
+    BOOST_REQUIRE_EQUAL(aOut->arr[0], 10);
+
+    event->push_back(inputString);
+    event->push_back(inputArray);
+    aOut = event->back<Uint32SharedArray_ptr>(Uint32TestSerializer);
+    BOOST_REQUIRE_EQUAL(aOut->arr[0], 10);
+}
+
+
+MutableCharArray_ptr copyIntoMutArray(serialize::BaseResult_ptr serialized)
 {
     char* receivedData = new char[serialized->size()];
     std::memcpy(receivedData, serialized->data(), serialized->size());
-    return boost::make_shared<datastruct::MutableCharArray>(receivedData,
+    return boost::make_shared<MutableCharArray>(receivedData,
                                                 serialized->size());
 }
 
@@ -135,7 +171,7 @@ BOOST_AUTO_TEST_CASE(TestEventSerialized)
     BOOST_REQUIRE_EQUAL(serializedString->data(), "Serialized:Hello World");
 
     // Simulate network transfer (copy the serialized data)
-    datastruct::MutableCharArrayVector_ptr serialized = boost::make_shared<datastruct::MutableCharArrayVector>();
+    MutableCharArrayVector_ptr serialized = boost::make_shared<MutableCharArrayVector>();
     serialized->push_back(copyIntoMutArray(serializedArray));
     serialized->push_back(copyIntoMutArray(serializedString));
 
@@ -144,7 +180,7 @@ BOOST_AUTO_TEST_CASE(TestEventSerialized)
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), true);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(1), true);
 
-    datastruct::Uint32SharedArray_ptr aOut = eventIn->first<datastruct::Uint32SharedArray_ptr>(Uint32TestSerializer);
+    Uint32SharedArray_ptr aOut = eventIn->first<Uint32SharedArray_ptr>(Uint32TestSerializer);
     BOOST_REQUIRE_EQUAL(eventIn->isSerialized(0), false);
     BOOST_REQUIRE_EQUAL(aOut->arr[0], 9);  // The array serializer reduce values by one..
     BOOST_REQUIRE_EQUAL(aOut->arr[1], 19);

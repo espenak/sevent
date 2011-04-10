@@ -65,6 +65,12 @@ namespace sevent
                     return at<T>(0, serializer);
                 }
 
+                template<typename T>
+                T back(const serialize::Pair& serializer)
+                {
+                    return at<T>(size()-1, serializer);
+                }
+
                 serialize::BaseResult_ptr serialize_at(int index)
                 {
                     return _buffers.at(index)->serialize();
@@ -75,6 +81,11 @@ namespace sevent
                     boost::lock_guard<boost::mutex> lock(_lock);
                     _buffers.push_back(buffer);
                     _isSerialized.push_back(false);
+                }
+
+                void pop_back()
+                {
+                    _buffers.pop_back();
                 }
 
                 bool isSerialized(int index)
@@ -90,6 +101,11 @@ namespace sevent
                 const eventid_t::value_typeref eventid()
                 {
                     return _eventid.value();
+                }
+
+                void setEventid(eventid_t::value_typeref eventid)
+                {
+                    _eventid = eventid;
                 }
 
                 eventid_t& eventid_object()
