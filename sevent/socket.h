@@ -8,10 +8,6 @@
  * to work with the socket interface. sevent::socket::Facade::make()
  * creates the currently default socket implementation (a subclass of
  * sevent::socket::Facade).
- *
- * \section Example
- *
- * \include SocketExample.cc
  */
 
 
