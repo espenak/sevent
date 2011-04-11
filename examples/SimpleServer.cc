@@ -34,9 +34,9 @@ void uint32ArrayHandler(Facade_ptr facade,
                         Event_ptr event)
 {
     Uint32SharedArray_ptr arrayContainer = event->first<Uint32SharedArray_ptr>(serialize::Uint32SharedArray);
-    boost::shared_array<uint32_t> array = arrayContainer->arr;
+    boost::shared_array<uint32_t> array = arrayContainer->array();
     std::cout << "Shared array-event received! " << std::endl;
-    for(int i = 0; i < arrayContainer->size; i++)
+    for(int i = 0; i < arrayContainer->size(); i++)
     {
         std::cout << "sharedArray[" << i << "] = "
             << array[i] << std::endl;

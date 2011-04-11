@@ -20,9 +20,9 @@ namespace sevent
                 static serialize::BaseResult_ptr serialize(boost::any& data)
                 {
                     shared_array_ptr a = boost::any_cast<shared_array_ptr>(data);
-                    value_type* arr = a->arr.get();
+                    value_type* arr = a->array().get();
                     return serialize::ConstPtrResult::make(reinterpret_cast<const char*>(arr),
-                                                           a->size*sizeof(value_type));
+                                                           a->size()*sizeof(value_type));
                 }
 
                 static boost::any deserialize(datastruct::MutableCharArray_ptr serialized)

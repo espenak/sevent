@@ -12,11 +12,22 @@ namespace sevent
             public:
                 typedef T value_type;
                 typedef boost::shared_array<value_type> value_shared_array;
-                value_shared_array arr;
-                unsigned size;
             public:
-                SharedArray(value_shared_array sharedarr_, unsigned size_) :
-                    arr(sharedarr_), size(size_) {}
+                SharedArray(value_shared_array sharedarr, unsigned size) :
+                    _array(sharedarr), _size(size) {}
+
+                value_shared_array array()
+                {
+                    return _array;
+                }
+
+                unsigned size()
+                {
+                    return _size;
+                }
+            private:
+                value_shared_array _array;
+                unsigned _size;
         };
 
         typedef SharedArray<char> CharSharedArray;
