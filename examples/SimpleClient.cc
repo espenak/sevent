@@ -5,6 +5,7 @@
 using namespace sevent;
 using namespace sevent::socket;
 using namespace sevent::event;
+using namespace sevent::datastruct;
 
 int main(int argc, const char *argv[])
 {
@@ -24,16 +25,24 @@ int main(int argc, const char *argv[])
     typedef boost::shared_ptr<std::string> String_ptr;
     String_ptr hello = boost::make_shared<std::string>("Hello");
     Person_ptr superman = boost::make_shared<Person>("Superman", 39);
+    boost::shared_array<uint32_t> array = boost::shared_array<uint32_t>(new uint32_t[3]);
+    array[0] = 10;
+    array[1] = 20;
+    array[2] = 30;
+    Uint32SharedArray_ptr arrayContainer = boost::make_shared<Uint32SharedArray>(array, 3);
 
     // The events
     Event_ptr helloEvent = Event::make("example::Msg",
                Buffer::make(hello, serialize::String));
     Event_ptr supermanEvent = Event::make("example::Person",
                Buffer::make(superman, serialize::Boost<Person>()));
+    Event_ptr arrayEvent = Event::make("example::Array",
+               Buffer::make(arrayContainer, serialize::Uint32SharedArray));
 
     // Send the events
     facade->sendEvent(session, helloEvent);
     facade->sendEvent(session, supermanEvent);
+    facade->sendEvent(session, arrayEvent);
     facade->sendEvent(session, Event::make("example::Die"));
     return 0;
 }

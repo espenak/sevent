@@ -7,6 +7,7 @@
 using namespace sevent;
 using namespace sevent::socket;
 using namespace sevent::event;
+using namespace sevent::datastruct;
 
 void helloHandler(Facade_ptr facade,
                   Session_ptr session,
@@ -26,6 +27,20 @@ void personHandler(Facade_ptr facade,
     Person_ptr p = event->first<Person_ptr>(serialize::Boost<Person>());
     std::cout << "Person-event received! "
         << p->name << ":" << p->age << std::endl;
+}
+
+void uint32ArrayHandler(Facade_ptr facade,
+                        Session_ptr session,
+                        Event_ptr event)
+{
+    Uint32SharedArray_ptr arrayContainer = event->first<Uint32SharedArray_ptr>(serialize::Uint32SharedArray);
+    boost::shared_array<uint32_t> array = arrayContainer->arr;
+    std::cout << "Shared array-event received! " << std::endl;
+    for(int i = 0; i < arrayContainer->size; i++)
+    {
+        std::cout << "sharedArray[" << i << "] = "
+            << array[i] << std::endl;
+    }
 }
 
 
@@ -58,6 +73,8 @@ int main(int argc, const char *argv[])
                                      helloHandler);
     eventHandlerMap->addEventHandler("example::Person",
                                      personHandler);
+    eventHandlerMap->addEventHandler("example::Array",
+                                     uint32ArrayHandler);
     eventHandlerMap->addEventHandler("example::Die",
                                      dieHandler);
 
