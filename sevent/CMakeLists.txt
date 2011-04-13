@@ -13,6 +13,7 @@ set(sevent_sources
     serialize/Result.h
     serialize/SharedArray.cc serialize/SharedArray.h
     serialize/String.cc serialize/String.h
+    serialize/EndianSafe.cc serialize/EndianSafe.h
 
     socket/Address.h socket/Address.cc
     socket/SessionRegistry.cc socket/SessionRegistry.h

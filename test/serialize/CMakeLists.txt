@@ -3,3 +3,6 @@ target_link_libraries(TestStringSerialize sevent)
 
 add_boost_test(TestBoostSerialize TestBoostSerialize.cc)
 target_link_libraries(TestBoostSerialize sevent)
+
+add_boost_test(TestEndianSafe TestEndianSafe.cc)
+target_link_libraries(TestEndianSafe sevent)
