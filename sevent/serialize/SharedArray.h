@@ -23,6 +23,7 @@ namespace sevent
                     value_type* arr = a->array().get();
                     return serialize::ConstPtrResult::make(reinterpret_cast<const char*>(arr),
                                                            a->size()*sizeof(value_type));
+                    // TODO: append BOM
                 }
 
                 static boost::any deserialize(datastruct::MutableCharArray_ptr serialized)
@@ -30,6 +31,7 @@ namespace sevent
                     value_type* data = reinterpret_cast<value_type*>(serialized->data);
                     shared_array_ptr arr = boost::make_shared<shared_array_type>(boost::shared_array<value_type>(data),
                                                                                  serialized->size/sizeof(value_type));
+                    // TODO: remove BOM
                     return arr;
                 }
         };
