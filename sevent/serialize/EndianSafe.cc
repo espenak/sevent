@@ -11,8 +11,10 @@ namespace sevent
         {
 #ifdef BOOST_LITTLE_ENDIAN
             return SEVENT_LITTLE_ENDIAN;
-#elif BOOST_BIG_ENDIAN
+#elif defined BOOST_BIG_ENDIAN
             return SEVENT_BIG_ENDIAN;
+#elif defined BOOST_PDP_ENDIAN
+#error "PDP endian."
 #else
 #error "Unsupported endianess detected."
 #endif
