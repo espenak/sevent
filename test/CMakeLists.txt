@@ -13,5 +13,8 @@ endfunction(add_boost_test)
 #add_boost_test(TestBoostSerialize TestBoostSerialize.cc)
 add_boost_test(TestEvent TestEvent.cc)
 
+add_boost_test(TestExample TestExample.cc)
+target_link_libraries(TestExample sevent)
+
 add_subdirectory(socket)
 add_subdirectory(serialize)
