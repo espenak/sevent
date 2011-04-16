@@ -11,59 +11,51 @@ using namespace sevent::datastruct;
 
 void helloHandler(Facade_ptr facade,
                   Session_ptr session,
-                  Event_ptr event)
-{
+                  Event_ptr event) {
     typedef boost::shared_ptr<std::string> String_ptr;
-    String_ptr data = event->first<String_ptr>(serialize::String);
+    String_ptr data = event->first<String_ptr>(
+                            serialize::String);
     std::cout << "EventId=" << event->eventid()
         << "  Data=" << *data << std::endl;
 }
 
-
 void personHandler(Facade_ptr facade,
                    Session_ptr session,
-                   Event_ptr event)
-{
-    Person_ptr p = event->first<Person_ptr>(serialize::Boost<Person>());
+                   Event_ptr event) {
+    Person_ptr p = event->first<Person_ptr>(
+                            serialize::Boost<Person>());
     std::cout << "Person-event received! "
         << p->name << ":" << p->age << std::endl;
 }
 
 void uint32ArrayHandler(Facade_ptr facade,
                         Session_ptr session,
-                        Event_ptr event)
-{
+                        Event_ptr event) {
     Uint32SharedArray_ptr arrayContainer = event->first<Uint32SharedArray_ptr>(serialize::Uint32SharedArray);
     boost::shared_array<uint32_t> array = arrayContainer->array();
     std::cout << "Shared array-event received! " << std::endl;
-    for(int i = 0; i < arrayContainer->size(); i++)
-    {
+    for(int i = 0; i < arrayContainer->size(); i++) {
         std::cout << "sharedArray[" << i << "] = "
             << array[i] << std::endl;
     }
 }
 
-
 void dieHandler(Facade_ptr facade,
                 Session_ptr session,
-                Event_ptr event)
-{
+                Event_ptr event) {
     std::cout << "*** DIE-event received ***" << std::endl;
     facade->service()->stop();
 }
 
-
-
-int main(int argc, const char *argv[])
-{
-    if(argc < 3)
-    {
+int main(int argc, const char *argv[]) {
+    if(argc < 3) {
         std::cout << "Usage: " << argv[0]
             << " <ip> <port>" << std::endl;
         return 1;
     }
     std::string host(argv[1]);
-    unsigned short port = boost::lexical_cast<unsigned short>(argv[2]);
+    unsigned short port = boost::lexical_cast<unsigned short>(
+                                                    argv[2]);
 
     Facade_ptr facade = Facade::make();
 
@@ -86,10 +78,11 @@ int main(int argc, const char *argv[])
                         _1, _2, _3));
 
     // Create a listening socket.
-    Listener_ptr listener1 = facade->listen(Address::make(host, port));
+    facade->listen(Address::make(host, port));
 
-    // Wait for all work to finish. In this example this will happen
-    // when the dieHandler calls facade->service()->stop().
+    // Wait for all work to finish. In this example this will
+    // happen when the dieHandler calls
+    // facade->service()->stop().
     facade->joinAllWorkerThreads();
 
     return 0;
