@@ -45,7 +45,7 @@ namespace sevent
             public:
                 StringResult(const std::string& data) : _data(data) {}
                 const char* data() const { return _data.c_str(); }
-                unsigned size() const { return _data.size(); }
+                unsigned size() const { return _data.size()+1; }
             private:
                 std::string _data;
 
