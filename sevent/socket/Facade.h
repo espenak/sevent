@@ -85,6 +85,7 @@ namespace sevent
 
                 virtual void sendEvent(Session_ptr session,
                                        event::Event_ptr event) = 0;
+                void sendEvent(Address_ptr address, event::Event_ptr event);
                 virtual void invokeAllEventsHandler(Session_ptr session,
                                                     event::Event_ptr event) = 0;
 
@@ -97,7 +98,6 @@ namespace sevent
 
             private:
                 std::map<Address, Listener_ptr> _listeners;
-
         };
     }
 }

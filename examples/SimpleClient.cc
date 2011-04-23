@@ -8,18 +8,15 @@ using namespace sevent::event;
 using namespace sevent::datastruct;
 
 int main(int argc, const char *argv[]) {
-    if(argc < 3) {
+    if(argc != 2) {
         std::cout << "Usage: " << argv[0]
-            << " <server-ip> <server-port>" << std::endl;
+            << " <server-addr>" << std::endl;
         return 1;
     }
-    std::string host(argv[1]);
-    unsigned short port = boost::lexical_cast<unsigned short>(
-                                                argv[2]);
+    std::string serverAddr(argv[1]);
 
     Facade_ptr facade = Facade::make();
-    Session_ptr session = facade->connect(Address::make(host,
-                                                port));
+    Session_ptr session = facade->connect(Address::make(serverAddr));
 
     // Event data
     typedef boost::shared_ptr<std::string> String_ptr;
@@ -48,6 +45,7 @@ int main(int argc, const char *argv[]) {
     facade->sendEvent(session, helloEvent);
     facade->sendEvent(session, supermanEvent);
     facade->sendEvent(session, arrayEvent);
+    facade->sendEvent(Address::make(serverAddr), helloEvent);
     facade->sendEvent(session, Event::make("example::Die"));
     return 0;
 }

@@ -48,14 +48,12 @@ void dieHandler(Facade_ptr facade,
 }
 
 int main(int argc, const char *argv[]) {
-    if(argc < 3) {
+    if(argc != 2) {
         std::cout << "Usage: " << argv[0]
-            << " <ip> <port>" << std::endl;
+            << " <address>" << std::endl;
         return 1;
     }
-    std::string host(argv[1]);
-    unsigned short port = boost::lexical_cast<unsigned short>(
-                                                    argv[2]);
+    std::string address(argv[1]);
 
     Facade_ptr facade = Facade::make();
 
@@ -78,7 +76,7 @@ int main(int argc, const char *argv[]) {
                         _1, _2, _3));
 
     // Create a listening socket.
-    facade->listen(Address::make(host, port));
+    facade->listen(Address::make(address));
 
     // Wait for all work to finish. In this example this will
     // happen when the dieHandler calls

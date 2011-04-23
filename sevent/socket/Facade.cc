@@ -27,5 +27,11 @@ namespace sevent
         {
             _listeners[address] = listener;
         }
+
+        void Facade::sendEvent(Address_ptr address, event::Event_ptr event)
+        {
+            Session_ptr session = connect(address);
+            sendEvent(session, event);
+        }
     }
 }
