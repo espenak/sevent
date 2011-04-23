@@ -29,11 +29,13 @@ namespace sevent
         class Address
         {
             public:
+                static Address_ptr make(const std::string& address);
                 static Address_ptr make(const std::string& host,
                                         unsigned short port);
 
             public:
                 Address();
+                Address(const std::string& address);
                 Address(const std::string& host, unsigned short port);
                 virtual ~Address();
                 const std::string& host() const;

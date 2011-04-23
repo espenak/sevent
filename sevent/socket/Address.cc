@@ -1,5 +1,7 @@
 #include "Address.h"
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <vector>
 
 namespace sevent
 {
@@ -9,14 +11,24 @@ namespace sevent
         {}
 
         Address::Address(const std::string& host, unsigned short port) :
-            _host(host), _port(port)
+            _host(host), _port(port) {}
+
+        Address::Address(const std::string& address)
         {
+            std::vector<std::string> addrSplit;
+            boost::split(addrSplit, address,
+                         boost::is_any_of(":"),
+                         boost::token_compress_on);
+            _host = addrSplit[0];
+            _port = boost::lexical_cast<unsigned short>(addrSplit[1]);
         }
 
-        Address::~Address()
-        {
-        }
+        Address::~Address() {}
 
+        Address_ptr Address::make(const std::string& address)
+        {
+            return Address_ptr(new Address(address));
+        }
         Address_ptr Address::make(const std::string& host, unsigned short port)
         {
             return Address_ptr(new Address(host, port));
