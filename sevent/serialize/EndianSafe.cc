@@ -7,14 +7,14 @@ namespace sevent
     {
 
         /** Get the current endianess. */
-        inline Endianess myEndianess()
+        Endianess myEndianess()
         {
 #ifdef BOOST_LITTLE_ENDIAN
             return SEVENT_LITTLE_ENDIAN;
 #elif defined BOOST_BIG_ENDIAN
             return SEVENT_BIG_ENDIAN;
-#elif defined BOOST_PDP_ENDIAN
-#error "PDP endian."
+//#elif defined BOOST_PDP_ENDIAN
+            //return SEVENT_MIDDLE_ENDIAN;
 #else
 #error "Unsupported endianess detected."
 #endif

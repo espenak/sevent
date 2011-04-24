@@ -12,10 +12,10 @@ namespace sevent
         };
 
         /** Get the current endianess. */
-        inline Endianess myEndianess();
+        Endianess myEndianess();
 
-        //template<typename T> T endianSwapUint32(T num);
-        template<typename T> T endianSwapUint32(T num)
+        //template<typename T> T endianSwap(T num);
+        template<typename T> T endianSwap(T num)
         {
             // http://stackoverflow.com/questions/1826159/swapping-two-variable-value-without-using-3rd-variable
             T result;

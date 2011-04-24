@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(TestEndianSafeSanity)
 {
     // 0x 00 00 00 02
     // 0x 02 00 00 00
-    BOOST_REQUIRE_EQUAL(endianSwapUint32<uint32_t>(0x2), 0x2000000);
+    BOOST_REQUIRE_EQUAL(endianSwap<uint32_t>(0x2), 0x2000000);
 
-    BOOST_REQUIRE_EQUAL(endianSwapUint32<uint16_t>(0x2), 0x200);
+    BOOST_REQUIRE_EQUAL(endianSwap<uint16_t>(0x2), 0x200);
 }

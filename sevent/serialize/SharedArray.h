@@ -3,6 +3,7 @@
 #include "Result.h"
 #include "Pair.h"
 #include "sevent/datastruct/SharedArray.h"
+#include "EndianSafe.h"
 
 namespace sevent
 {
@@ -21,17 +22,30 @@ namespace sevent
                 {
                     shared_array_ptr a = boost::any_cast<shared_array_ptr>(data);
                     value_type* arr = a->array().get();
-                    return serialize::ConstPtrResult::make(reinterpret_cast<const char*>(arr),
-                                                           a->size()*sizeof(value_type));
-                    // TODO: append BOM
+                    unsigned size = a->size() * sizeof(value_type);
+                    char* withEnd = new char[size + 1];  // Plus 1 for endianess
+                    memcpy(withEnd, arr, size);
+                    withEnd[size] = myEndianess();
+                    return serialize::ConstPtrResult::make(
+                                reinterpret_cast<const char*>(withEnd),
+                                size + 1);
                 }
 
                 static boost::any deserialize(datastruct::MutableCharArray_ptr serialized)
                 {
                     value_type* data = reinterpret_cast<value_type*>(serialized->data);
-                    shared_array_ptr arr = boost::make_shared<shared_array_type>(boost::shared_array<value_type>(data),
-                                                                                 serialized->size/sizeof(value_type));
-                    // TODO: remove BOM
+                    unsigned size = (serialized->size-1)/sizeof(value_type); // Minus 1 for endianess
+                    shared_array_ptr arr = boost::make_shared<shared_array_type>(
+                                                boost::shared_array<value_type>(data),
+                                                size);
+                    Endianess endianess = static_cast<Endianess>(serialized->data[serialized->size-1]);
+                    if(endianess != myEndianess())
+                    {
+                        for(int i = 0; i < size; i++)
+                        {
+                            data[i] = endianSwap<value_type>(data[i]);
+                        }
+                    }
                     return arr;
                 }
         };
