@@ -38,3 +38,15 @@ set(sevent_sources
 add_library(sevent STATIC ${sevent_sources})
 target_link_libraries(sevent ${Boost_LIBRARIES})
 set_target_properties(sevent PROPERTIES COMPILE_FLAGS -fPIC)
+
+add_library(sevent-shared SHARED ${sevent_sources})
+target_link_libraries(sevent-shared ${Boost_LIBRARIES})
+set_target_properties(sevent-shared PROPERTIES COMPILE_FLAGS -fPIC)
+
+install(
+    TARGETS sevent-shared
+    LIBRARY DESTINATION lib)
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h")
