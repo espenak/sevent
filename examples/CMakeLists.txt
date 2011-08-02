@@ -8,6 +8,8 @@ function(add_sevent_example_executable execname)
 endfunction(add_sevent_example_executable)
 
 add_sevent_example_executable(EventExample)
+add_sevent_example_executable(BugExampleClient)
+add_sevent_example_executable(BugExampleServer)
 add_sevent_example_executable(SimpleServer)
 add_sevent_example_executable(SimpleClient)
 
