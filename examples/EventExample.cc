@@ -44,6 +44,36 @@ void dieHandler(socket::Facade_ptr facade, socket::Session_ptr session,
     facade->service()->stop();
 }
 
+void msgAckHandler(socket::Facade_ptr facade, socket::Session_ptr session,
+                   event::Event_ptr event)
+{
+    boost::lock_guard<boost::mutex> lock(stream_lock);
+    std::cout << "*** MSG-AKC-event received ***" << std::endl;
+}
+
+
+class ConversationChain
+{
+    public:
+        static void onFirst(socket::Facade_ptr facade, socket::Session_ptr session,
+                            event::Event_ptr event)
+        {
+            { // We have to make sure the lock is released before sending the ack, since the same lock is used in the ack handler.
+                boost::lock_guard<boost::mutex> lock(stream_lock);
+                std::cout << "*** FIRST-event received ***" << std::endl;
+            }
+            facade->sendEvent(session, Event::make("sevent::examples::chain::1"));
+        }
+
+        static void onFirstAck(socket::Facade_ptr facade, socket::Session_ptr session,
+                               event::Event_ptr event)
+        {
+            {
+                boost::lock_guard<boost::mutex> lock(stream_lock);
+                std::cout << "*** FIRST-AKC-event received ***" << std::endl;
+            }
+        }
+};
 
 int main(int argc, const char *argv[])
 {
@@ -53,7 +83,14 @@ int main(int argc, const char *argv[])
     // Setup the eventhandlers
     event::HandlerMap_ptr eventHandlerMap = event::HandlerMap::make();
     eventHandlerMap->addEventHandler("sevent::examples::Msg", msgHandler);
+    //eventHandlerMap->addEventHandler("sevent::examples::chain.first", ConversationChain::onFirst);
+    //eventHandlerMap->addEventHandler("sevent::examples::chain.firstAck", ConversationChain::onFirstAck);
     eventHandlerMap->addEventHandler("sevent::examples::Die", dieHandler);
+
+    event::Chain_ptr chain = event::Chain::make(eventHandlerMap,
+                                                "sevent::examples::chain::");
+    chain->add(ConversationChain::onFirst);
+    chain->add(ConversationChain::onFirstAck);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     // Worker threads poll for IO-events, and ends up running event-handlers
@@ -96,12 +133,13 @@ int main(int argc, const char *argv[])
                                               Buffer::make(world, serialize::String));
     facade->sendEvent(session1, helloEvent);
     facade->sendEvent(session4, worldEvent);
+    facade->sendEvent(session1, Event::make("sevent::examples::chain::0"));
 
-    // Not that facade->sendEvent is a shortcut for:
+    // Note that facade->sendEvent is a shortcut for:
     if(facade->isLocalSession(session1)) {
-        session1->sendEvent(helloEvent); // Serialize message, and send it via the session (socket communication)
-    } else {
         facade->invokeAllEventsHandler(session1, helloEvent); // Invoke handler directly
+    } else {
+        session1->sendEvent(helloEvent); // Serialize message, and send it via the session (socket communication)
     }
 
     // Send the die event, which will invoke the dieHandler and kill the
