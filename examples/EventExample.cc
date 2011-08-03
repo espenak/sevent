@@ -62,7 +62,7 @@ class ConversationChain
                 boost::lock_guard<boost::mutex> lock(stream_lock);
                 std::cout << "*** FIRST-event received ***" << std::endl;
             }
-            facade->sendEvent(session, Event::make("sevent::examples::chain::1"));
+            facade->sendEvent(session, Event::make("sevent::examples::chain::1")); // TODO: make this easier
         }
 
         static void onFirstAck(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -72,6 +72,14 @@ class ConversationChain
                 boost::lock_guard<boost::mutex> lock(stream_lock);
                 std::cout << "*** FIRST-AKC-event received ***" << std::endl;
             }
+            facade->sendEvent(session, Event::make("sevent::examples::chain::2"));
+        }
+
+        static void onFirstAckAck(socket::Facade_ptr facade, socket::Session_ptr session,
+                                  event::Event_ptr event)
+        {
+            boost::lock_guard<boost::mutex> lock(stream_lock);
+            std::cout << "*** FIRST-AKC-ACK-event received ***" << std::endl;
         }
 };
 
@@ -91,6 +99,7 @@ int main(int argc, const char *argv[])
                                                 "sevent::examples::chain::");
     chain->add(ConversationChain::onFirst);
     chain->add(ConversationChain::onFirstAck);
+    chain->add(ConversationChain::onFirstAckAck);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     // Worker threads poll for IO-events, and ends up running event-handlers
