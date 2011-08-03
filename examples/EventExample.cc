@@ -62,7 +62,7 @@ class ConversationChain
                 boost::lock_guard<boost::mutex> lock(stream_lock);
                 std::cout << "*** FIRST-event received ***" << std::endl;
             }
-            facade->sendEvent(session, Event::make("sevent::examples::chain::1")); // TODO: make this easier
+            facade->sendEvent(session, Event::make(event::Chain::nextEventId(event)));
         }
 
         static void onFirstAck(socket::Facade_ptr facade, socket::Session_ptr session,
@@ -72,14 +72,25 @@ class ConversationChain
                 boost::lock_guard<boost::mutex> lock(stream_lock);
                 std::cout << "*** FIRST-AKC-event received ***" << std::endl;
             }
-            facade->sendEvent(session, Event::make("sevent::examples::chain::2"));
+            facade->sendEvent(session, Event::make(event::Chain::nextEventId(event)));
         }
+
 
         static void onFirstAckAck(socket::Facade_ptr facade, socket::Session_ptr session,
                                   event::Event_ptr event)
         {
+            {
+                boost::lock_guard<boost::mutex> lock(stream_lock);
+                std::cout << "*** FIRST-AKC-ACK-event received ***" << std::endl;
+            }
+            facade->sendEvent(session, Event::make(event::Chain::nextEventId(event)));
+        }
+
+        static void onFirstAckAckAck(socket::Facade_ptr facade, socket::Session_ptr session,
+                                  event::Event_ptr event)
+        {
             boost::lock_guard<boost::mutex> lock(stream_lock);
-            std::cout << "*** FIRST-AKC-ACK-event received ***" << std::endl;
+            std::cout << "*** FIRST-AKC-ACK-ACK-event received ***" << std::endl;
         }
 };
 
@@ -100,6 +111,7 @@ int main(int argc, const char *argv[])
     chain->add(ConversationChain::onFirst);
     chain->add(ConversationChain::onFirstAck);
     chain->add(ConversationChain::onFirstAckAck);
+    chain->add(ConversationChain::onFirstAckAckAck);
 
     // Start 5 worker threads, and use the handler above for incoming events.
     // Worker threads poll for IO-events, and ends up running event-handlers
@@ -142,7 +154,7 @@ int main(int argc, const char *argv[])
                                               Buffer::make(world, serialize::String));
     facade->sendEvent(session1, helloEvent);
     facade->sendEvent(session4, worldEvent);
-    facade->sendEvent(session1, Event::make("sevent::examples::chain::0"));
+    facade->sendEvent(session1, Event::make("sevent::examples::chain::000"));
 
     // Note that facade->sendEvent is a shortcut for:
     if(facade->isLocalSession(session1)) {
