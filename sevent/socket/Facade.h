@@ -83,13 +83,36 @@ namespace sevent
                  * Service. */
                 virtual void joinAllWorkerThreads() = 0;
 
+                /** Send an event using the given session, using local transfer
+                 * if the session was created with this facade.
+                 *
+                 * Shortcut for:
+                 * \code
+                 * if(facade->isLocalSession(session)) {
+                 *     facade->invokeAllEventsHandler(session, event); // Invoke handler directly
+                 * } else {
+                 *     session->sendEvent(event); // Serialize message, and send it via the session (socket communication)
+                 * }
+                 * \endcode
+                 * */
                 virtual void sendEvent(Session_ptr session,
                                        event::Event_ptr event) = 0;
+
+                /** Create session with the server at the given address, and
+                 * send the given event via the newly created session. */
                 void sendEvent(Address_ptr address, event::Event_ptr event);
+
+                /** Send the given event directly to the all-events-handler in
+                 * this facade. */
                 virtual void invokeAllEventsHandler(Session_ptr session,
                                                     event::Event_ptr event) = 0;
 
                 void removeListener(const Address& address);
+
+                /** Check if the given session is a local session.
+                 *
+                 * @return true of it is a local session.
+                 */
                 bool isLocalSession(Session_ptr session);
 
             protected:
