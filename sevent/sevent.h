@@ -10,9 +10,11 @@
  * implementation (sevent::asiosocket). On top of that it has a couple of
  * utilities making common tasks easier:
  *  - sevent::event
- *  - sevent::boostserialize
- *  - sevent::endiansafe
+ *  - sevent::serialize
  * 
+ * \section sourcecode Source code
+ *
+ * The source code is available <a href="http://espenak.github.com/sevent/">here</a>.
  *
  * \section simpleexample Simple example
  *
