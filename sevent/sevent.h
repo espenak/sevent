@@ -14,7 +14,7 @@
  * 
  * \section sourcecode Source code
  *
- * The source code is available <a href="http://espenak.github.com/sevent/">here</a>.
+ * The source code is available <a href="https://github.com/espenak/sevent">here</a>.
  *
  * \section simpleexample Simple example
  *
