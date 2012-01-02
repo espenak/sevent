@@ -2,7 +2,7 @@
 
 TARFILE=/tmp/sevent-docs.tar
 doxygen
-tar -C docs/html/ -czf $TARFILE .
+tar -C doc/html/ -czf $TARFILE .
 git checkout gh-pages
 rm -r *
 tar -xvf $TARFILE
